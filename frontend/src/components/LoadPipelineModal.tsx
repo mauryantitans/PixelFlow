@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, FolderOpen, Users, Lock, Calendar, Layers, Trash2, Edit2, Copy, Eye, EyeOff } from 'lucide-react';
+import { X, FolderOpen, Users, Lock, Calendar, Layers, Trash2, Copy, Eye, EyeOff } from 'lucide-react';
 import { pipelineService } from '../services/auth';
 import { SavedPipeline } from '../types';
 
@@ -25,6 +25,9 @@ export const LoadPipelineModal: React.FC<LoadPipelineModalProps> = ({
     if (isOpen) {
       loadPipelines();
     }
+    // Intentionally runs only when the dialog opens/changes; listing the
+    // loader (re-created every render) would re-run it on every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, activeTab]);
 
   const loadPipelines = async () => {

@@ -29,6 +29,9 @@ export const ImageAnalytics: React.FC<ImageAnalyticsProps> = ({
     if (isOpen && imageUrl) {
       loadAnalytics();
     }
+    // Intentionally runs only when the dialog opens/changes; listing the
+    // loader (re-created every render) would re-run it on every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, imageUrl]);
 
   const loadAnalytics = async () => {

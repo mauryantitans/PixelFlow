@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Zap, Image as ImageIcon, Layers, Lock, Users, Github, ArrowRight, CheckCircle,
+  Image as ImageIcon, Layers, Lock, Github, ArrowRight, CheckCircle,
   Upload, Settings, Download, Eye, Sparkles, Clock
 } from 'lucide-react';
 import { Header } from './Header';

@@ -65,6 +65,9 @@ export const GoogleSignIn: React.FC<GoogleSignInProps> = ({ onSuccess, onError }
       // Cleanup
       return () => clearInterval(checkGoogle);
     }
+    // Initialise Google Sign-In once on mount; the callback only uses stable
+    // setters/navigate, so re-running on every render is not wanted.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleCredentialResponse = async (response: any) => {

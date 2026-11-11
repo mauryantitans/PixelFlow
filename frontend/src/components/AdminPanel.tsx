@@ -53,6 +53,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
       setPin('');
       setSelectedUser(null);
     }
+    // Intentionally runs only when the dialog opens/changes; listing the
+    // loader (re-created every render) would re-run it on every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   const loadData = async () => {
