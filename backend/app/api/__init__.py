@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Response
-from .routes import images_db, processing_db, auth, oauth, pipelines, admin
+
+from ..core.config import settings
+from .routes import admin, auth, images_db, oauth, pipelines, processing_db
 
 api_router = APIRouter()
 
@@ -44,7 +46,7 @@ api_router.include_router(
 async def root():
     return {
         "message": "PixelFlow API",
-        "version": "1.0.0",
+        "version": settings.VERSION,
         "status": "running"
     }
 

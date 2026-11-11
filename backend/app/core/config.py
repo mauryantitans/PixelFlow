@@ -15,7 +15,7 @@ _DEFAULT_SECRET = "your-secret-key-change-in-production"
 class Settings:
     # App settings
     APP_NAME: str = os.environ.get("APP_NAME", "PixelFlow")
-    VERSION: str = os.environ.get("VERSION", "1.2.0")
+    VERSION: str = os.environ.get("VERSION", "1.3.0")
     DEBUG: bool = os.environ.get("DEBUG", "False").lower() == "true"
 
     # File storage settings
