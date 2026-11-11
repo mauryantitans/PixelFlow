@@ -2,7 +2,7 @@
 
 ## Visual Image Processing Pipeline Builder
 
-**Version 1.2.0** | [V1.0.0 on GitHub](https://github.com/Mauryantitans/PixelFlow/tree/v1.0.0) | [Changelog](CHANGELOG.md)
+**Version 1.3.0** | [V1.0.0 on GitHub](https://github.com/Mauryantitans/PixelFlow/tree/v1.0.0) | [Changelog](CHANGELOG.md)
 
 ---
 
@@ -60,20 +60,18 @@ admin features locally, create your own admin account — see [Quick Start](#-qu
 
 ---
 
-## 🆕 What's New in 1.2.0 — Dynamic Pipeline Engine
+## 🆕 What's New in 1.3.0 — Sessions, security and accessibility
 
-**Major Features:**
-- ✅ **Schema-driven operation registry** - operations are declared once in the backend; the UI renders every control dynamically from the API (no duplicated frontend configs)
-- ✅ **77 operations** - up from ~53, including fixed Watershed/Denoise Wavelet and ~22 new stylize/photo/segmentation techniques
-- ✅ **Typed + interactive parameters** - scalars, enums, booleans, angles, colors, and image-coordinate inputs you pick directly on the preview (click a point, drag a region, eyedropper a color)
-- ✅ **Incremental live preview** - a prefix cache recomputes only the steps after your edit; superseded requests are cancelled
-- ✅ **Step-by-step comparison** - before/after wipe slider, any-two-step side-by-side, and a diff/overlay view
-- ✅ **Tested codebase + CI** - pytest (~64) + GitHub Actions (ruff/mypy/pytest) + pre-commit; FastAPI bumped to 0.115
-- ✅ **Docker** - full-stack `docker-compose` for local dev
+- ✅ **WCAG 2.1 AA** — keyboard access, screen-reader announcements, focus management, contrast, reflow down to 320px; audit reports in [a11y-reports/](a11y-reports/REPORT.md)
+- ✅ **Mobile-friendly layout** — the workspace works on phones and small windows
+- ✅ **Automatic cleanup** — the server deletes data past the retention periods every 15 minutes (switchable in Admin → Retention)
+- ✅ **Sessions you can trust** — sliding expiry from real activity, never shared between accounts; signing back in restores your work
+- ✅ **Stay signed in** — tokens refresh in the background instead of silently dropping you to guest after 30 minutes
+- ✅ **Admin PIN enforced by the server**, with a lockout after 5 wrong PINs
+- ✅ **Connection badge** — the header shows whether the backend is reachable (`GET /api/health`), replacing the old heartbeat
+- ✅ **Workflow fixes** — partial uploads, TIFF previews, Stop-then-Apply in batch mode, stale previews, picking on the right image, pipeline kept on reload
 
-See [CHANGELOG.md](CHANGELOG.md) for the complete list of changes.
-
-> Previous (1.1.0): PostgreSQL persistence, JWT + Google OAuth authentication, admin panel, session management, and pipeline saving.
+See [CHANGELOG.md](CHANGELOG.md) for details and earlier releases (1.2.0: schema-driven registry and 77 operations; 1.1.0: PostgreSQL, accounts, admin panel).
 
 ---
 
@@ -109,14 +107,14 @@ See [CHANGELOG.md](CHANGELOG.md) for the complete list of changes.
 
 ### Advanced Features
 
-- **User Authentication**: Secure JWT-based login with Google OAuth integration
+- **User Authentication**: JWT in httpOnly cookies with CSRF protection, plus optional Google sign-in
 - **Admin Panel**: User management, session tracking, quota administration, and database tools
 - **Database Storage**: PostgreSQL support with SQLAlchemy ORM for data persistence
-- **Session Management**: Heartbeat-based tracking (active = last 5 minutes)
+- **Session Management**: Activity-based sessions with sliding expiry and automatic cleanup
 - **Pipeline Saving**: Save, load, and manage your processing pipelines
 - **Performance Analytics**: Millisecond-precision timing for every operation
 - **Undo/Redo System**: Complete operation history (Ctrl+Z/Ctrl+Y)
-- **Modern Interface**: Dark/light theme support with professional design
+- **Accessible, responsive interface**: WCAG 2.1 AA, dark/light themes, works down to 320px wide
 - **Tested + CI**: pytest suite, GitHub Actions (ruff/mypy/pytest), and pre-commit hooks
 
 ### Developer Tools
@@ -140,8 +138,8 @@ See [CHANGELOG.md](CHANGELOG.md) for the complete list of changes.
 │ • Tailwind CSS      │    │ • OpenCV               │    │ • Image storage     │
 │ • Custom Hooks      │    │ • Scikit-Image         │    │ • Session tracking  │
 │ • State Management  │    │ • SQLAlchemy           │    │ • Pipeline storage  │
-│ • JWT Auth          │    │ • Google OAuth         │    │ • Audit logs        │
-│                     │    │ • Heartbeat System     │    │                     │
+│ • Cookie auth       │    │ • Google OAuth         │    │ • Audit logs        │
+│                     │    │ • Cleanup scheduler    │    │                     │
 └─────────────────────┘    └────────────────────────┘    └─────────────────────┘
 ```
 
@@ -181,90 +179,20 @@ See [CHANGELOG.md](CHANGELOG.md) for the complete list of changes.
 
 ## 🚀 Quick Start
 
-### Prerequisites
+Fastest path (SQLite, hot reload, both servers):
 
-- Python 3.11 or higher
-- Node.js 16 or higher
-- PostgreSQL (for production) or SQLite (for development)
+```bash
+git clone https://github.com/MauryanTitans/pixelflow.git
+cd pixelflow
+./start.sh          # Windows: start.bat
+```
 
-### Local Development Setup
+Or the full stack with PostgreSQL: `docker compose up`.
 
-1. **Clone Repository**
-   ```bash
-   git clone https://github.com/MauryanTitans/pixelflow.git
-   cd pixelflow
-   ```
+- App: http://localhost:3000 · API docs: http://localhost:8000/docs · Health: http://localhost:8000/api/health
+- **Admin account:** set `ADMIN_EMAIL` and `ADMIN_PASSWORD` in `backend/.env` before starting; the first admin is created automatically. There are no default credentials.
 
-2. **Backend Setup**
-   ```bash
-   cd backend
-   
-   # Create virtual environment
-   python -m venv env
-   
-   # Activate virtual environment
-   # Windows:
-   .\env\Scripts\activate
-   # macOS/Linux:
-   source env/bin/activate
-   
-   # Install dependencies
-   pip install -r requirements.txt
-   
-   # Create .env file from example
-   cp .env.example .env
-   # Edit .env and add your configuration
-   
-   # Initialize database
-   python database/init_db.py
-   
-   # Start backend server
-   python run.py
-   ```
-
-3. **Frontend Setup**
-   ```bash
-   # In a new terminal
-   cd frontend
-   
-   # Install dependencies
-   npm install
-   
-   # Create .env file
-   # Add: REACT_APP_API_URL=http://localhost:8000/api
-   
-   # Start development server
-   npm start
-   ```
-
-4. **Access Application**
-   - Frontend: http://localhost:3000
-   - API Docs: http://localhost:8000/docs
-   - Health Check: http://localhost:8000/health
-
-5. **Create Admin Account (Local Development)**
-   
-   After your backend starts, you can create an admin user in two ways:
-   
-   **Option A: Environment Variables (Automatic)**
-   ```bash
-   # Add to backend/.env file:
-   ADMIN_EMAIL=your.email@example.com
-   ADMIN_PASSWORD=YourStrongPassword
-   ADMIN_USERNAME=admin
-   ADMIN_FULL_NAME=Your Name
-   
-   # Restart backend - admin will be auto-created if none exists
-   ```
-   
-   **Option B: Database Script**
-   ```bash
-   cd backend
-   python database/list_users.py  # Find your user ID after registering
-   # Then manually update is_admin=true in database
-   ```
-
-For detailed setup instructions, see [INSTALLATION.md](INSTALLATION.md)
+Manual setup, prerequisites and troubleshooting: [INSTALLATION.md](INSTALLATION.md).
 
 ---
 
@@ -272,63 +200,16 @@ For detailed setup instructions, see [INSTALLATION.md](INSTALLATION.md)
 
 ```
 pixelflow/
-├── backend/                    # FastAPI backend
-│   ├── app/
-│   │   ├── api/               # API routes and endpoints
-│   │   │   └── routes/        # Auth, admin, images, processing, OAuth
-│   │   ├── core/              # Configuration and security
-│   │   ├── models/            # Database models and schemas
-│   │   ├── middleware/        # Rate limiting, security headers
-│   │   └── utils/             # Processing, auth, cleanup utilities
-│   ├── database/              # Database scripts and utilities
-│   │   ├── init_db.py         # Database initialization
-│   │   ├── backup_database.py # Backup utilities
-│   │   ├── cleanup_database.py # Cleanup scripts
-│   │   └── ... (more utilities)
-│   ├── alembic/               # Database migrations framework
-│   ├── requirements.txt       # Python dependencies
-│   ├── .env.example           # Environment template
-│   └── run.py                 # Application entry point
-│
-├── frontend/                  # React frontend
-│   ├── public/                # Static assets
-│   ├── src/
-│   │   ├── components/        # React components
-│   │   │   ├── AdminPanel.tsx # Admin interface
-│   │   │   ├── AuthPage.tsx   # Authentication
-│   │   │   └── ... (more components)
-│   │   ├── contexts/          # React contexts (Auth, Theme)
-│   │   ├── hooks/             # Custom React hooks
-│   │   ├── services/          # API communication
-│   │   ├── types/             # TypeScript definitions
-│   │   └── utils/             # Utility functions
-│   ├── package.json           # Node dependencies
-│   └── vercel.json            # Vercel deployment config
-│
-├── guides/                    # Development documentation
-│   ├── GETTING_STARTED.md     # Local development guide
-│   ├── DEVELOPMENT.md         # Development workflow
-│   ├── API_REFERENCE.md       # Complete API documentation
-│   ├── DATABASE_SETUP.md      # Database configuration
-│   ├── ADMIN_PANEL.md         # Admin features guide
-│   ├── ADDING_OPERATIONS.md   # Adding new operations
-│   └── GOOGLE_OAUTH_SETUP.md  # OAuth configuration
-│
-├── deployment/                # Deployment resources
-│   ├── QUICK_START.md         # Fast deployment guide
-│   ├── DEPLOYMENT_GUIDE.md    # Complete deployment docs
-│   ├── render.yaml            # Render configuration
-│   └── vercel.json            # Vercel configuration
-│
-├── images/                    # Application screenshots
-│   └── PixelFlow (1-16).png   # UI screenshots for README
-│
-├── README.md                  # This file
-├── CHANGELOG.md               # Version history
-├── CURRENT_LIMITATIONS.md     # Known issues and limitations
-├── INSTALLATION.md            # Detailed installation guide
-└── LICENSE                    # Project license
+├── backend/            FastAPI app (app/processing = the operation registry), tests, database scripts
+├── frontend/           React + TypeScript app (renders every operation from the API schema)
+├── guides/             User, developer, API, admin and OAuth guides
+├── deployment/         Render / Vercel deployment docs and env-var reference
+├── a11y-reports/       Accessibility audit results and scripts
+├── scripts/e2e/        Browser workflow checks
+└── docker-compose.yml, start.sh, start.bat
 ```
+
+A file-by-file architecture tour lives in [CLAUDE.md](CLAUDE.md#architecture).
 
 ---
 
@@ -341,8 +222,8 @@ pixelflow/
    - Or use Google Sign-In (if configured)
 
 2. **Upload Images**
-   - Click "Upload Image(s)" or drag files (JPEG, PNG, BMP, TIFF up to 50MB)
-   - Images stored in database and persist across sessions
+   - Click "Upload Image(s)" (JPEG, PNG, BMP, TIFF up to 50MB, 20 at a time)
+   - Images are stored on the server for your browser session; automatic cleanup removes them after the retention period (24 h for guests, 7 days for accounts by default)
 
 3. **Build Pipeline**
    - Browse 77 operations
@@ -355,7 +236,6 @@ pixelflow/
 
 5. **Apply & Download**
    - Process images and download results
-   - Results persist in database until manually deleted
 
 ### Admin Features (Admin Users Only)
 
@@ -371,51 +251,9 @@ For detailed usage instructions, see [guides/GETTING_STARTED.md](guides/GETTING_
 
 ## 📚 API Documentation
 
-### Core Endpoints
-
-**Authentication:**
-```http
-POST /api/auth/register          # Create account
-POST /api/auth/login             # Login
-POST /api/auth/logout            # Logout
-POST /api/auth/refresh           # Refresh token
-GET  /api/auth/me                # Get user info
-```
-
-**Google OAuth:**
-```http
-GET  /api/auth/google/login      # Initiate Google login
-POST /api/auth/google/callback   # Handle callback
-GET  /api/auth/google/status     # Check OAuth config
-```
-
-**Image Management:**
-```http
-POST /api/images/upload          # Upload single image
-POST /api/images/upload-multiple # Upload multiple images
-GET  /api/images/session/{id}/images # Get session images
-POST /api/images/heartbeat       # Keep session alive
-```
-
-**Processing:**
-```http
-POST /api/processing/process        # Batch mode
-POST /api/processing/process-live   # Live mode
-GET  /api/processing/operations     # Available operations
-```
-
-**Admin (Admin Users Only):**
-```http
-GET  /api/admin/stats/overview      # System statistics
-GET  /api/admin/users               # List all users
-GET  /api/admin/storage/overview    # Storage stats
-GET  /api/admin/database/overview   # Database viewer
-POST /api/admin/cleanup/run         # Manual cleanup
-```
-
-For complete API documentation, see:
-- Interactive docs: http://localhost:8000/docs
-- Full reference: [guides/API_REFERENCE.md](guides/API_REFERENCE.md)
+Interactive docs run at http://localhost:8000/docs. The guide to auth (httpOnly cookies +
+`X-CSRF-Token`), sessions, processing, pipelines, admin and error codes is
+[guides/API_REFERENCE.md](guides/API_REFERENCE.md).
 
 ---
 
@@ -443,65 +281,20 @@ automatically) — see [guides/ADDING_OPERATIONS.md](guides/ADDING_OPERATIONS.md
 
 ## 🚀 Deployment
 
-PixelFlow can be deployed to production using free hosting services:
+Free tiers: **frontend on Vercel**, **backend + PostgreSQL on Render**. The frontend calls `/api`
+on its own origin and Vercel proxies it to Render, so the auth cookies stay first-party.
 
-- **Frontend**: Vercel (free tier)
-- **Backend**: Render (free tier)
-- **Database**: PostgreSQL on Render (free tier)
-
-### Environment Variables
-
-**Backend (Render):**
-```env
-DATABASE_URL=postgresql://user:password@host:port/database
-SECRET_KEY=your-secret-key-here
-GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=your-client-secret
-ALLOWED_ORIGINS=https://your-frontend.vercel.app
-ADMIN_EMAIL=admin@example.com      # Optional: Auto-create first admin
-ADMIN_PASSWORD=YourStrongPassword   # Optional: Auto-create first admin
-ADMIN_USERNAME=admin                # Optional: Default is 'admin'
-ADMIN_FULL_NAME=Admin User          # Optional: Default is 'Admin User'
-```
-
-**Frontend (Vercel):**
-```env
-REACT_APP_API_URL=https://your-backend.onrender.com/api
-REACT_APP_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
-```
-
-### Quick Deployment
-
-See the [deployment/](deployment/) folder for:
-- [START_HERE.md](deployment/START_HERE.md) - Deployment overview
-- [QUICK_START.md](deployment/QUICK_START.md) - Fast deployment checklist
-- [DEPLOYMENT_GUIDE.md](deployment/DEPLOYMENT_GUIDE.md) - Comprehensive guide
-- [ALTERNATIVE_HOSTING_OPTIONS.md](deployment/ALTERNATIVE_HOSTING_OPTIONS.md) - Other platforms
-- Configuration files: `render.yaml`, `vercel.json`
-
-**Total Monthly Cost: $0** using free tiers!
-
-**Estimated Deployment Time:** 45-60 minutes for first deployment
+- Step by step: [deployment/DEPLOYMENT_GUIDE.md](deployment/DEPLOYMENT_GUIDE.md)
+- Every environment variable: [deployment/ENVIRONMENT_VARIABLES.md](deployment/ENVIRONMENT_VARIABLES.md)
+- Other hosts and self-hosting: [deployment/ALTERNATIVE_HOSTING_OPTIONS.md](deployment/ALTERNATIVE_HOSTING_OPTIONS.md)
 
 ---
 
 ## ⚠️ Limitations
 
-PixelFlow 1.2.0 has some known limitations:
-
-**Critical:**
-- Desktop-only interface (mobile support planned for V2.0)
-- Google OAuth requires manual configuration
-- No background cleanup jobs (manual trigger via admin panel)
-- Free tier limitations (cold starts, 1GB database)
-
-**Moderate:**
-- No email verification or password reset
-- Limited file format support (JPEG, PNG, BMP, TIFF only)
-- No batch download as ZIP file
-- Rate limiting is in-memory / single-instance (Redis needed for multi-instance)
-
-For the complete list of known limitations and what was recently resolved, see [CURRENT_LIMITATIONS.md](CURRENT_LIMITATIONS.md)
+No password reset or email verification yet, synchronous processing, images stored in
+Postgres, and the usual free-tier cold starts. Render deletes a free database after 30 days.
+The full list is in [CURRENT_LIMITATIONS.md](CURRENT_LIMITATIONS.md).
 
 ---
 
@@ -528,10 +321,9 @@ Use the [GitHub issue tracker](https://github.com/MauryanTitans/pixelflow/issues
 ### Areas Needing Help
 
 See [CURRENT_LIMITATIONS.md](CURRENT_LIMITATIONS.md) for areas where contributions would be valuable:
-- httpOnly-cookie auth (move JWT out of localStorage)
-- Background cleanup jobs / scheduler
-- Mobile responsiveness (V2.0)
 - Email verification & password reset
+- Object storage for images and a job queue for heavy processing
+- Accessibility checks in CI
 - More image-processing operation batches
 - End-to-end (Playwright) tests in CI
 
@@ -570,7 +362,10 @@ This project is licensed under the Apache-2.0 License - see the [LICENSE](LICENS
 
 ## 📖 Documentation
 
-- **[INSTALLATION.md](INSTALLATION.md)** - Detailed setup instructions
+- **[INSTALLATION.md](INSTALLATION.md)** - Local setup and troubleshooting
+- **[guides/GETTING_STARTED.md](guides/GETTING_STARTED.md)** - Using the app
+- **[guides/API_REFERENCE.md](guides/API_REFERENCE.md)** - API
+- **[a11y-reports/REPORT.md](a11y-reports/REPORT.md)** - Accessibility audit
 - **[CHANGELOG.md](CHANGELOG.md)** - Version history and changes
 - **[CURRENT_LIMITATIONS.md](CURRENT_LIMITATIONS.md)** - Known issues and limitations
 - **[guides/](guides/)** - Development and usage guides
@@ -587,6 +382,6 @@ This project is licensed under the Apache-2.0 License - see the [LICENSE](LICENS
 [![GitHub stars](https://img.shields.io/github/stars/MauryanTitans/pixelflow?style=social)](https://github.com/MauryanTitans/pixelflow)
 [![GitHub forks](https://img.shields.io/github/forks/MauryanTitans/pixelflow?style=social)](https://github.com/MauryanTitans/pixelflow/fork)
 
-**Current Version: 1.2.0** | [View Previous Versions](CHANGELOG.md)
+**Current Version: 1.3.0** | [View Previous Versions](CHANGELOG.md)
 
 </div>

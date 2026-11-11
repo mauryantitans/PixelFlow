@@ -18,9 +18,9 @@ PixelFlow is a visual image-processing pipeline builder: a React/TypeScript fron
 - `uvicorn app.main:app --reload` — equivalent direct invocation
 - `python database/init_db.py` — create tables
 - **Quality gate** (matches CI — see `.github/workflows/ci.yml`):
-  - `ruff check .` and `ruff format --check .`
-  - `mypy app` (scoped via `pyproject.toml` to `app/processing` + `app/utils/datetime_utils.py`)
-  - `pytest` — full suite; `pytest tests/test_executor.py -k coerce` runs a single test/expr; `pytest -q` for quiet
+  - `ruff check app/processing tests` and `ruff format --check app/processing tests` (CI's scope; the older modules aren't ruff-clean yet)
+  - `mypy` (scoped via `pyproject.toml` to `app/processing` + `app/utils/datetime_utils.py`)
+  - `pytest` — full suite (pytest `pythonpath` is set in `pyproject.toml`); `pytest tests/test_executor.py -k coerce` runs a single test/expr; `pytest -q` for quiet
 - Database utility scripts live in `backend/database/`: `list_users.py`, `reset_password.py`, `backup_database.py`, `restore_database.py`, `cleanup_database.py`, `migrate_to_postgres.py`, `verify_business_rules.py`
 - Migrations: `alembic upgrade head` / `alembic revision --autogenerate -m "..."` (config in `backend/alembic.ini`, env in `backend/alembic/env.py`). Note: `init_db()` also runs `Base.metadata.create_all` on startup, so the schema can exist without migrations.
 - API docs while running: http://localhost:8000/docs ; health: `/health`
@@ -30,6 +30,12 @@ PixelFlow is a visual image-processing pipeline builder: a React/TypeScript fron
 - `npm start` — dev server (proxies to `localhost:8000`; reads `REACT_APP_API_URL`)
 - `npm run build` — production build
 - `npm test` — Create React App / Jest test runner (smoke tests). `npx tsc --noEmit` for the strict type-check that CI runs.
+- `CI=true npm run build` — what Vercel runs; ESLint warnings fail the build in CI mode.
+
+### Browser checks (need the stack running; puppeteer-core installed outside the repo, path in `TOOLS`)
+- `node scripts/e2e/session-flow.js` — sign-in, token expiry, shared-browser sessions (env vars in the file header).
+- `node scripts/e2e/workflows.js` — uploads, live preview, batch Stop/Apply, picking, reload.
+- `node a11y-reports/scripts/audit.js` (+ `VIEWPORT=320x640`) and `keyboard-checks.js` — accessibility audit; see [a11y-reports/REPORT.md](a11y-reports/REPORT.md).
 
 ## Architecture
 
@@ -54,39 +60,40 @@ Pipelines are ordered lists of `{name, params}` steps. `ImageProcessor.apply_ope
 `GET /api/processing/operations` returns the grouped schema (`version`, `categories[] → subcategories[] → operations[]` with typed `params`) plus a legacy flat `operations` list + `total_count` for backward compat. The frontend fetches it once at startup.
 
 ### Backend layout (`backend/app/`)
-- `main.py` — app factory, lifespan (init db, auto-create first admin, start/stop cleanup task), CORS, middleware wiring, global exception handler. (The legacy `/upload` `/process` shims were removed; the DB routers are always mounted.)
+- `main.py` — app factory, lifespan (init db with connection retries, auto-create first admin, start/stop the DB cleanup scheduler), middleware wiring (CORS is added **last** so it is outermost and 403/429 responses keep CORS headers), global exception handler.
 - `processing/` — the operation engine (see above). `utils/image_processing.py` is now a thin `ImageProcessor` façade over the executor + prefix cache.
 - `core/config.py` — central `Settings` (env-driven). **Fails fast** (`sys.exit(1)`) in production if `SECRET_KEY` is still the default. Rewrites Render/Heroku `postgres://` → `postgresql://`. `USE_SQLITE=True` switches `DATABASE_URL` to a local SQLite file.
 - `core/security_config.py` — constants for CORS origins, rate limits (incl. per-IP upload/processing limits), login lockout, session/token expiry, file-upload limits. `core/business_rules.py` — quota/retention **seed defaults only**; the live policy is read from the DB `SystemSettings` row (admin-editable).
 - `core/database.py` — SQLAlchemy engine, `SessionLocal`, `Base`, `get_db` dependency.
 - `models/db_models.py` — all ORM tables (`User`, `RefreshToken`, `LoginAttempt`, `Session`, `UploadedImage`, `ProcessedImage`, `SavedPipeline`, `ProcessingHistory`, `APIKey`, `SharedPipeline`, `SystemSettings`). `models/schemas.py` — Pydantic request/response models. `models/__init__.py` — `PipelineStep` (its `params` value type is widened to allow nested list/dict for coord params) and `StepError`.
 - `api/routes/` — `auth`, `oauth` (Google), `pipelines`, `admin`, `images_db` (upload incl. `/upload-multiple`), `processing_db` (`load_image_from_db`, the `/operations` schema, live/batch processing). Images are always stored in the database (the old filesystem router pair was removed).
-- `middleware/` — `RateLimitMiddleware`, `SecurityHeadersMiddleware`.
-- `utils/` — `auth.py` (JWT/bcrypt), `session_manager.py` + `session_db.py` (session lifecycle), `cleanup_service.py` (background session/image expiry, reads `SystemSettings`), `quota_manager.py`, `settings_manager.py`, `datetime_utils.py` (`ensure_aware`), `init_admin.py`.
+- `middleware/` — `RateLimitMiddleware` (per client IP + path, in memory; `TRUSTED_PROXY_HOPS` picks the real client IP from `X-Forwarded-For` behind Render/Vercel; `/health` and `/api/health` are exempt), `SecurityHeadersMiddleware`, `CSRFMiddleware`.
+- `utils/` — `auth.py` (JWT/bcrypt, cookies), `admin_pin.py` (server-side admin PIN: 15-min signed cookie, `require_admin_pin`, wrong-PIN lockout), `session_db.py` (session activity: sliding expiry, ownership, guest→user linking), `cleanup_scheduler.py` (runs `cleanup_service.run_full_cleanup` every 15 min), `cleanup_service.py`, `quota_manager.py`, `settings_manager.py` (DB settings + validation), `datetime_utils.py`, `init_admin.py`. `session_manager.py` is **deprecated/unused** (old filesystem storage).
 
 ### Frontend layout (`frontend/src/`)
 - `App.tsx` — top-level orchestrator; the palette/search/add-op all read the operation schema (with a loading/error state when the schema is unavailable).
-- `contexts/` — `AuthContext` (JWT/user state), `PipelineContext` (pipeline + undo/redo history), `OperationSchemaContext` (fetches `/operations` once; exposes `palette`/`getOp`/`getDefaults`), `PickerContext` (which step/param is currently capturing an interactive pick).
+- `contexts/` — `AuthContext` (user state; keeps the browser session in step with who is signed in via `SessionUtils.syncWithUser`), `PipelineContext` (pipeline + undo/redo history, kept in `sessionStorage` across reloads), `OperationSchemaContext` (fetches `/operations` once; exposes `palette`/`getOp`/`getDefaults`), `PickerContext` (which step/param is currently capturing an interactive pick).
 - `components/params/ParamControl.tsx` — renders the correct control per param `type` (sliders, enum, bool, color, and coordinate placeholders). `components/PreviewCanvas.tsx` — the interactive overlay (click=point, drag=ROI, eyedropper=color), object-contain-aware coordinate mapping. `components/CompareSlider.tsx`, `DiffView.tsx`, `Inspector.tsx` — comparison views. `components/PipelineStep.tsx` — a step's controls + per-step error banner.
-- `hooks/index.ts` — custom hooks: `useImages`, `useLiveProcessing` (debounced, prefix-cache aware, request cancellation, surfaces `stepErrors`), `useBatchProcessing`, `usePipeline`, `useSession`/`useSessionHeartbeat`, `useUI`, `useStatus`, `useModal`, `useTheme`, `useKeyboardShortcuts`.
-- `services/` — `api.ts` (`ApiService`: upload, process, `getOperationsSchema`, `processLive` with an abort signal, session, file validation, cleanup beacon) and `auth.ts`. Auth token is read from `localStorage['pixelflow_access_token']` and attached per-request.
+- `hooks/` — `index.ts`: `useImages` (thumbnails first, then full images one by one; partial-upload aware), `useLiveProcessing` (debounced, prefix-cache aware, request cancellation, surfaces `stepErrors`), `useBatchProcessing` (one run at a time, abortable), `usePipeline`, `useSession` (reactive session id), `useUI`, `useStatus`, `useModal`, `useTheme`, `useKeyboardShortcuts`. Also `useConnectionStatus.ts` (pings `/api/health`), `useDialog.ts` (accessible modal focus trap), `useDocumentTitle.ts`.
+- `services/` — `api.ts` (`ApiService`: upload, process, `getOperationsSchema`, `processLive` with an abort signal, images, file validation; errors keep `status`/`response`/`code`), `auth.ts` (auth + pipelines), `tokenRefresh.ts` (shared request/response interceptors: proactive token refresh, CSRF header, 401 refresh-and-retry), `cookies.ts`.
 - `types/index.ts` — TS interfaces and the schema DTOs (`ParamSpecDTO`, `OperationSpecDTO`, `OperationSchema`, `StepErrorDTO`). The old static `*_OPERATION_CONFIGS` were removed.
 
-### Sessions & heartbeat
-Frontend sends periodic heartbeats (`/api/images/heartbeat`); a session is "active" if seen in the last ~5 min. The backend cleanup task (started in `main.py` lifespan) expires stale sessions and their images using the retention/lifetime values from the DB `SystemSettings` row. On page unload the frontend fires a `sendBeacon` cleanup.
+### Sessions, cleanup and the connection indicator
+Each browser has a session id (`SessionUtils`, localStorage). The server records **activity** on it (upload, opening the workspace, processing): `session_db.create_or_update_session` creates the row on first upload, slides `expires_at` forward on activity (throttled to one write/min) and refuses a session owned by another user (upload → 409 `session_owned_by_another_user`; signed-out owner → 401 `sign_in_required`). Signing out switches to a fresh guest session; signing back in restores the account's session in that browser. "Active" in the admin panel = activity in the last 15 min. `cleanup_scheduler` runs `CleanupService.run_full_cleanup` every 15 min (honours the admin auto-cleanup switch; retention/lifetimes come from `SystemSettings`). The header's `ConnectionStatus` badge only pings `GET /api/health` (no DB, no session writes); `/images/heartbeat` is deprecated and never creates sessions.
 
 ### Auth (httpOnly cookies + CSRF)
 JWT access + refresh tokens (`python-jose`, bcrypt via `passlib`) are delivered as **httpOnly cookies**, never in response bodies or `localStorage`:
 - `set_auth_cookies`/`clear_auth_cookies` in `utils/auth.py` set `pf_access` (httpOnly, Path=/), `pf_refresh` (httpOnly, Path=/api/auth), and a non-httpOnly `pf_csrf`. `get_current_user`/`_optional` read the token from the `pf_access` cookie or, for non-browser clients, an `Authorization: Bearer` header.
 - **CSRF**: `middleware/csrf.py` enforces a double-submit cookie — cookie-authenticated unsafe requests (POST/PUT/DELETE/PATCH under `/api`) must send `X-CSRF-Token` matching the `pf_csrf` cookie. Exempt: login/register/oauth (no session yet) and the session-id-keyed `heartbeat`/`cleanup-session` (reached via fetch/beacon). The frontend echoes the cookie via axios request interceptors (`services/api.ts`, `services/auth.ts`).
 - `/auth/login` and the OAuth callback set the cookies and return only the user; `/auth/refresh` reads the refresh cookie, **rotates** it (DB-backed `RefreshToken`, hashed), and re-sets cookies; `/auth/logout` clears cookies and revokes refresh tokens. Tokens carry a random `jti` so they're always unique.
+- **Token refresh**: the access cookie lasts 30 min and the browser stops sending it afterwards, and image/processing routes accept guests, so the frontend refreshes **proactively** (`services/tokenRefresh.ts`: before a request, if `pf_csrf` exists and the tokens are 20+ min old) with a 401 refresh-and-retry fallback on both axios clients. A rejected refresh fires `pixelflow:auth-expired` → signed out.
 - Cookie attributes are env-driven: `COOKIE_SECURE` (default on in prod), `COOKIE_SAMESITE` (default `lax`), `COOKIE_DOMAIN`. **In production the frontend must be same-origin with the API** (a Vercel rewrite proxies `/api/*` → the Render backend; set `REACT_APP_API_URL=/api`) so cookies are first-party — see `frontend/vercel.json` and `deployment/DEPLOYMENT_GUIDE.md`.
 
-Optional Google OAuth (`authlib`) gated on `GOOGLE_CLIENT_ID`/`SECRET`. First admin is auto-created on startup from `ADMIN_EMAIL`/`ADMIN_PASSWORD` if no admin exists. The admin panel is additionally gated behind a client-side PIN.
+Optional Google OAuth (`authlib`) gated on `GOOGLE_CLIENT_ID`/`SECRET`. First admin is auto-created on startup from `ADMIN_EMAIL`/`ADMIN_PASSWORD` if no admin exists. The admin panel's user-data views are protected by an **admin PIN enforced server-side** (`utils/admin_pin.py`).
 
 ## Configuration notes
-- Backend env lives in `backend/.env` (template: `backend/.env.example`). Key vars: `DATABASE_URL`, `SECRET_KEY`, `USE_SQLITE`, `DEBUG`, `ALLOWED_ORIGINS`, `ALLOWED_ORIGINS_REGEX` (for Vercel preview URLs), `GOOGLE_CLIENT_ID/SECRET/REDIRECT_URI`, `ADMIN_*`. Full list in [deployment/ENVIRONMENT_VARIABLES.md](deployment/ENVIRONMENT_VARIABLES.md). (Note: the old `IMAGE_STORAGE` switch was removed — images are always stored in the database.)
-- Frontend env: `REACT_APP_API_URL`, `REACT_APP_GOOGLE_CLIENT_ID`.
+- Backend env lives in `backend/.env` (template: `backend/.env.example`). Key vars: `DATABASE_URL`, `SECRET_KEY`, `USE_SQLITE`, `DEBUG`, `ALLOWED_ORIGINS`, `ALLOWED_ORIGINS_REGEX` (for Vercel preview URLs), `GOOGLE_CLIENT_ID/SECRET/REDIRECT_URI`, `ADMIN_*`, `TRUSTED_PROXY_HOPS`, `DB_CLEANUP_INTERVAL_SECONDS`, `DB_CONNECT_RETRIES`. Full list in [deployment/ENVIRONMENT_VARIABLES.md](deployment/ENVIRONMENT_VARIABLES.md).
+- Frontend env: `REACT_APP_API_URL` (`/api` in production, via the Vercel rewrite), `REACT_APP_GOOGLE_CLIENT_ID`, optional `REACT_APP_TOKEN_REFRESH_MINUTES` (default 20).
 - CORS: defaults to localhost origins in dev; in production set `ALLOWED_ORIGINS` (comma-separated) and/or `ALLOWED_ORIGINS_REGEX`.
 - Supported uploads: JPEG/PNG/BMP/TIFF, up to 50MB, max 20 files per batch (enforced both client- and server-side); PNG alpha is preserved.
 
