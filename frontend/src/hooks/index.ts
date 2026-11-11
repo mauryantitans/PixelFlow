@@ -11,7 +11,8 @@ import {
 } from '../types';
 import { ApiService } from '../services/api';
 import { hasSignedInSession } from '../services/tokenRefresh';
-import { SessionUtils, ThemeUtils } from '../utils';
+import { SessionUtils } from '../utils';
+import { useAppearance } from '../theme/appearance';
 
 /**
  * Session management hook - CLEANUP DISABLED for testing
@@ -42,21 +43,12 @@ export function useSession() {
 }
 
 /**
- * Theme management hook
+ * Light/dark mode hook (kept for existing callers). The mode is shared with the
+ * appearance picker through theme/appearance.ts, so every toggle stays in sync.
  */
 export function useTheme() {
-  const [theme, setTheme] = useState<'light' | 'dark'>(() => ThemeUtils.getTheme());
-  
-  const toggleTheme = useCallback(() => {
-    const newTheme = ThemeUtils.toggleTheme();
-    setTheme(newTheme);
-  }, []);
-  
-  useEffect(() => {
-    ThemeUtils.setTheme(theme);
-  }, [theme]);
-  
-  return { theme, toggleTheme, setTheme };
+  const { mode, setMode, toggleMode } = useAppearance();
+  return { theme: mode, toggleTheme: toggleMode, setTheme: setMode };
 }
 
 /**

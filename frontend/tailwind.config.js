@@ -1,4 +1,33 @@
 /** @type {import('tailwindcss').Config} */
+const defaults = require('tailwindcss/colors');
+
+// Every palette the app uses reads a CSS variable, with Tailwind's own value as the
+// fallback. The Classic theme sets no variables (so it looks exactly like Tailwind);
+// other themes set them from src/theme (see applyUiTheme). Alpha modifiers such as
+// bg-blue-900/30 keep working through <alpha-value>.
+const THEMED = [
+  'slate', 'gray', 'zinc', 'neutral', 'stone',
+  'red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald', 'teal', 'cyan', 'sky',
+  'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose',
+];
+
+const rgb = (hex) => {
+  const h = hex.replace('#', '');
+  return [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16)).join(' ');
+};
+
+const themed = Object.fromEntries(
+  THEMED.map((name) => [
+    name,
+    Object.fromEntries(
+      Object.entries(defaults[name]).map(([shade, hex]) => [
+        shade,
+        `rgb(var(--c-${name}-${shade}, ${rgb(hex)}) / <alpha-value>)`,
+      ]),
+    ),
+  ]),
+);
+
 module.exports = {
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
@@ -7,23 +36,13 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        'inter': ['Inter', 'sans-serif'],
+        // Set per theme by applyUiTheme; Inter is the Classic face.
+        sans: ['var(--font-sans, Inter)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        inter: ['var(--font-sans, Inter)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        mono: ['var(--font-mono, ui-monospace)', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace'],
+        display: ['var(--font-display, var(--font-sans, Inter))', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
-      colors: {
-        // Custom colors to match the original design
-        zinc: {
-          50: '#fafafa',
-          100: '#f4f4f5',
-          200: '#e4e4e7',
-          300: '#d4d4d8',
-          400: '#a1a1aa',
-          500: '#71717a',
-          600: '#52525b',
-          700: '#3f3f46',
-          800: '#27272a',
-          900: '#18181b',
-        }
-      },
+      colors: themed,
       animation: {
         'spin': 'spin 1s linear infinite',
       },
