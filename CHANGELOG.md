@@ -7,6 +7,72 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.0] - 2026-11-11
+
+Accessibility (WCAG 2.1 AA), a production-outage fix, and a pass over every
+workflow. Details per change are in the git history; the accessibility audit
+is written up in [a11y-reports/REPORT.md](a11y-reports/REPORT.md).
+
+### ♿ Accessibility (WCAG 2.1 AA)
+- All 24 audited pages/states score 100 in Lighthouse (desktop and 320px mobile) and have
+  0 axe-core violations in light and dark theme (before: average 75, 492 critical/serious).
+- Accessible dialogs (focus trap, Escape, focus return), keyboard alternatives for every
+  mouse-only interaction (upload, gallery selection, compare slider, image picker, lightbox,
+  step reordering with Alt+↑/↓), names/labels for all controls, AA contrast, landmarks,
+  page titles, heading order, live-region announcements.
+- The whole app reflows to a single column at 320px / 400% zoom (it used to be desktop-only),
+  no content appears only on hover, text spacing and 200% text don't clip anything.
+
+### ✨ New
+- **Backend connection indicator** in the header (Connecting / Server connected / Server
+  waking up / Can't reach server / You're offline) using `GET /api/health`.
+- **Automatic database cleanup** every 15 minutes (expired sessions, retention periods,
+  orphans, expired refresh tokens), with an on/off switch and session-lifetime settings in
+  Admin → Retention.
+- Operation descriptions are visible (a line under the search box); result and gallery
+  actions are always visible (they were hover-only).
+- The pipeline being built survives a page reload (per tab).
+
+### 🔒 Security
+- The admin PIN is enforced by the server: a correct PIN grants a 15-minute httpOnly cookie
+  that the user-data endpoints require; changing the PIN needs the current one; 5 wrong PINs
+  lock the admin out for 15 minutes.
+- Images can only be processed by their owner (processing with an empty pipeline used to
+  return any user's image by id).
+- Browser sessions are never shared between accounts on one computer; a user's session can
+  only be used, listed or deleted by that user.
+
+### 🐛 Fixed
+- Signed-in users silently became guests after 30 minutes (access cookie expiry): tokens are
+  now refreshed proactively, with a 401 refresh-and-retry fallback on every API client.
+- Exposure, Gamma Correction, Contrast Stretching and Unsharp Mask corrupted images (uint8
+  overflow / library bug) even at their "no change" settings.
+- Stop then Apply Pipeline ran both batches; removing the last step left a stale preview;
+  point/region picking used the final image's coordinates; one failed file hid the files
+  that did upload; TIFF uploads had no preview; the step "Preview" button did nothing.
+- Quota / image-limit dialogs never appeared (error details were dropped); deleting an image
+  that the server refused looked successful; register/login could show "[object Object]".
+- Duplicating a pipeline bypassed the free-account pipeline limit; `/api/pipelines` without
+  a trailing slash redirected (to an `http://` URL behind the proxy).
+- Admin settings are validated (an emptied field used to save `null` and crash cleanup).
+- Global Ctrl+Z / Ctrl+Y no longer override undo inside text fields; duplicate pipeline step
+  ids; swapped before/after captions in the compare slider.
+
+### ⚙️ Operations / deployment
+- Startup retries the database connection and logs the cause (password masked) when it can't
+  connect, e.g. an expired free Render Postgres.
+- `TRUSTED_PROXY_HOPS` makes rate limiting use the real client IP behind Render / Vercel;
+  processing limit raised to 150/min; `/api/health` is never rate limited.
+- CORS is the outermost middleware (403/429 responses now reach the frontend); CI's plain
+  `pytest` works (`pythonpath`); Render blueprint pins Python 3.11.9; the Vercel `/api`
+  rewrite points at the real backend; the frontend builds under `CI=true`.
+- Opening the workspace loads thumbnails first and full images one by one (instead of every
+  full image base64-encoded in one response).
+- The old `/images/heartbeat` endpoint is deprecated: it no longer creates sessions or writes
+  on every call.
+
+---
+
 ## [1.2.0] - 2026-06-13
 
 ### 🎉 Major New Features — Dynamic Pipeline Engine
@@ -259,25 +325,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## Version Comparison
-
-| Feature | V1.0.0 | V1.1.0 |
-|---------|--------|--------|
-| **Core Processing** | ✅ | ✅ |
-| **Operation Count** | 50+ | 50+ |
-| **User Accounts** | ❌ | ✅ |
-| **Database** | ❌ | ✅ PostgreSQL |
-| **Authentication** | ❌ | ✅ JWT + OAuth |
-| **Admin Panel** | ❌ | ✅ Partial |
-| **Persistent Storage** | ❌ | ✅ |
-| **Session Management** | Basic | ✅ Advanced |
-| **Pipeline Saving** | ❌ | ✅ |
-| **Google OAuth** | ❌ | ✅ |
-| **Security** | Basic | ✅ Enhanced |
-| **Deployment Docs** | Basic | ✅ Comprehensive |
-
----
-
 ## Migration Guide (1.0.0 → 1.1.0)
 
 ### Prerequisites
@@ -300,14 +347,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
    # Set in backend/.env
    DATABASE_URL=postgresql://user:password@localhost:5432/pixelflow
    USE_SQLITE=False  # or True for development
-   IMAGE_STORAGE=database
    ```
 
 3. **Add Authentication Variables**
    ```bash
    SECRET_KEY=<generate-new-key>
-   ACCESS_TOKEN_EXPIRE_MINUTES=30
-   REFRESH_TOKEN_EXPIRE_DAYS=7
    ```
 
 4. **Initialize Database**
@@ -337,24 +381,9 @@ If you have important session data:
 
 ---
 
-## Upcoming Features (V1.2.0)
+## Upcoming
 
-### Planned Additions
-- Background cleanup cron jobs
-- Dark/light theme toggle UI
-- Batch download as ZIP
-- Email verification
-- Password reset functionality
-- Pipeline sharing interface
-- Processing history dashboard
-- Enhanced admin panel features
-
-### Under Consideration
-- Mobile responsiveness (V2.0)
-- WebSocket real-time updates
-- Automated testing suite
-- Docker deployment option
-- Additional file format support
+Planned work and known gaps are tracked in [CURRENT_LIMITATIONS.md](CURRENT_LIMITATIONS.md).
 
 ---
 
@@ -376,8 +405,8 @@ If you have important session data:
 - **Patch**: Bug fixes, minor improvements
 
 ### Support
-- V1.1.0: Current, actively developed
-- V1.0.0: Stable, no longer maintained (use V1.1.0)
+- 1.3.0: current
+- Earlier versions are not maintained
 
 ---
 
