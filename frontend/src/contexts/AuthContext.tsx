@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, AuthContextType, RegisterRequest } from '../types';
 import { authService } from '../services/auth';
+import { getCookie } from '../services/api';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -27,6 +28,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Check if the auth cookie is valid on mount (no token in JS to inspect).
   useEffect(() => {
     const initAuth = async () => {
+      // Guests have no session: the non-httpOnly pf_csrf cookie is issued with
+      // the refresh token (same lifetime) and cleared on logout, so its absence
+      // means there is nothing to check. Skipping the call matters: /auth/* is
+      // rate limited (10/min per client IP) and behind the Render/Vercel proxy
+      // many visitors share one IP, so a /auth/me (+ /auth/refresh) on every
+      // guest page load exhausted the limit and logged real users out (429).
+      if (!getCookie('pf_csrf')) {
+        setUser(null);
+        setLoading(false);
+        return;
+      }
       try {
         const userData = await authService.getCurrentUser();
         setUser(userData);
