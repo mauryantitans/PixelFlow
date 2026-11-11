@@ -6,7 +6,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://REPLACE-WITH-YOUR-RENDER-BACKEND.onrender.com/api/:path*"
+      "destination": "https://pixelflow-d9q5.onrender.com/api/:path*"
     },
     {
       "source": "/(.*)",
