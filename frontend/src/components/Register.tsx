@@ -20,6 +20,8 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
     full_name: '',
   });
   const [error, setError] = useState('');
+  // Which field the current error is about, so it can be marked aria-invalid.
+  const passwordError = /password/i.test(error);
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,11 +79,19 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
           <p className="text-slate-600 dark:text-slate-300 mt-2">Create your account</p>
         </div>
 
-        {error && (
-          <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-md">
-            {error}
-          </div>
-        )}
+        {/* Always-present live region so the error is announced when it appears
+
+
+            (WCAG 3.3.1 Error Identification, 4.1.3 Status Messages). */}
+
+
+        <div id="register-error" role="alert" aria-live="assertive" className={error ? "mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-md" : 'sr-only'}>
+
+
+          {error}
+
+
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -90,6 +100,8 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
             </label>
             <input
               id="email"
+              aria-invalid={!!error && !passwordError}
+              aria-describedby={!!error && !passwordError ? 'register-error' : undefined}
               autoComplete="email"
               name="email"
               type="email"
@@ -108,6 +120,8 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
             </label>
             <input
               id="username"
+              aria-invalid={!!error && !passwordError}
+              aria-describedby={!!error && !passwordError ? 'register-error' : undefined}
               autoComplete="username"
               name="username"
               type="text"
@@ -143,6 +157,8 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
             </label>
             <input
               id="password"
+              aria-invalid={passwordError}
+              aria-describedby={passwordError ? 'register-error password-hint' : 'password-hint'}
               autoComplete="new-password"
               name="password"
               type="password"
@@ -153,7 +169,7 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
               placeholder="••••••••"
               disabled={loading}
             />
-            <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">Minimum 8 characters</p>
+            <p id="password-hint" className="text-xs text-slate-600 dark:text-slate-400 mt-1">Minimum 8 characters</p>
           </div>
 
           <div>
@@ -162,6 +178,8 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
             </label>
             <input
               id="confirmPassword"
+              aria-invalid={passwordError}
+              aria-describedby={passwordError ? 'register-error' : undefined}
               autoComplete="new-password"
               name="confirmPassword"
               type="password"

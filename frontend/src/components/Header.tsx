@@ -8,6 +8,7 @@ import { SavePipelineModal } from './SavePipelineModal';
 import { LoadPipelineModal } from './LoadPipelineModal';
 import { AdminPanel } from './AdminPanel';
 import { SavedPipeline } from '../types';
+import { announce } from '../utils/announce';
 
 export const Header: React.FC = () => {
   const { user, logout, isAuthenticated } = useAuth();
@@ -97,6 +98,8 @@ export const Header: React.FC = () => {
 
   const showNotification = (message: string, type: 'success' | 'error') => {
     setNotification({ message, type });
+    // The toast is visual only; announce it for screen-reader users too.
+    announce(message, type === 'error' ? 'assertive' : 'polite');
     setTimeout(() => setNotification(null), 3000);
   };
 
@@ -348,7 +351,7 @@ export const Header: React.FC = () => {
 
         {/* Notification Toast */}
         {notification && (
-          <div className={`absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-4 py-2 rounded-lg shadow-lg z-50 animate-fade-in ${
+          <div aria-hidden="true" className={`absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-4 py-2 rounded-lg shadow-lg z-50 animate-fade-in ${
             notification.type === 'success' 
               ? 'bg-green-700 dark:bg-green-700' 
               : 'bg-red-700 dark:bg-red-700'

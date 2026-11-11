@@ -49,11 +49,19 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
           <p className="text-slate-600 dark:text-slate-300 mt-2">Sign in to your account</p>
         </div>
 
-        {error && (
-          <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-md">
-            {error}
-          </div>
-        )}
+        {/* Always-present live region so the error is announced when it appears
+
+
+            (WCAG 3.3.1 Error Identification, 4.1.3 Status Messages). */}
+
+
+        <div id="login-error" role="alert" aria-live="assertive" className={error ? "mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-md" : 'sr-only'}>
+
+
+          {error}
+
+
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -62,6 +70,8 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
             </label>
             <input
               id="email"
+              aria-invalid={!!error}
+              aria-describedby={error ? 'login-error' : undefined}
               autoComplete="email"
               type="email"
               required
@@ -79,6 +89,8 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
             </label>
             <input
               id="password"
+              aria-invalid={!!error}
+              aria-describedby={error ? 'login-error' : undefined}
               autoComplete="current-password"
               type="password"
               required

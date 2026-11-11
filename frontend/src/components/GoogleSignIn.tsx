@@ -110,8 +110,8 @@ export const GoogleSignIn: React.FC<GoogleSignInProps> = ({ onSuccess, onError }
   return (
     <div className="w-full">
       {isLoading ? (
-        <div className="w-full py-2 px-4 border-2 border-slate-300 dark:border-zinc-700 rounded-md flex items-center justify-center">
-          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+        <div role="status" className="w-full py-2 px-4 border-2 border-slate-300 dark:border-zinc-700 rounded-md flex items-center justify-center">
+          <div aria-hidden="true" className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
           <span className="ml-2 text-sm text-slate-600 dark:text-slate-400">Signing in...</span>
         </div>
       ) : (

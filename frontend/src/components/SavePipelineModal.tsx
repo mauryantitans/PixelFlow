@@ -102,11 +102,15 @@ export const SavePipelineModal: React.FC<SavePipelineModalProps> = ({
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {error && (
-            <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">
-              {error}
-            </div>
-          )}
+          {/* Always-present live region so the error is announced when it appears
+
+              (WCAG 3.3.1 Error Identification, 4.1.3 Status Messages). */}
+
+          <div id="save-pipeline-error" role="alert" aria-live="assertive" className={error ? "p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm" : 'sr-only'}>
+
+            {error}
+
+          </div>
 
           {/* Pipeline info */}
           <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">

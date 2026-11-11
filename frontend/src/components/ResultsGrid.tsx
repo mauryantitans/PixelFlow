@@ -103,7 +103,7 @@ const ResultsGridComponent: React.FC<ResultsGridProps> = ({
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <div className="text-center text-gray-600 dark:text-gray-400">
+        <div className="text-center text-gray-600 dark:text-gray-400" role="status">
           <LucideReact.Image aria-hidden="true" className="w-16 h-16 mx-auto mb-4" />
           <p className="font-semibold text-lg mb-2">Processing...</p>
           <p className="text-sm">Results will appear when ready</p>

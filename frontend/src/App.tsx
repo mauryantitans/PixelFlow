@@ -558,7 +558,7 @@ const App: React.FC = () => {
             {/* Enhanced Operations List */}
             <div className="flex-grow overflow-y-auto space-y-1 pr-1">
               {(opsLoading || opsError) && (
-                <div className="p-3 text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                <div role={opsError ? 'alert' : 'status'} className="p-3 text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2">
                   {opsLoading ? (
                     <>
                       <LucideReact.Loader2 aria-hidden="true" className="w-4 h-4 animate-spin" />
@@ -706,8 +706,9 @@ const App: React.FC = () => {
             </button>
           </div>
 
-          {/* Status Display */}
-          <div className="flex-1 text-center px-4">
+          {/* Status Display — a polite live region, so upload/processing/
+              error messages are read out without moving focus (WCAG 4.1.3). */}
+          <div className="flex-1 text-center px-4" role="status" aria-live="polite" aria-atomic="true">
             {status.text && (
               <span className={`text-sm flex items-center justify-center gap-2 transition-colors duration-200 font-medium ${getStatusTextColor(status.type)}`}>
                 {status.type === 'processing' && <LucideReact.Loader2 aria-hidden="true" className="w-4 h-4 animate-spin" />}

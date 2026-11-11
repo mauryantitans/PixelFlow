@@ -212,16 +212,20 @@ export const LoadPipelineModal: React.FC<LoadPipelineModalProps> = ({
           tabIndex={0}
           className="flex-1 overflow-y-auto p-6"
         >
-          {error && (
-            <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm mb-4">
-              {error}
-            </div>
-          )}
+          {/* Always-present live region so the error is announced when it appears
+
+              (WCAG 3.3.1 Error Identification, 4.1.3 Status Messages). */}
+
+          <div id="load-pipeline-error" role="alert" aria-live="assertive" className={error ? "p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm mb-4" : 'sr-only'}>
+
+            {error}
+
+          </div>
 
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <div className="text-center" role="status">
+                <div aria-hidden="true" className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
                 <p className="text-gray-600">Loading pipelines...</p>
               </div>
             </div>

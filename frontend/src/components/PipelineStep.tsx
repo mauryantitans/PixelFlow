@@ -173,7 +173,7 @@ const PipelineStepComponent: React.FC<PipelineStepProps> = ({
 
         {/* Per-step error (validation / execution) surfaced from the backend */}
         {stepError && (
-          <div className="mt-2 flex items-start gap-1.5 rounded bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-2 py-1.5">
+          <div role="alert" className="mt-2 flex items-start gap-1.5 rounded bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-2 py-1.5">
             <LucideReact.AlertTriangle aria-hidden="true" className="w-3.5 h-3.5 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
             <span className="text-xs text-red-700 dark:text-red-300">{stepError.message}</span>
           </div>
