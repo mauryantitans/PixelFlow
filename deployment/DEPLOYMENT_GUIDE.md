@@ -1,516 +1,179 @@
-# 🚀 PixelFlow Deployment Guide
+# PixelFlow Deployment Guide
 
-Complete guide for deploying PixelFlow to production using free hosting services.
+The canonical guide for deploying PixelFlow (v1.3.0): **backend + PostgreSQL on Render**, **frontend on Vercel**. Free tiers are enough for personal and demo use.
+
+- Environment variables: [ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md) (full reference)
+- Go-live review: [PRODUCTION_CHECKLIST.md](PRODUCTION_CHECKLIST.md)
+- Other hosts and self-hosting: [ALTERNATIVE_HOSTING_OPTIONS.md](ALTERNATIVE_HOSTING_OPTIONS.md)
 
 ---
 
-## 📋 Overview
+## Architecture
 
-This guide will help you deploy PixelFlow using:
-- **Vercel** - Frontend hosting (React app)
-- **Render** - Backend hosting (FastAPI) + PostgreSQL database
-- **Total Cost**: $0/month (using free tiers)
-
-### Architecture Overview
 ```
-┌─────────────┐      ┌──────────────┐      ┌────────────────┐
-│   Vercel    │ ───► │    Render    │ ───► │   PostgreSQL   │
-│  (Frontend) │      │  (Backend)   │      │   (Database)   │
-└─────────────┘      └──────────────┘      └────────────────┘
+Browser ──► Vercel (React app, same origin)
+              │  /api/*  rewrite (frontend/vercel.json)
+              ▼
+            Render web service (FastAPI) ──► Render PostgreSQL
 ```
 
----
+Why the rewrite matters:
 
-## 🎯 Pre-Deployment Checklist
-
-Before deploying, ensure you have:
-- [x] GitHub account
-- [x] Vercel account (sign up at vercel.com)
-- [x] Render account (sign up at render.com)
-- [x] Your code pushed to GitHub repository
-- [x] All sensitive data in `.env` (not committed to Git)
+- Auth uses **httpOnly cookies** (`pf_access`, `pf_refresh`) plus a readable `pf_csrf` cookie. Unsafe `/api` requests must echo it in an `X-CSRF-Token` header (double-submit CSRF).
+- Vercel and Render are different sites. Called directly, the cookies would be third-party and blocked by Safari/Chrome.
+- So the frontend calls a **relative** `/api` (`REACT_APP_API_URL=/api`) and Vercel proxies it to Render. The cookies become first-party (`SameSite=Lax`).
+- Any other frontend host needs an equivalent same-origin `/api` proxy.
 
 ---
 
-## Part 1: Database Deployment (Render PostgreSQL)
+## Before you start
 
-### Step 1: Create PostgreSQL Database
-
-1. **Go to Render Dashboard**
-   - Navigate to https://dashboard.render.com
-   - Click **"New +"** → **"PostgreSQL"**
-
-2. **Configure Database**
-   ```
-   Name: pixelflow-db
-   Database: pixelflow
-   User: pixelflow_user
-   Region: Choose closest to your location
-   PostgreSQL Version: 16 (latest)
-   Plan: Free
-   ```
-
-3. **Create Database**
-   - Click **"Create Database"**
-   - Wait 2-3 minutes for provisioning
-
-4. **Get Connection Details**
-   After creation, you'll see:
-   ```
-   Internal Database URL: postgresql://...
-   External Database URL: postgresql://...
-   PSQL Command: psql -h ...
-   ```
-   
-   **📋 IMPORTANT**: Copy the **External Database URL** - you'll need it!
-   
-   Format: `postgresql://username:password@host:port/database`
-
-5. **Test Connection (Optional)**
-   ```bash
-   # Install PostgreSQL client if needed
-   # Then test connection
-   psql <External_Database_URL>
-   ```
+- Code pushed to a GitHub repository; no `.env` files committed.
+- Render and Vercel accounts connected to GitHub.
+- Optional: run `deployment/prepare-for-deployment.ps1` (Windows PowerShell). It checks the project files and Git status and prints a fresh `SECRET_KEY`.
 
 ---
 
-## Part 2: Backend Deployment (Render)
+## Part 1: Backend + database on Render
 
-### Step 1: Prepare Backend for Deployment
+### Option A: Blueprint (recommended)
 
-1. **Create `render.yaml` in project root**
-   This file is already created in the `deployment/` folder. Copy it to root:
-   ```bash
-   # From project root
-   copy deployment\render.yaml .
+The root `render.yaml` defines the backend web service (`pixelflow-backend`) and the database (`pixelflow-db`). It does **not** define a frontend site.
+
+1. Render Dashboard → **New → Blueprint** → select the repository.
+2. Render creates the database and web service. `DATABASE_URL` is wired from the database, and `SECRET_KEY` is generated.
+3. In **pixelflow-backend → Environment**, add or check these values:
+   - `ADMIN_EMAIL`, `ADMIN_PASSWORD`: the first admin account. It is created on startup only if no admin exists yet. There are **no default credentials**. `ADMIN_USERNAME` and `ADMIN_FULL_NAME` are optional.
+   - `TRUSTED_PROXY_HOPS=2`: requests arrive through the Vercel rewrite and then Render's proxy. Use `1` only if browsers call Render directly. Without this, every visitor shares one rate-limit bucket (Render's proxy IP).
+   - `ALLOWED_ORIGINS`: set it to your Vercel URL after Part 2, comma-separated.
+   - `ALLOWED_ORIGINS_REGEX`: change the `pixelflow` prefix to your Vercel project name (this allows preview URLs).
+   - Google OAuth (optional): `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`. See [../guides/GOOGLE_OAUTH_SETUP.md](../guides/GOOGLE_OAUTH_SETUP.md).
+4. Save. Render redeploys.
+
+Notes from `render.yaml`:
+
+- `PYTHON_VERSION=3.11.9` is required. On Render's default Python, the pinned numpy/scikit-image/psycopg2 versions have no wheels and the build fails.
+- The service runs with `--workers 1` because the rate limiter is in memory.
+
+### Option B: Manual setup
+
+1. **New → PostgreSQL**. Name `pixelflow-db`, database `pixelflow`, PostgreSQL 16, plan Free. Pick a region.
+2. **New → Web Service** from the repository. Use the **same region** as the database.
    ```
-
-2. **Verify `requirements.txt`**
-   Ensure your `backend/requirements.txt` includes all dependencies.
-   ✅ Already configured correctly!
-
-3. **Create Production Settings**
-   Update `backend/.env.example` with production values (keep secret!)
-
-### Step 2: Deploy Backend to Render
-
-1. **Go to Render Dashboard**
-   - Click **"New +"** → **"Web Service"**
-
-2. **Connect Repository**
-   - Select **"Build and deploy from a Git repository"**
-   - Click **"Connect account"** → Choose GitHub
-   - Find and select your **PixelFlow** repository
-
-3. **Configure Web Service**
-   ```
-   Name: pixelflow-backend
-   Region: Same as database (important!)
-   Branch: main
    Root Directory: backend
-   Runtime: Python 3
-   Build Command: pip install -r requirements.txt
-   Start Command: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+   Runtime:        Python 3
+   Build Command:  pip install -r requirements.txt
+   Start Command:  uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1
+   Health Check:   /health
    ```
+3. Set the must-set variables:
 
-4. **Select Plan**
-   - Choose **"Free"** plan
-   - Free tier: 512 MB RAM, shared CPU
+   | Variable | Value |
+   |---|---|
+   | `DATABASE_URL` | Internal Database URL of the Render database (`postgres://` is rewritten to `postgresql://` automatically) |
+   | `SECRET_KEY` | `python -c "import secrets; print(secrets.token_urlsafe(32))"` |
+   | `ALLOWED_ORIGINS` | `https://your-app.vercel.app` |
+   | `ADMIN_EMAIL` / `ADMIN_PASSWORD` | First admin account |
+   | `TRUSTED_PROXY_HOPS` | `2` |
+   | `PYTHON_VERSION` | `3.11.9` |
 
-5. **Add Environment Variables**
-   Click **"Advanced"** → **"Add Environment Variable"**
-   
-   Add these variables:
-   ```
-   DEBUG=False
-   APP_NAME=PixelFlow
-   VERSION=1.2.0
-   
-   # Database (paste your External Database URL from Step 1.4)
-   DATABASE_URL=postgresql://pixelflow_user:password@host:port/pixelflow
-   USE_SQLITE=False
-   
-   # Security (generate new secret key!)
-   SECRET_KEY=<generate-new-secret-key>
-   ACCESS_TOKEN_EXPIRE_MINUTES=30
-   REFRESH_TOKEN_EXPIRE_DAYS=7
-   
-   # Server
-   HOST=0.0.0.0
-   PORT=10000
-   
-   # CORS (add your Vercel URL after frontend deployment)
-   CORS_ORIGINS=https://your-app.vercel.app,http://localhost:3000
-   ```
+   Also set `DEBUG=False` and `USE_SQLITE=False`. Everything else has defaults; see [ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md).
 
-   **🔐 Generate SECRET_KEY:**
-   ```bash
-   python -c "import secrets; print(secrets.token_urlsafe(32))"
-   ```
-   Copy the output and use it as SECRET_KEY!
+### What happens on startup
 
-6. **Create Web Service**
-   - Click **"Create Web Service"**
-   - Wait 5-10 minutes for first build
-   - You'll get a URL like: `https://pixelflow-backend.onrender.com`
+- With `DEBUG=False`, the app **refuses to start** if `SECRET_KEY` is still the default value.
+- Tables are created automatically on startup. No manual `init_db.py` step is needed.
+- The first admin is created from `ADMIN_EMAIL`/`ADMIN_PASSWORD` if no admin exists.
+- Database cleanup (expired sessions, old images) runs inside the backend every 15 minutes. You don't need a cron job. Retention settings live in the admin panel.
 
-7. **Initialize Database**
-   After deployment succeeds:
-   - Go to **"Shell"** tab in Render dashboard
-   - Run:
-   ```bash
-   python database/init_db.py
-   ```
-   This creates all database tables.
+### Verify
 
-8. **Verify Backend**
-   - Open: `https://pixelflow-backend.onrender.com/docs`
-   - You should see FastAPI documentation
-   - Test `/health` endpoint
-
-**⚠️ Free Tier Limitations:**
-- Service spins down after 15 min of inactivity
-- First request after spin-down takes ~30 seconds (cold start)
-- 750 hours/month free usage
+- `https://your-backend.onrender.com/api/health` (or `/health`) returns `{"status": "healthy", ...}`.
+- `https://your-backend.onrender.com/docs` shows the API docs.
 
 ---
 
-## Part 3: Frontend Deployment (Vercel)
+## Part 2: Frontend on Vercel
 
-### Step 1: Prepare Frontend (same-origin proxy for httpOnly cookies)
-
-Auth uses **httpOnly cookies**. Since Vercel and Render are different sites, third-party
-cookies would be blocked by Safari/Chrome — so the frontend proxies the API **same-origin**
-and the cookies become first-party (`SameSite=Lax`, works everywhere).
-
-1. **Point the proxy at your backend**
-   `frontend/vercel.json` already contains the rewrite — edit its destination host:
-   ```jsonc
-   "rewrites": [
-     { "source": "/api/:path*",
-       "destination": "https://YOUR-BACKEND.onrender.com/api/:path*" },   // ← your Render URL
-     { "source": "/(.*)", "destination": "/index.html" }
-   ]
+1. **Point the proxy at your backend.** In `frontend/vercel.json`, set the `/api/:path*` rewrite destination to your Render URL:
+   ```json
+   { "source": "/api/:path*", "destination": "https://YOUR-BACKEND.onrender.com/api/:path*" }
    ```
-
-2. **Use a relative API URL** (so calls are same-origin and the proxy handles them):
-   set `REACT_APP_API_URL=/api` in the Vercel env (Step 2 below). No code change needed —
-   `services/api.ts` reads this env var.
-
-### Step 2: Deploy to Vercel
-
-1. **Go to Vercel Dashboard**
-   - Navigate to https://vercel.com/dashboard
-   - Click **"Add New..."** → **"Project"**
-
-2. **Import Repository**
-   - Click **"Import Git Repository"**
-   - Select your **PixelFlow** repository
-   - Click **"Import"**
-
-3. **Configure Project**
+   Commit and push. No code change is needed; `services/api.ts` reads `REACT_APP_API_URL`.
+2. Vercel → **Add New → Project** → import the repository.
    ```
    Framework Preset: Create React App
-   Root Directory: frontend
-   Build Command: npm run build (auto-detected)
-   Output Directory: build (auto-detected)
-   Install Command: npm install (auto-detected)
+   Root Directory:   frontend
    ```
+3. Environment variables:
+   - `REACT_APP_API_URL=/api` (relative, so the rewrite handles it)
+   - `REACT_APP_GOOGLE_CLIENT_ID` (optional, only for Google Sign-In)
+4. **Deploy.** Vercel runs `CI=true npm run build`, so ESLint warnings fail the build.
+5. Back on Render, set `ALLOWED_ORIGINS=https://your-app.vercel.app` (exact URL, `https://`, no trailing slash) and let it redeploy.
 
-4. **Add Environment Variables**
-   Click **"Environment Variables"** tab:
-   ```
-   Name: REACT_APP_API_URL
-   Value: /api
-   ```
-   (Relative path — the `frontend/vercel.json` rewrite proxies it to your Render backend,
-   keeping auth cookies first-party.)
+Cookie settings (`COOKIE_SECURE` defaults to on in production; `COOKIE_SAMESITE` defaults to `lax`) need no change when you use the proxy.
 
-5. **Deploy**
-   - Click **"Deploy"**
-   - Wait 3-5 minutes for build
-   - You'll get a URL like: `https://pixelflow.vercel.app`
-
-6. **Set backend env**
-   Go back to Render → Backend → Environment Variables:
-   ```
-   ALLOWED_ORIGINS=https://pixelflow.vercel.app,http://localhost:3000
-   COOKIE_SECURE=True
-   COOKIE_SAMESITE=lax
-   ```
-   (`ALLOWED_ORIGINS` still helps for direct/dev calls; the proxied path is same-origin.)
-
-   **Important**: After updating, Render will automatically redeploy!
-
-### Step 3: Configure Custom Domain (Optional)
-
-1. **In Vercel Dashboard**
-   - Go to your project → **"Settings"** → **"Domains"**
-   - Add your custom domain
-   - Follow DNS configuration instructions
+Custom domain (optional): Vercel → Project → Settings → Domains. Then add the domain to `ALLOWED_ORIGINS`.
 
 ---
 
-## Part 4: Post-Deployment Configuration
+## Part 3: Smoke test
 
-### 1. Update Backend CORS
-
-Ensure backend allows your frontend domain:
-```
-CORS_ORIGINS=https://pixelflow.vercel.app
-```
-
-### 2. Test Full Application
-
-1. **Test Frontend**
-   - Visit your Vercel URL
-   - Should load without errors
-
-2. **Test Backend Connection**
-   - Upload an image
-   - Apply operations
-   - Check browser console for errors
-
-3. **Test Database**
-   - Create a user account
-   - Save a pipeline
-   - Check data persists after browser refresh
-
-### 3. Monitor Performance
-
-**Render Monitoring:**
-- Dashboard shows CPU, memory usage
-- View logs in real-time
-- Set up email alerts (Settings → Notifications)
-
-**Vercel Analytics:**
-- Built-in Web Vitals tracking
-- Real-time visitor analytics
-- Performance insights
+- The app loads at the Vercel URL with no console errors.
+- Upload an image, add an operation, and check the live preview. Run a batch.
+- Register or sign in, save a pipeline, and reload. The pipeline and images persist.
+- Sign in as the admin from `ADMIN_EMAIL`. The admin panel opens; its user-data views ask for the admin PIN.
 
 ---
 
-## 🔍 Troubleshooting
+## Free tier limits
 
-### Backend Issues
+**Render**
+- The web service spins down after 15 minutes idle. The first request after that takes about 30 seconds.
+- Free PostgreSQL (1 GB) **expires 30 days after creation and is then deleted**. After that the backend crash-loops on startup with `could not translate host name "dpg-..."`. Create a new database (or use a paid plan) and point `DATABASE_URL` at it. Back up before then, e.g. `pg_dump` against the External Database URL.
+- Paid: Starter ($7/month) is always-on.
 
-**Problem**: 502 Bad Gateway
-```
-Solution: 
-- Check Render logs for errors
-- Verify environment variables
-- Ensure database is running
-- Check DATABASE_URL format
-```
+**Vercel**
+- The hobby tier is generous for personal projects (100 GB bandwidth/month).
 
-**Problem**: Database connection fails
-```
-Solution:
-- Verify DATABASE_URL is correct
-- Check External URL (not Internal)
-- Ensure database is in same region
-- Try manual psql connection
-```
-
-**Problem**: Cold starts too slow
-```
-Solution:
-- Free tier limitation
-- Consider paid plan ($7/month for always-on)
-- Or use cron job to ping every 14 minutes
-```
-
-### Frontend Issues
-
-**Problem**: API calls fail (CORS errors)
-```
-Solution:
-- Check CORS_ORIGINS in backend
-- Verify exact URL (https, no trailing slash)
-- Check browser console for exact error
-- Redeploy backend after CORS changes
-```
-
-**Problem**: Build fails
-```
-Solution:
-- Check build logs in Vercel
-- Verify all dependencies in package.json
-- Test build locally: npm run build
-- Check TypeScript errors
-```
-
-**Problem**: Environment variable not working
-```
-Solution:
-- Must start with REACT_APP_
-- Redeploy after adding env vars
-- Check exact variable name
-- Verify in build logs
-```
+**Keep the backend warm (optional).** Use a free external pinger (e.g. cron-job.org or UptimeRobot) to call `https://your-backend.onrender.com/api/health` every 14 minutes. `/api/health` touches no database and is exempt from rate limiting.
 
 ---
 
-## 🔄 Redeployment
+## Troubleshooting
 
-### Update Backend
-```bash
-# 1. Make changes
-# 2. Commit and push
-git add .
-git commit -m "Update backend"
-git push origin main
+| Symptom | Check |
+|---|---|
+| Build fails on Render | `PYTHON_VERSION=3.11.9` is set; read the build log. |
+| 502 / service won't start | Render logs; `DATABASE_URL`; `SECRET_KEY` is not the default; the free database has not expired. |
+| Signed out right after login, or 403 CSRF errors | `REACT_APP_API_URL` must be `/api`, not the Render URL; the `vercel.json` rewrite must point at your backend. |
+| CORS errors | `ALLOWED_ORIGINS` matches the exact frontend URL (https, no trailing slash); redeploy the backend. |
+| Everyone hits rate limits together | Set `TRUSTED_PROXY_HOPS` (2 behind the Vercel rewrite). |
+| No admin account | Set `ADMIN_EMAIL`/`ADMIN_PASSWORD` and redeploy. They are only used when no admin exists yet. |
+| `REACT_APP_*` value ignored | The name must start with `REACT_APP_`; redeploy after changing it. Values are baked in at build time. |
+| Vercel build fails on warnings | Run `CI=true npm run build` and `npx tsc --noEmit` locally. |
 
-# Render auto-deploys from main branch!
-```
-
-### Update Frontend
-```bash
-# 1. Make changes
-# 2. Commit and push
-git add .
-git commit -m "Update frontend"
-git push origin main
-
-# Vercel auto-deploys from main branch!
-```
-
-### Manual Redeploy
-- Render: Dashboard → Service → **"Manual Deploy"** → **"Deploy latest commit"**
-- Vercel: Dashboard → Project → **"Deployments"** → **"Redeploy"**
+Logs: Render → service → **Logs**; Vercel → project → **Deployments**.
 
 ---
 
-## 💰 Cost Breakdown
+## Redeploying and rollback
 
-### Free Tier Limits
-
-**Render (Backend + Database):**
-- Web Service: 750 hours/month
-- PostgreSQL: 1GB storage, 90 days retention
-- Limitations: Spins down after 15min inactivity
-
-**Vercel (Frontend):**
-- 100GB bandwidth/month
-- Unlimited deployments
-- 100 builds/day
-- Custom domains included
-
-**Total**: $0/month for small-medium usage!
-
-### Paid Upgrades (if needed)
-
-**Render:**
-- Starter ($7/month): Always-on, 512MB RAM
-- Standard ($25/month): 2GB RAM, better performance
-
-**Vercel:**
-- Pro ($20/month): 1TB bandwidth, priority support
-- Usually not needed for personal projects
+- Push to the deployed branch. Render and Vercel auto-deploy.
+- Manual: Render → **Manual Deploy → Deploy latest commit**; Vercel → **Deployments → Redeploy**.
+- Rollback: Render → **Events** → roll back to a previous deploy; Vercel → **Deployments** → **Promote to Production** on an earlier build.
 
 ---
 
-## 🔐 Security Checklist
+## Deployment checklist
 
-Before going live:
-
-- [x] Change SECRET_KEY to unique value
-- [x] Set DEBUG=False
-- [x] Verify CORS_ORIGINS is restrictive
-- [x] Database uses strong password
-- [x] Environment variables not in Git
-- [x] HTTPS enabled (automatic on Vercel/Render)
-- [ ] Enable rate limiting (add later)
-- [ ] Set up monitoring/alerts
-- [ ] Regular database backups
-
----
-
-## 📚 Additional Resources
-
-**Render Documentation:**
-- https://render.com/docs
-- https://render.com/docs/deploy-fastapi
-
-**Vercel Documentation:**
-- https://vercel.com/docs
-- https://vercel.com/docs/frameworks/create-react-app
-
-**PixelFlow Guides:**
-- See `/guides` folder for detailed setup instructions
-- `DATABASE_SETUP.md` - Database configuration
-- `DEPLOYMENT.md` - General deployment info
-
----
-
-## 🆘 Getting Help
-
-If you encounter issues:
-
-1. **Check Logs**
-   - Render: Dashboard → Logs tab
-   - Vercel: Dashboard → Deployments → View Function Logs
-
-2. **Common Issues**
-   - Review troubleshooting section above
-   - Check Render/Vercel status pages
-
-3. **Community Support**
-   - Render Discord: https://discord.gg/render
-   - Vercel Discord: https://vercel.com/discord
-
----
-
-## ✅ Deployment Checklist
-
-Follow this checklist for successful deployment:
-
-### Pre-Deployment
-- [ ] Code pushed to GitHub
-- [ ] `.env` files not committed
-- [ ] All dependencies listed
-- [ ] Test locally works
-
-### Database
-- [ ] PostgreSQL created on Render
-- [ ] Connection URL copied
-- [ ] Tables initialized
-
-### Backend
-- [ ] Deployed to Render
-- [ ] Environment variables set
-- [ ] SECRET_KEY generated
-- [ ] DATABASE_URL configured
-- [ ] `/docs` endpoint accessible
-
-### Frontend
-- [ ] Deployed to Vercel
-- [ ] REACT_APP_API_URL set
-- [ ] CORS configured in backend
-- [ ] Application loads correctly
-
-### Testing
-- [ ] Upload image works
-- [ ] Processing works
-- [ ] Results display correctly
-- [ ] No console errors
-
-### Post-Deployment
-- [ ] Custom domain configured (optional)
-- [ ] Monitoring set up
-- [ ] Backup strategy planned
-
----
-
-## 🎉 Success!
-
-Your PixelFlow application is now live and accessible worldwide!
-
-**Next Steps:**
-1. Share your app URL
-2. Monitor usage and performance
-3. Collect user feedback
-4. Plan feature updates
-
-Happy deploying! 🚀
+- [ ] Repository pushed; no `.env` committed
+- [ ] Render database and backend created (Blueprint or manual), same region
+- [ ] `SECRET_KEY`, `DATABASE_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `TRUSTED_PROXY_HOPS` set; `DEBUG=False`
+- [ ] `/api/health` returns healthy
+- [ ] `frontend/vercel.json` rewrite points at your Render URL
+- [ ] Vercel project deployed with `REACT_APP_API_URL=/api`
+- [ ] `ALLOWED_ORIGINS` (and `ALLOWED_ORIGINS_REGEX`) updated with your Vercel URL
+- [ ] Smoke test passed (Part 3)
+- [ ] Database expiry date noted (free tier: 30 days)
+- [ ] Reviewed [PRODUCTION_CHECKLIST.md](PRODUCTION_CHECKLIST.md)

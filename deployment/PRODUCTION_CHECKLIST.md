@@ -1,26 +1,28 @@
 # 🛡️ Production Readiness Checklist
 
-Ensure your PixelFlow application is production-ready before going live.
+Ensure your PixelFlow application is production-ready before going live. The deployment steps themselves are in [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md); environment variables are in [ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md).
 
 ---
 
 ## 🔐 Security Checklist
 
 ### Authentication & Authorization
-- [x] JWT tokens implemented with secure SECRET_KEY
-- [x] Token expiration configured (30 min access, 7 day refresh)
+- [x] JWT access/refresh tokens in httpOnly cookies (`pf_access`, `pf_refresh`)
+- [x] Token expiration configured (30 min access, 7 day refresh; refresh tokens rotate)
 - [x] Password hashing with bcrypt
-- [ ] **CRITICAL: Generate new SECRET_KEY for production**
-- [ ] **CRITICAL: Never use development SECRET_KEY in production**
-- [ ] Rate limiting on auth endpoints (recommended)
-- [ ] Account lockout after failed login attempts (recommended)
+- [x] Rate limiting on auth endpoints (per client IP)
+- [x] Account lockout after failed login attempts
+- [x] Admin panel user-data views protected by a server-side admin PIN
+- [ ] **CRITICAL: Generate new SECRET_KEY for production** (the app refuses to start with the default when `DEBUG=False`)
+- [ ] **CRITICAL: Set `ADMIN_EMAIL` / `ADMIN_PASSWORD`** for the first admin (there are no default credentials) and use a strong password
 
 ### Environment Variables
 - [x] `.env` in `.gitignore` (verified ✓)
 - [ ] **CRITICAL: All production secrets generated and unique**
 - [ ] DATABASE_URL not exposed in logs
-- [ ] CORS_ORIGINS restricted to your domain only
+- [ ] `ALLOWED_ORIGINS` (and `ALLOWED_ORIGINS_REGEX`) restricted to your domains only
 - [ ] DEBUG set to False
+- [ ] `TRUSTED_PROXY_HOPS` set on Render (2 behind the Vercel rewrite) so rate limits are per client IP
 - [ ] Environment variables backed up securely
 
 ### Database Security
@@ -35,14 +37,14 @@ Ensure your PixelFlow application is production-ready before going live.
 - [x] CORS properly configured
 - [x] File upload size limits (50MB max)
 - [x] File type validation (images only)
-- [ ] Rate limiting on all endpoints (recommended)
-- [ ] API key authentication for admin endpoints (recommended)
+- [x] Rate limiting (per client IP + path, in memory; requires `--workers 1`)
+- [x] CSRF protection (double-submit `pf_csrf` cookie + `X-CSRF-Token` header)
 
 ### Frontend Security
 - [x] XSS protection headers configured
 - [x] Content Security Policy headers
 - [x] No sensitive data in client-side code
-- [ ] Implement CSRF protection (if using forms)
+- [x] Same-origin `/api` proxy (`frontend/vercel.json`, `REACT_APP_API_URL=/api`) so auth cookies are first-party
 - [ ] Regular dependency audits (`npm audit`)
 
 ---
@@ -51,7 +53,7 @@ Ensure your PixelFlow application is production-ready before going live.
 
 ### Backend Performance
 - [x] Database queries optimized with indexes
-- [x] Session cleanup jobs configured
+- [x] Automatic database cleanup (runs inside the backend every 15 min)
 - [x] Image processing uses efficient algorithms
 - [ ] Caching implemented for frequent operations (recommended)
 - [ ] CDN for static assets (if needed)
@@ -69,7 +71,7 @@ Ensure your PixelFlow application is production-ready before going live.
 - [ ] Set up error tracking (e.g., Sentry)
 - [ ] Monitor API response times
 - [ ] Track database query performance
-- [ ] Set up uptime monitoring
+- [ ] Set up uptime monitoring (ping `GET /api/health`)
 - [ ] Configure alerting for critical errors
 
 ---
@@ -83,7 +85,7 @@ Ensure your PixelFlow application is production-ready before going live.
 - [ ] Live processing mode works
 - [ ] Batch processing mode works
 - [ ] Image download works
-- [ ] Pipeline save/load works (if implemented)
+- [ ] Pipeline save/load works
 - [ ] Session management works correctly
 - [ ] Mobile responsive (if applicable)
 
@@ -132,8 +134,8 @@ Ensure your PixelFlow application is production-ready before going live.
 ### Deployment Documentation
 - [x] Deployment guide created
 - [x] Environment variables documented
-- [x] Quick start checklist
-- [ ] Rollback procedure documented
+- [x] Deployment checklist ([DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md#deployment-checklist))
+- [x] Rollback procedure documented (DEPLOYMENT_GUIDE.md, Redeploying and rollback)
 - [ ] Disaster recovery plan
 
 ---
@@ -149,14 +151,7 @@ Ensure your PixelFlow application is production-ready before going live.
 - [ ] Backup of current production (if redeploying)
 
 ### Deployment Steps
-- [ ] Database created and initialized
-- [ ] Backend deployed to Render
-- [ ] Environment variables configured
-- [ ] Database tables initialized
-- [ ] Frontend deployed to Vercel
-- [ ] CORS configured correctly
-- [ ] DNS configured (if using custom domain)
-- [ ] SSL certificates valid (auto on Vercel/Render)
+- [ ] Completed the [deployment checklist](DEPLOYMENT_GUIDE.md#deployment-checklist) in DEPLOYMENT_GUIDE.md
 
 ### Post-Deployment
 - [ ] Smoke test all critical features
@@ -186,6 +181,7 @@ Ensure your PixelFlow application is production-ready before going live.
 - [ ] Track backend runtime hours
 - [ ] Monitor bandwidth usage
 - [ ] Check database storage (1GB limit)
+- [ ] Track the free database's expiry (deleted 30 days after creation)
 - [ ] Review cold start frequency
 - [ ] Monitor user count and traffic
 

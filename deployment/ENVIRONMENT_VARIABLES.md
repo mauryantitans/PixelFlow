@@ -1,238 +1,60 @@
-# Environment Variables Configuration
+# Environment variables
 
-## Backend Environment Variables (Render)
+The one reference for every variable PixelFlow reads. Other docs link here instead of
+repeating it. Backend values go in `backend/.env` locally (template: `backend/.env.example`)
+or in Render → your service → Environment. Frontend values go in Vercel → Project → Settings →
+Environment Variables. They are compiled in at build time, so redeploy after changing them.
 
-Copy these to Render Dashboard → Web Service → Environment Variables
+## Backend
 
-```bash
-# Application Settings
-DEBUG=False
-APP_NAME=PixelFlow
-VERSION=1.2.0
+### Must set in production
 
-# Server Settings
-HOST=0.0.0.0
-PORT=10000
+| Variable | Example | Notes |
+|---|---|---|
+| `DATABASE_URL` | `postgresql://user:pass@host:5432/db` | Render's Internal Database URL works when the backend is on Render. `postgres://` is rewritten to `postgresql://`. |
+| `SECRET_KEY` | output of `python -c "import secrets; print(secrets.token_urlsafe(32))"` | Signs tokens and the admin-PIN cookie. The app **refuses to start** in production with the default. |
+| `ALLOWED_ORIGINS` | `https://your-app.vercel.app` | Comma-separated CORS origins, no trailing slash. (`CORS_ORIGINS` is not read.) |
+| `ADMIN_EMAIL`, `ADMIN_PASSWORD` | | Creates the first admin on startup if no admin exists. Optional: `ADMIN_USERNAME`, `ADMIN_FULL_NAME`. |
+| `TRUSTED_PROXY_HOPS` | `2` | How many proxies append to `X-Forwarded-For`. `2` when the browser calls Vercel, which proxies `/api` to Render (the recommended setup). `1` when the browser calls Render directly. Default `0` uses the socket peer: behind proxies every visitor then shares one rate-limit bucket. |
+| `DEBUG` | `False` | `True` enables reload and relaxes production checks. |
 
-# Database Settings
-USE_SQLITE=False
-DATABASE_URL=<YOUR_POSTGRES_URL_FROM_RENDER>
-# Format: postgresql://username:password@host:port/database
+### Optional
 
-# Security - IMPORTANT: Generate new values!
-SECRET_KEY=<GENERATE_NEW_SECRET_KEY>
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-REFRESH_TOKEN_EXPIRE_DAYS=7
+| Variable | Default | Notes |
+|---|---|---|
+| `ALLOWED_ORIGINS_REGEX` | — | Extra origins by regex, e.g. Vercel previews: `https://your-app(-[a-z0-9]+)*\.vercel\.app`. |
+| `USE_SQLITE` | `False` | `True` uses a local SQLite file instead of `DATABASE_URL` (what `start.sh` does). |
+| `COOKIE_SECURE` | on unless `DEBUG` | Secure flag on auth cookies. |
+| `COOKIE_SAMESITE` | `lax` | Keep `lax` with the same-origin proxy. `none` (forces Secure) only for cross-site API calls, which Safari blocks. |
+| `COOKIE_DOMAIN` | — | Only to share cookies across subdomains. |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | — | Enable Google sign-in ([guide](../guides/GOOGLE_OAUTH_SETUP.md)). |
+| `GOOGLE_REDIRECT_URI` | `http://localhost:3000/auth/google/callback` | The **frontend** callback URL registered with Google. |
+| `DB_CONNECT_RETRIES`, `DB_CONNECT_BASE_DELAY` | `5`, `1` (s) | Startup retries while the database wakes up (exponential backoff). |
+| `DB_CLEANUP_INTERVAL_SECONDS` | `900` | How often the built-in cleanup job runs. Whether it deletes anything is the admin's Auto-cleanup switch (Admin → Retention). |
+| `DB_CLEANUP_INITIAL_DELAY_SECONDS` | `120` | Delay before the first run after startup. |
+| `HOST`, `PORT` | `0.0.0.0`, `8000` | Render sets `PORT` itself. |
+| `APP_NAME`, `VERSION` | `PixelFlow`, `1.3.0` | Shown at `/` and in logs. |
 
-# CORS Origins - Update after frontend deployment
-# NOTE: the env var is ALLOWED_ORIGINS (not CORS_ORIGINS)
-ALLOWED_ORIGINS=https://your-app.vercel.app,http://localhost:3000
+Token lifetimes (access 30 min, refresh 7 days), rate limits and upload limits are constants in
+`backend/app/core/security_config.py`, not environment variables. Quotas, retention periods
+and session lifetimes are edited in the admin panel (stored in the `system_settings` table).
 
-# Vercel preview-deployment regex (update prefix to match your project name)
-ALLOWED_ORIGINS_REGEX=https://your-app(-[a-z0-9]+)*\.vercel\.app
+## Frontend
 
-# Auth cookies (httpOnly cookie-based auth)
-# With the same-origin proxy (recommended), keep SameSite=lax. Secure defaults to
-# on in production. Only set COOKIE_SAMESITE=none (requires Secure) if you serve the
-# API cross-site without the proxy — note third-party cookies are blocked in Safari
-# and being phased out in Chrome.
-COOKIE_SECURE=True
-COOKIE_SAMESITE=lax
-# COOKIE_DOMAIN=          # optional; only if sharing cookies across subdomains
-
-# Google OAuth (Optional - if using OAuth)
-# GOOGLE_CLIENT_ID=your-client-id
-# GOOGLE_CLIENT_SECRET=your-client-secret
-# GOOGLE_REDIRECT_URI=https://your-app.vercel.app/auth/google/callback
-```
-
-### Generate SECRET_KEY
-
-Run this command locally:
-```bash
-python -c "import secrets; print(secrets.token_urlsafe(32))"
-```
-
-Copy the output and paste as SECRET_KEY value.
-
----
-
-## Frontend Environment Variables (Vercel)
-
-Add these in Vercel Dashboard → Project → Settings → Environment Variables
-
-```bash
-# API URL — with the same-origin proxy (recommended for httpOnly cookies), use a
-# RELATIVE path so the API is first-party. The Vercel rewrite in frontend/vercel.json
-# proxies /api/* to your Render backend (edit that file's destination host).
-REACT_APP_API_URL=/api
-
-# (Only if you are NOT using the proxy — direct cross-site calls; note this makes
-#  cookies third-party and unreliable in Safari/Chrome:)
-# REACT_APP_API_URL=https://your-backend.onrender.com/api
-```
-
-**Important Notes:**
-- Variable MUST start with `REACT_APP_` for Create React App
-- The same-origin proxy keeps auth cookies first-party (SameSite=Lax) — set the rewrite
-  destination in `frontend/vercel.json` to your Render backend URL
-- Don't include a trailing slash
-- Must redeploy after adding/changing variables
-
----
-
-## Local Development Environment Variables
-
-### Backend (.env file in backend/)
-
-```bash
-# Application Settings
-DEBUG=True
-APP_NAME=PixelFlow
-VERSION=1.2.0
-
-# Server Settings
-HOST=0.0.0.0
-PORT=8000
-
-# Database Settings (use SQLite for local dev)
-USE_SQLITE=True
-
-# Security
-SECRET_KEY=dev-secret-key-change-in-production
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-REFRESH_TOKEN_EXPIRE_DAYS=7
-
-# CORS Origins
-ALLOWED_ORIGINS=http://localhost:3000
-
-# Google OAuth (Optional)
-# GOOGLE_CLIENT_ID=
-# GOOGLE_CLIENT_SECRET=
-# GOOGLE_REDIRECT_URI=http://localhost:3000/auth/google/callback
-```
-
-### Frontend (.env file in frontend/)
-
-```bash
-# API URL for local development
-REACT_APP_API_URL=http://localhost:8000/api
-```
-
----
-
-## Environment Variable Checklist
-
-### Before Backend Deployment
-- [ ] DEBUG set to False
-- [ ] NEW SECRET_KEY generated (never use dev key!)
-- [ ] DATABASE_URL from Render PostgreSQL
-- [ ] USE_SQLITE set to False
-- [ ] ALLOWED_ORIGINS includes localhost for testing
-
-### After Frontend Deployment
-- [ ] Update CORS_ORIGINS with Vercel URL
-- [ ] Redeploy backend to apply CORS changes
-
-### Optional OAuth Setup
-- [ ] GOOGLE_CLIENT_ID configured
-- [ ] GOOGLE_CLIENT_SECRET configured
-- [ ] GOOGLE_REDIRECT_URI points to production URL
-- [ ] OAuth consent screen configured in Google Cloud Console
-
----
-
-## Security Best Practices
-
-1. **Never commit .env files to Git**
-   - Already in .gitignore ✓
-   - Use .env.example as template
-
-2. **Use different keys for dev/production**
-   - Development: Simple keys for testing
-   - Production: Strong randomly generated keys
-
-3. **Rotate secrets regularly**
-   - Change SECRET_KEY every 3-6 months
-   - Update DATABASE_URL if password changes
-
-4. **Restrict CORS origins**
-   - Production: Only your domain
-   - Development: Include localhost
-   - Never use `*` (allow all)
-
-5. **Monitor environment variables**
-   - Render/Vercel dashboards show masked values
-   - Download backup of variables for disaster recovery
-
----
+| Variable | Value | Notes |
+|---|---|---|
+| `REACT_APP_API_URL` | `/api` in production | Relative, so the API is same-origin and cookies are first-party. `frontend/vercel.json` rewrites `/api/*` to the Render backend: set its destination to your backend URL. Locally `start.sh` writes `http://localhost:8000/api` to `frontend/.env.local`. |
+| `REACT_APP_GOOGLE_CLIENT_ID` | — | Shows the Google button. Must match the backend's `GOOGLE_CLIENT_ID`. |
+| `REACT_APP_TOKEN_REFRESH_MINUTES` | `20` | Refresh tokens proactively after this many minutes. Keep it below the 30-minute access-token lifetime. |
 
 ## Troubleshooting
 
-### Environment variable not working
-
-**Backend (Render):**
-- Check variable name matches exactly (case-sensitive)
-- Verify value has no extra spaces
-- Redeploy service after changes
-- Check logs for "Environment variable XYZ not set"
-
-**Frontend (Vercel):**
-- Must start with `REACT_APP_`
-- Redeploy after adding variables
-- Check build logs for correct values
-- Variables are compiled at build time (not runtime)
-
-### Database connection fails
-
-1. Check DATABASE_URL format:
-   ```
-   postgresql://username:password@host:port/database
-   ```
-
-2. Use External URL (not Internal):
-   - Internal: Only works within Render network
-   - External: Required for web services
-
-3. Verify database is in same region as backend
-
-4. Test connection manually:
-   ```bash
-   psql <DATABASE_URL>
-   ```
-
-### CORS errors
-
-1. Check exact URL in CORS_ORIGINS:
-   - Include https://
-   - No trailing slash
-   - Exact subdomain
-
-2. Multiple origins separated by comma:
-   ```
-   https://app.vercel.app,https://www.app.com,http://localhost:3000
-   ```
-
-3. Redeploy backend after CORS changes
-
-4. Clear browser cache and try again
-
----
-
-## Quick Reference
-
-### Render Environment Variables Location
-```
-Dashboard → Your Service → Environment → Add Environment Variable
-```
-
-### Vercel Environment Variables Location
-```
-Dashboard → Your Project → Settings → Environment Variables
-```
-
-### Update Variables
-```
-Render: Environment tab → Edit → Save → Auto-redeploys
-Vercel: Settings → Environment Variables → Edit → Redeploy
-```
+- **A variable has no effect.** Check the exact (case-sensitive) name against the tables above,
+  then redeploy. Frontend variables must start with `REACT_APP_` and need a new build.
+- **CORS error in the browser.** `ALLOWED_ORIGINS` must contain the exact origin (scheme, host,
+  no trailing slash). With the Vercel proxy, requests are same-origin and CORS doesn't apply.
+- **Signed out after every request, or 403 CSRF errors in production.** The frontend is calling
+  the backend cross-site. Use `REACT_APP_API_URL=/api` with the Vercel rewrite.
+- **Backend won't start: database unreachable.** Check `DATABASE_URL`. A Render free database is
+  deleted 30 days after creation; the startup log names the host it couldn't reach.
+- **Everyone hits the rate limit at once.** Set `TRUSTED_PROXY_HOPS`.
