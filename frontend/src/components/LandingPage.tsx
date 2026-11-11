@@ -37,7 +37,7 @@ export const LandingPage: React.FC = () => {
             </span>
           </h1>
           <p className="text-xl text-slate-600 dark:text-slate-300 mb-8 max-w-3xl mx-auto">
-            Build powerful image processing pipelines with 50+ operations from OpenCV and Scikit-Image. 
+            Build powerful image processing pipelines with 77 operations from OpenCV and Scikit-Image. 
             No coding required. Real-time preview. Export and share.
           </p>
           
@@ -88,7 +88,7 @@ export const LandingPage: React.FC = () => {
               </div>
               <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-50 mb-2">1. Upload Images</h3>
               <p className="text-slate-600 dark:text-slate-300">
-                Drag and drop or select images from your computer. Supports JPG, PNG, BMP, and TIFF formats.
+                Select images from your computer (up to 20 at a time). Supports JPG, PNG, BMP, and TIFF formats.
               </p>
             </div>
 
@@ -138,7 +138,7 @@ export const LandingPage: React.FC = () => {
             <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center mb-4">
               <Sparkles aria-hidden="true" className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
             </div>
-            <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-50 mb-3">50+ Operations</h3>
+            <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-50 mb-3">77 Operations</h3>
             <p className="text-slate-600 dark:text-slate-300">
               Professional-grade filters from OpenCV and Scikit-Image. Basic adjustments to advanced computer vision.
             </p>
@@ -151,7 +151,7 @@ export const LandingPage: React.FC = () => {
             </div>
             <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-50 mb-3">Visual Pipeline Builder</h3>
             <p className="text-slate-600 dark:text-slate-300">
-              Drag, drop, and reorder operations. Build complex workflows visually without writing any code.
+              Add operations with a click, then reorder them with buttons or Alt+Arrow keys. Build complex workflows without writing any code.
             </p>
           </div>
 
