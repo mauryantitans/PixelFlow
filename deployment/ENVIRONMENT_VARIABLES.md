@@ -27,8 +27,8 @@ Environment Variables. They are compiled in at build time, so redeploy after cha
 | `COOKIE_SECURE` | on unless `DEBUG` | Secure flag on auth cookies. |
 | `COOKIE_SAMESITE` | `lax` | Keep `lax` with the same-origin proxy. `none` (forces Secure) only for cross-site API calls, which Safari blocks. |
 | `COOKIE_DOMAIN` | — | Only to share cookies across subdomains. |
-| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | — | Enable Google sign-in ([guide](../guides/GOOGLE_OAUTH_SETUP.md)). |
-| `GOOGLE_REDIRECT_URI` | `http://localhost:3000/auth/google/callback` | The **frontend** callback URL registered with Google. |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | — | Enable Google sign-in ([guide](../guides/GOOGLE_OAUTH_SETUP.md)). The ID token is verified with the client ID. |
+| `GOOGLE_REDIRECT_URI` | `http://localhost:3000/auth/google/callback` | Only used by the legacy redirect route `GET /api/auth/google/login`. The app's Google button uses a popup and needs no redirect URI. |
 | `DB_CONNECT_RETRIES`, `DB_CONNECT_BASE_DELAY` | `5`, `1` (s) | Startup retries while the database wakes up (exponential backoff). |
 | `DB_CLEANUP_INTERVAL_SECONDS` | `900` | How often the built-in cleanup job runs. Whether it deletes anything is the admin's Auto-cleanup switch (Admin → Retention). |
 | `DB_CLEANUP_INITIAL_DELAY_SECONDS` | `120` | Delay before the first run after startup. |

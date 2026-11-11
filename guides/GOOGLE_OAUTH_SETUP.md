@@ -1,355 +1,143 @@
 # Google OAuth Setup Guide
 
-Step-by-step guide to enable Google Sign-In for PixelFlow.
+Enable "Continue with Google" sign-in for PixelFlow. It's optional: without it, the button is hidden and
+email/password accounts work as usual.
 
 ---
 
-## 🎯 **Why Enable Google OAuth?**
+## How it works
 
-Benefits:
-- ✅ Users can sign in with their Google account
-- ✅ No password to remember
-- ✅ More secure (Google handles authentication)
-- ✅ Faster registration process
-- ✅ Profile pictures automatically imported
+PixelFlow uses **Google Identity Services** (the Google button in a popup), not a server-side redirect:
+
+1. The frontend loads `https://accounts.google.com/gsi/client` and renders the button, but only when
+   `REACT_APP_GOOGLE_CLIENT_ID` is set.
+2. The user picks an account. Google returns a signed **ID token** to the page.
+3. The frontend POSTs it to `POST /api/auth/google/callback` (`{REACT_APP_API_URL}/auth/google/callback`).
+4. The backend verifies the token against `GOOGLE_CLIENT_ID` and requires a verified email. It then finds the
+   user by Google ID, or by email (linking an existing password account), or creates a new user with a
+   generated username and the Google profile picture.
+5. The backend sets the usual **httpOnly auth cookies** (`pf_access`, `pf_refresh`, plus `pf_csrf`) and
+   returns only the user record. No token is stored in `localStorage`.
+
+Because there is no redirect, Google only needs your frontend's **Authorized JavaScript origins**.
+
+Backend routes (mounted under `/api/auth`, in `backend/app/api/routes/oauth.py`):
+
+| Route | Used by the app | Purpose |
+|---|---|---|
+| `POST /api/auth/google/callback` | Yes | Verifies the ID token and signs the user in |
+| `GET /api/auth/google/status` | No (diagnostic) | Reports whether `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` are set and the configured `redirect_uri` |
+| `GET /api/auth/google/login` | No | Legacy redirect to Google's consent page with `redirect_uri=GOOGLE_REDIRECT_URI` |
+
+`GOOGLE_REDIRECT_URI` (default `http://localhost:3000/auth/google/callback`) is only used by the legacy
+`/google/login` route. The frontend doesn't call that route and has no `/auth/google/callback` page, so you
+don't need to register a redirect URI for the button flow.
 
 ---
 
-## 📋 **Prerequisites**
+## Step 1: Google Cloud project and consent screen
 
-- Google account
-- PixelFlow backend and frontend running locally
-- 15 minutes of setup time
+1. In the [Google Cloud Console](https://console.cloud.google.com/), create or select a project.
+2. Open **APIs & Services → OAuth consent screen** (shown as **Google Auth Platform** in newer consoles).
+   - App name, user support email, developer contact email.
+   - Audience **External**. While the app is in **Testing**, add your Google account under **Test users**.
+   - The default scopes `openid`, `email` and `profile` are all PixelFlow needs.
 
----
+You don't need to enable any extra API. The deprecated Google+ API is not used.
 
-## 🚀 **Step-by-Step Setup**
+## Step 2: OAuth client ID
 
-### **Step 1: Create Google Cloud Project**
-
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Click **"Select a project"** → **"New Project"**
-3. **Project name**: `PixelFlow`
-4. Click **"Create"**
-5. Wait for project creation (30 seconds)
-
-### **Step 2: Enable Google+ API**
-
-1. In Google Cloud Console, select your PixelFlow project
-2. Go to **"APIs & Services"** → **"Library"**
-3. Search for **"Google+ API"**
-4. Click on it → Click **"Enable"**
-5. Wait for activation
-
-### **Step 3: Create OAuth Credentials**
-
-1. Go to **"APIs & Services"** → **"Credentials"**
-2. Click **"Create Credentials"** → **"OAuth client ID"**
-3. If prompted, configure consent screen first:
-   - Click **"Configure Consent Screen"**
-   - Choose **"External"** (for testing)
-   - **App name**: `PixelFlow`
-   - **User support email**: Your email
-   - **Developer contact**: Your email
-   - Click **"Save and Continue"**
-   - Skip "Scopes" → Click **"Save and Continue"**
-   - Add test users (your email) → Click **"Save and Continue"**
-   - Click **"Back to Dashboard"**
-
-4. Now create OAuth client:
-   - Go back to **"Credentials"**
-   - Click **"Create Credentials"** → **"OAuth client ID"**
-   - **Application type**: `Web application`
-   - **Name**: `PixelFlow Web Client`
-
-5. **Add Authorized JavaScript origins:**
+1. **APIs & Services → Credentials → Create credentials → OAuth client ID**.
+2. Application type **Web application**.
+3. **Authorized JavaScript origins.** For local development, add both:
    ```
+   http://localhost
    http://localhost:3000
-   http://127.0.0.1:3000
    ```
+   Add `http://127.0.0.1:3000` only if you open the app on that host.
+4. **Authorized redirect URIs:** leave empty (see [How it works](#how-it-works)).
+5. Create, and copy the **Client ID** (`...apps.googleusercontent.com`). The client secret isn't used to verify
+   sign-ins.
 
-6. **Add Authorized redirect URIs:**
-   ```
-   http://localhost:3000
-   http://localhost:3000/auth
-   http://localhost:8000/api/auth/google/callback
-   ```
+Changes to origins can take a few minutes to take effect.
 
-7. Click **"Create"**
+## Step 3: Backend
 
-8. **IMPORTANT**: Copy the credentials shown:
-   - **Client ID**: `12345-abcdef.apps.googleusercontent.com`
-   - **Client Secret**: `GOCSPX-xxxxx`
-
----
-
-### **Step 4: Configure PixelFlow Backend**
-
-Edit `backend/.env`:
+In `backend/.env`:
 
 ```env
-# Add these lines (replace with your actual credentials)
-GOOGLE_CLIENT_ID=your_client_id_here.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=GOCSPX-your_client_secret_here
+GOOGLE_CLIENT_ID=1234567890-abc.apps.googleusercontent.com
+# Optional: only reported by /api/auth/google/status ("configured" is true when both are set)
+GOOGLE_CLIENT_SECRET=GOCSPX-...
 ```
 
-**Save the file** and **restart backend**:
+Restart the backend.
 
-```bash
-# Stop backend (Ctrl+C)
-python run.py
-```
+## Step 4: Frontend
 
----
-
-### **Step 5: Configure PixelFlow Frontend**
-
-Edit `frontend/.env`:
+The frontend must use the **same** client ID. Add it to `frontend/.env.local` (`start.sh` / `start.bat` create
+this file with `REACT_APP_API_URL`, so keep that line):
 
 ```env
-REACT_APP_GOOGLE_CLIENT_ID=your_client_id_here.apps.googleusercontent.com
+REACT_APP_API_URL=http://localhost:8000/api
+REACT_APP_GOOGLE_CLIENT_ID=1234567890-abc.apps.googleusercontent.com
 ```
 
-**Save the file** and **restart frontend**:
+Restart `npm start`. `REACT_APP_*` values are read at start/build time. With Docker Compose, set
+`REACT_APP_GOOGLE_CLIENT_ID` (and `GOOGLE_CLIENT_ID` for the backend) in `docker-compose.yml` instead.
 
-```bash
-# Stop frontend (Ctrl+C)
-npm start
-```
+## Step 5: Test
 
----
-
-### **Step 6: Test Google Sign-In**
-
-1. Go to `http://localhost:3000/auth`
-2. You should see **"Sign in with Google"** button
-3. Click it
-4. Select your Google account
-5. Grant permissions
-6. You should be redirected to the app, logged in!
-
----
-
-## ✅ **Verification**
-
-After signing in with Google, verify:
-
-**In Frontend:**
-- [ ] User menu shows your Google profile picture
-- [ ] Username matches your Google name
-- [ ] Can save and load pipelines
-
-**In Backend Database:**
-```bash
-python list_users.py
-```
-
-Should show your user with:
-- `oauth_provider: google`
-- `oauth_id: [your Google ID]`
-
----
-
-## 🔧 **Troubleshooting**
-
-### **Problem: "Sign in with Google" button doesn't appear**
-
-**Check:**
-1. `REACT_APP_GOOGLE_CLIENT_ID` is set in `frontend/.env`
-2. Frontend was restarted after adding the env variable
-3. Browser console for JavaScript errors
-
-**Fix:**
-```bash
-# Restart frontend
-cd frontend
-npm start
-```
-
-### **Problem: "Invalid client" error**
-
-**Check:**
-1. Client ID in frontend `.env` matches Google Cloud Console
-2. Client ID is the full string (ends with `.apps.googleusercontent.com`)
-3. No extra spaces or quotes in .env file
-
-### **Problem: "Redirect URI mismatch"**
-
-**Check in Google Cloud Console:**
-1. Authorized JavaScript origins includes `http://localhost:3000`
-2. Authorized redirect URIs includes all three:
-   - `http://localhost:3000`
-   - `http://localhost:3000/auth`
-   - `http://localhost:8000/api/auth/google/callback`
-
-**Fix:**
-- Add missing URIs in Google Cloud Console
-- Wait 5 minutes for changes to propagate
-- Try again
-
-### **Problem: "Access blocked: This app hasn't been verified"**
-
-**For Development:**
-- Click **"Advanced"** → **"Go to PixelFlow (unsafe)"**
-- This is normal for apps in testing mode
-
-**For Production:**
-- Submit app for Google verification
-- Or add users to "Test users" list in OAuth consent screen
-
----
-
-## 🔐 **Security Best Practices**
-
-### **Development**
-
-✅ **DO:**
-- Use localhost URLs
-- Keep credentials in .env (not in code)
-- Add .env to .gitignore
-
-❌ **DON'T:**
-- Commit credentials to GitHub
-- Share your client secret publicly
-- Use the same credentials for production
-
-### **Production**
-
-1. **Create separate OAuth client** for production
-2. **Use production URLs** in authorized origins:
+1. Open http://localhost:3000/auth. The Google button appears.
+2. Sign in with a test user. You land on `/app`, signed in.
+3. Optional checks:
+   ```bash
+   curl http://localhost:8000/api/auth/google/status
    ```
-   https://yourdomain.com
-   https://www.yourdomain.com
-   ```
-3. **Submit for Google verification** (if public app)
-4. **Rotate client secret** regularly
+   In the database, the user row has `oauth_provider = 'google'` and an `oauth_id`. `list_users` doesn't print
+   these fields, so query the `users` table directly.
 
 ---
 
-## 📊 **OAuth Flow Explained**
+## Production
 
-Here's what happens when a user clicks "Sign in with Google":
+- Create a **separate OAuth client** for production. Don't reuse the development one.
+- **Authorized JavaScript origins:** your frontend origin, for example `https://your-app.vercel.app` (and a
+  custom domain if you have one). Vercel preview URLs change per deploy, so add any you want to test.
+- **Backend (Render):** `GOOGLE_CLIENT_ID` (and optionally `GOOGLE_CLIENT_SECRET`), plus `ALLOWED_ORIGINS`
+  set to your frontend origin.
+- **Frontend (Vercel):** `REACT_APP_GOOGLE_CLIENT_ID` (same ID), and `REACT_APP_API_URL=/api` so the callback
+  goes through the same-origin `/api` rewrite and the auth cookies are first-party. Redeploy after changing it.
+- To let anyone sign in (not only test users), publish the app on the consent screen. Google may require
+  verification.
 
-```
-1. User clicks button
-   ↓
-2. Redirected to Google login
-   ↓
-3. User selects Google account
-   ↓
-4. User grants permissions
-   ↓
-5. Google redirects back to PixelFlow with auth code
-   ↓
-6. PixelFlow backend exchanges code for user info
-   ↓
-7. Backend creates/updates user in database
-   ↓
-8. Backend generates JWT token
-   ↓
-9. Frontend stores token and logs user in
-   ↓
-10. User is now authenticated!
-```
+Full variable reference: [deployment/ENVIRONMENT_VARIABLES.md](../deployment/ENVIRONMENT_VARIABLES.md).
+Deployment steps: [deployment/DEPLOYMENT_GUIDE.md](../deployment/DEPLOYMENT_GUIDE.md).
 
 ---
 
-## 🌐 **Production Deployment**
+## Troubleshooting
 
-When deploying to production (e.g., `https://pixelflow.yourdomain.com`):
-
-### **Step 1: Create New OAuth Client**
-
-- **Don't reuse** development credentials
-- Create new OAuth client in Google Cloud Console
-- Use production URLs
-
-### **Step 2: Update Authorized URLs**
-
-**JavaScript origins:**
-```
-https://pixelflow.yourdomain.com
-https://www.pixelflow.yourdomain.com
-```
-
-**Redirect URIs:**
-```
-https://pixelflow.yourdomain.com
-https://pixelflow.yourdomain.com/auth
-https://api.pixelflow.yourdomain.com/api/auth/google/callback
-```
-
-### **Step 3: Update Production Environment**
-
-```env
-GOOGLE_CLIENT_ID=your_production_client_id
-GOOGLE_CLIENT_SECRET=your_production_client_secret
-CORS_ORIGINS=https://pixelflow.yourdomain.com
-```
+| Symptom | Cause / fix |
+|---|---|
+| No Google button | `REACT_APP_GOOGLE_CLIENT_ID` is unset (or still the `YOUR_GOOGLE_CLIENT_ID...` placeholder), or the dev server wasn't restarted. Check the browser console. |
+| Google error "origin is not allowed" / `origin_mismatch` | Add the exact origin you're browsing from (scheme, host and port) to Authorized JavaScript origins, then wait a few minutes. |
+| `400 Invalid Google token` from the backend | The backend's `GOOGLE_CLIENT_ID` differs from the frontend's `REACT_APP_GOOGLE_CLIENT_ID`, or is unset. |
+| `400 Email not verified by Google` | The Google account's email isn't verified. |
+| "Access blocked: this app's request is invalid" or "app hasn't been verified" | Add the account under Test users, or publish the app on the consent screen. |
+| Signs in, but the next request acts as a guest (production) | The frontend calls the backend cross-site, so cookies are dropped. Use `REACT_APP_API_URL=/api` with the Vercel rewrite. |
+| CORS error on `/auth/google/callback` (local) | The page's origin isn't in `ALLOWED_ORIGINS` (see [INSTALLATION.md](../INSTALLATION.md#troubleshooting)). |
 
 ---
 
-## 🔑 **Managing OAuth Credentials**
+## Security notes
 
-### **Store Securely**
+- Keep client IDs and secrets in `.env` files or the host's environment settings, never in git.
+- Use separate OAuth clients for development, staging and production.
+- Google is the only built-in provider. The `users.oauth_provider` / `oauth_id` columns are generic, but there
+  is no code for other providers.
 
-**Development:**
-- Keep in `.env` file (gitignored)
-- Never commit to version control
+## References
 
-**Production:**
-- Use environment variables
-- Use secrets management (AWS Secrets Manager, etc.)
-- Rotate credentials every 90 days
-
-### **Multiple Environments**
-
-Create separate OAuth clients for:
-- **Development**: localhost URLs
-- **Staging**: staging.yourdomain.com
-- **Production**: yourdomain.com
-
-This prevents cross-contamination and improves security.
-
----
-
-## 📱 **Additional OAuth Providers**
-
-Want to add more sign-in options?
-
-PixelFlow supports:
-- Google (built-in)
-- GitHub (code structure ready)
-- Facebook (easy to add)
-- Microsoft (easy to add)
-
-See: [guides/ADDING_OAUTH_PROVIDERS.md](ADDING_OAUTH_PROVIDERS.md) for instructions.
-
----
-
-## 📚 **Related Resources**
-
-- [Google OAuth Documentation](https://developers.google.com/identity/protocols/oauth2)
-- [Google Cloud Console](https://console.cloud.google.com/)
-- [OAuth 2.0 Explained](https://oauth.net/2/)
-
----
-
-## ✅ **Checklist**
-
-Before going to production:
-
-- [ ] Created Google Cloud project
-- [ ] Enabled Google+ API  
-- [ ] Created OAuth client
-- [ ] Added production URLs to authorized origins
-- [ ] Configured backend .env with credentials
-- [ ] Configured frontend .env with client ID
-- [ ] Tested sign-in flow
-- [ ] Verified user creation in database
-- [ ] Set up credential rotation schedule
-- [ ] Documented credentials location securely
-
----
-
-**Google OAuth is now enabled! Users can sign in with one click! 🎉**
+- [Google Identity Services: Sign in with Google for web](https://developers.google.com/identity/gsi/web/guides/overview)
+- [Verify the Google ID token on your server](https://developers.google.com/identity/gsi/web/guides/verify-google-id-token)

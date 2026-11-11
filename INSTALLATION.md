@@ -1,283 +1,187 @@
 # PixelFlow Installation Guide
 
-Complete step-by-step installation guide for PixelFlow - Visual Image Processing Pipeline Builder.
+How to run PixelFlow (v1.3.0) on your own machine, create the first admin, and fix common local problems.
+For production see [deployment/DEPLOYMENT_GUIDE.md](deployment/DEPLOYMENT_GUIDE.md).
 
 ---
 
-## 📋 **Prerequisites**
+## Prerequisites
 
-Before installing PixelFlow, ensure you have:
-
-- **Python 3.8+** (recommended: Python 3.10 or 3.11)
-- **Node.js 16+** and npm (recommended: Node.js 18 LTS)
-- **Git** (for cloning the repository)
-- **PostgreSQL 13+** (optional - SQLite works out of the box)
-- **Windows/Mac/Linux** operating system
-
----
-
-## 🚀 **Quick Start (5 Minutes)**
-
-### **Step 1: Clone the Repository**
+- **Python 3.11** (the version used by `backend/Dockerfile`, `runtime.txt` and CI)
+- **Node.js 18+** and npm (CI uses Node 20; the frontend Docker image uses Node 18)
+- **Git**
+- Optional: **Docker** (for `docker compose`) or a local **PostgreSQL** server. SQLite needs no setup.
 
 ```bash
 git clone https://github.com/Mauryantitans/PixelFlow.git
 cd PixelFlow
 ```
 
-### **Step 2: Backend Setup**
+---
+
+## Option 1: one command (SQLite, no Docker)
 
 ```bash
-# Navigate to backend
-cd backend
-
-# Create virtual environment
-python -m venv env
-
-# Activate virtual environment
-# Windows:
-env\Scripts\activate
-# Mac/Linux:
-source env/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Create environment file
-copy .env.example .env
-
-# Generate secure SECRET_KEY
-python -c "import secrets; print(secrets.token_urlsafe(32))"
-# Copy the output and paste it as SECRET_KEY in .env file
-
-# Initialize database (SQLite by default)
-python database/init_db.py
-
-# Start backend server
-python run.py
+./start.sh        # macOS / Linux / Git Bash
+start.bat         # Windows
 ```
 
-Backend should now be running at `http://localhost:8000`
+The script:
 
-### **Step 3: Frontend Setup**
+- finds or creates a virtualenv (`env/`, `.venv/` or `venv/` at the repo root, or `backend/env`, `backend/.venv`) and installs `backend/requirements.txt`;
+- starts the backend on http://localhost:8000 with `USE_SQLITE=True DEBUG=True` and hot reload (database file: `backend/pixelflow.db`);
+- runs `npm install` if `frontend/node_modules` is missing;
+- writes `frontend/.env.local` with `REACT_APP_API_URL=http://localhost:8000/api` (only if the file doesn't exist yet);
+- starts the frontend on http://localhost:3000.
 
-Open a **new terminal** window:
+Press Ctrl+C to stop both. Values in `backend/.env` (for example `ADMIN_EMAIL`, see below) are still read; `USE_SQLITE` and `DEBUG` set by the script take precedence.
+
+## Option 2: Docker Compose (PostgreSQL)
 
 ```bash
-# Navigate to frontend
+docker compose up            # first run builds the images
+docker compose down -v       # stop and wipe the database volume
+```
+
+Backend on :8000, frontend on :3000, PostgreSQL 15 on :5432 (`postgres` / `postgres`, database `pixelflow`).
+The compose file sets a development `SECRET_KEY` and `DEBUG=True`.
+
+## Option 3: manual setup
+
+**Backend** (terminal 1):
+
+```bash
+cd backend
+python -m venv env
+source env/bin/activate          # Windows: env\Scripts\activate
+pip install -r requirements.txt
+cp .env.example .env             # Windows: copy .env.example .env
+```
+
+Edit `backend/.env`. The template defaults to PostgreSQL, so for local SQLite set at least:
+
+```env
+USE_SQLITE=True
+DEBUG=True
+SECRET_KEY=<output of: python -c "import secrets; print(secrets.token_urlsafe(32))">
+```
+
+With `DEBUG=False` the backend refuses to start while `SECRET_KEY` is the default. Every other variable is
+documented in [deployment/ENVIRONMENT_VARIABLES.md](deployment/ENVIRONMENT_VARIABLES.md).
+
+```bash
+python run.py                    # or: uvicorn app.main:app --reload
+```
+
+Tables are created automatically on startup (`Base.metadata.create_all`), so no separate init step is needed.
+
+**Frontend** (terminal 2):
+
+```bash
 cd frontend
-
-# Install dependencies
 npm install
-
-# Start development server
 npm start
 ```
 
-Frontend should open automatically at `http://localhost:3000`
+The frontend calls `REACT_APP_API_URL`, which must include the `/api` prefix. Locally it defaults to
+`http://localhost:8000/api`, so `frontend/.env.local` is optional. Create it only to change the URL or to add
+`REACT_APP_GOOGLE_CLIENT_ID`.
 
-### **Step 4: Access the Application**
-
-1. Open browser to `http://localhost:3000`
-2. Click **"App"** in navigation to start using PixelFlow
-3. Upload images and build your first pipeline!
+To use PostgreSQL instead of SQLite, see [guides/DATABASE_SETUP.md](guides/DATABASE_SETUP.md).
 
 ---
 
-## 🗄️ **Database Configuration**
+## First admin account
 
-### **Default: SQLite (No Setup Required)**
+There are **no default credentials**. Create the first admin in one of two ways:
 
-PixelFlow uses SQLite by default - perfect for development and testing.
+1. **On startup (recommended).** Add to `backend/.env` and start (or restart) the backend:
+   ```env
+   ADMIN_EMAIL=you@example.com
+   ADMIN_PASSWORD=<a strong password>
+   # optional: ADMIN_USERNAME (default "admin"), ADMIN_FULL_NAME
+   ```
+   If no admin exists yet, one is created from these values. If an admin already exists, they are ignored.
+   With Docker Compose, put them in `backend/.env` and rebuild (`docker compose up --build`), or add them
+   under the backend service's `environment:` in `docker-compose.yml`.
 
-**Location:** `backend/pixelflow.db`
+2. **Interactively.** From `backend/` with the venv active:
+   ```bash
+   python database/init_db.py
+   ```
+   It creates the tables and prompts for email, username, optional full name and password (min 8 characters).
 
-**No additional setup needed!**
+Other users register through the app (http://localhost:3000/auth). To reset a forgotten password or list
+accounts, use the scripts in [backend/database/README.md](backend/database/README.md).
 
-### **Optional: PostgreSQL for Production**
-
-For production deployments, PostgreSQL is recommended.
-
-See: [guides/DATABASE_SETUP.md](guides/DATABASE_SETUP.md) for detailed PostgreSQL setup instructions.
-
----
-
-## 🔐 **Authentication Setup**
-
-### **Basic Authentication (Built-in)**
-
-PixelFlow includes email/password authentication out of the box.
-
-**Create your first admin user:**
-
-```bash
-cd backend
-python database/init_db.py  # Creates default admin user
-```
-
-**Default Admin Credentials:**
-- Email: `admin@pixelflow.local`
-- Password: `admin123`
-
-**⚠️ IMPORTANT:** Change the admin password immediately after first login!
-
-### **Optional: Google OAuth**
-
-To enable Google Sign-In:
-
-See: [guides/GOOGLE_OAUTH_SETUP.md](guides/GOOGLE_OAUTH_SETUP.md) for detailed OAuth setup instructions.
+Google sign-in is optional: [guides/GOOGLE_OAUTH_SETUP.md](guides/GOOGLE_OAUTH_SETUP.md).
 
 ---
 
-## ⚙️ **Environment Configuration**
-
-### **Backend (.env)**
-
-Edit `backend/.env`:
-
-```env
-# Application Settings
-APP_NAME=PixelFlow
-VERSION=1.0.0
-DEBUG=False
-HOST=0.0.0.0
-PORT=8000
-
-# Security (CRITICAL - Generate new key!)
-SECRET_KEY=your_secret_key_here_generate_with_command_above
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-
-# Database
-USE_SQLITE=True
-DATABASE_URL=sqlite:///./pixelflow.db
-
-# CORS (adjust for production)
-CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
-
-# File Upload
-MAX_FILE_SIZE=52428800
-ALLOWED_EXTENSIONS=.jpg,.jpeg,.png,.bmp,.tiff,.webp
-
-# Google OAuth (optional)
-GOOGLE_CLIENT_ID=your_client_id_here
-GOOGLE_CLIENT_SECRET=your_client_secret_here
-```
-
-### **Frontend (.env)**
-
-Frontend `.env` is optional - defaults work fine for local development.
-
-```env
-REACT_APP_API_URL=http://localhost:8000
-REACT_APP_GOOGLE_CLIENT_ID=your_client_id_here
-```
-
----
-
-## 🧪 **Verify Installation**
-
-### **Test Backend**
+## Verify the installation
 
 ```bash
 curl http://localhost:8000/health
+# {"status":"healthy","app":"PixelFlow","version":"...", ...}
 ```
 
-Should return:
-```json
-{"status":"healthy","app":"PixelFlow","version":"1.0.0",...}
-```
-
-### **Test Frontend**
-
-1. Open `http://localhost:3000/app`
-2. Upload a test image
-3. Add an operation (e.g., "Grayscale")
-4. Click "Apply Pipeline"
-5. Should show processed result!
+API docs: http://localhost:8000/docs. Then open http://localhost:3000/app, upload an image, add an
+operation (for example Grayscale) and click **Apply Pipeline**.
 
 ---
 
-## 🔧 **Troubleshooting**
+## Troubleshooting
 
-### **Backend Issues**
+**`ModuleNotFoundError` when starting the backend**
+Activate the venv and run `pip install -r requirements.txt` from `backend/`.
 
-**Problem:** `ModuleNotFoundError`
+**Backend exits with "SECRET_KEY is still the default insecure value"**
+Set `SECRET_KEY` in `backend/.env`, or set `DEBUG=True` for local development.
+
+**Backend can't connect to the database**
+You are on the PostgreSQL default (`USE_SQLITE` unset or `False`) without a running server. Set
+`USE_SQLITE=True`, use `docker compose up`, or follow [guides/DATABASE_SETUP.md](guides/DATABASE_SETUP.md).
+
+**Port 8000 or 3000 already in use**
 ```bash
-pip install -r requirements.txt
+lsof -i :8000                     # macOS / Linux, then: kill <PID>
+netstat -ano | findstr :8000      # Windows, then: taskkill /F /PID <PID>
 ```
+Or set `PORT=8001` in `backend/.env` (and point `REACT_APP_API_URL` at it). `npm start` offers another port
+when 3000 is taken.
 
-**Problem:** Port 8000 already in use
-```bash
-# Kill process on Windows
-netstat -ano | findstr :8000
-taskkill /F /PID <process_id>
+**CORS errors in the browser console**
+With `ALLOWED_ORIGINS` unset, the usual localhost dev origins are allowed; once set (the template sets
+`http://localhost:3000`), only the listed origins are. If you open the frontend from another host or port, add
+that exact origin to `ALLOWED_ORIGINS` in `backend/.env` (comma-separated, no trailing slash).
 
-# Or change port in .env
-PORT=8001
-```
+**Signed in, but requests act as a guest (or 403 CSRF errors)**
+Auth uses httpOnly cookies. Open the frontend at `http://localhost:3000` (not `127.0.0.1`, unless both the
+frontend and `REACT_APP_API_URL` use the same host), and restart `npm start` after changing `.env.local`.
 
-**Problem:** Database errors
-```bash
-# Reset database
-del pixelflow.db
-python database/init_db.py
-```
+**Start with a clean local database**
+Stop the backend, delete `backend/pixelflow.db`, and start it again. Tables are recreated and the
+`ADMIN_EMAIL` admin is created again. With Docker: `docker compose down -v`.
 
-### **Frontend Issues**
+**`npm install` fails**
+`npm cache clean --force`, delete `frontend/node_modules`, and run `npm install` again.
 
-**Problem:** `npm install` fails
-```bash
-# Clear npm cache
-npm cache clean --force
-npm install
-```
-
-**Problem:** Port 3000 already in use
-```bash
-# Will prompt to use different port
-npm start
-# Press 'Y' to use port 3001
-```
-
-**Problem:** Styles not loading
-```bash
-# Hard refresh browser
-Ctrl + Shift + R
-
-# Or rebuild
-npm run build
-npm start
-```
+**The app still looks the same after a change**
+Hard-refresh the browser (Ctrl+Shift+R). The backend only hot-reloads with `DEBUG=True` (or `--reload`).
 
 ---
 
-## 📚 **Next Steps**
+## Next steps
 
-After installation, explore these guides:
+- [Getting Started](guides/GETTING_STARTED.md): using the app
+- [Development](guides/DEVELOPMENT.md): code style, tests, debugging
+- [Adding Operations](guides/ADDING_OPERATIONS.md)
+- [Admin Panel](guides/ADMIN_PANEL.md)
+- [API Reference](guides/API_REFERENCE.md)
+- [Deployment](deployment/DEPLOYMENT_GUIDE.md)
 
-- **[Getting Started](guides/GETTING_STARTED.md)** - First steps and basic usage
-- **[Adding Operations](guides/ADDING_OPERATIONS.md)** - How to add new image processing methods
-- **[Database Management](guides/DATABASE_SETUP.md)** - Database configuration and management
-- **[Google OAuth](guides/GOOGLE_OAUTH_SETUP.md)** - Setting up Google Sign-In
-- **[Admin Panel](guides/ADMIN_PANEL.md)** - Managing users, quotas, and settings
-- **[Deployment](guides/DEPLOYMENT.md)** - Deploy to production
-- **[API Documentation](guides/API_REFERENCE.md)** - Backend API endpoints
+Questions and bugs: [GitHub Issues](https://github.com/Mauryantitans/PixelFlow/issues).
 
----
+## License
 
-## 🆘 **Getting Help**
-
-- **Issues:** [GitHub Issues](https://github.com/Mauryantitans/PixelFlow/issues)
-- **Documentation:** [Project Wiki](https://github.com/Mauryantitans/PixelFlow/wiki)
-- **Email:** support@pixelflow.example.com
-
----
-
-## 📜 **License**
-
-PixelFlow is licensed under the MIT License. See [LICENSE](LICENSE) file for details.
-
----
-
-**Installation complete! 🎉 Start building amazing image processing pipelines!**
+PixelFlow is licensed under the Apache License 2.0. See [LICENSE](LICENSE).

@@ -1,235 +1,165 @@
 # Getting Started with PixelFlow
 
-A beginner's guide to using PixelFlow for image processing.
+A beginner's guide to using PixelFlow for image processing. To install and run it first, see
+[INSTALLATION.md](../INSTALLATION.md).
 
 ---
 
-## 🎯 **What is PixelFlow?**
+## What is PixelFlow?
 
-PixelFlow is a visual image processing pipeline builder that lets you:
-- Upload multiple images
-- Apply various filters and operations
-- Build complex processing pipelines
-- See results in real-time or batch mode
-- Save and reuse your favorite pipelines
+PixelFlow is a visual image-processing pipeline builder. You can:
 
----
-
-## 🚀 **Your First Pipeline (5 Minutes)**
-
-### **Step 1: Upload Images**
-
-1. Go to `http://localhost:3000/app`
-2. Click **"Upload Image(s)"** button
-3. Select one or more images from your computer
-4. Images appear in the gallery
-
-### **Step 2: Select Images**
-
-- Click on images in the gallery to select them (blue border = selected)
-- You can select multiple images for batch processing
-- Or select just one image for live preview mode
-
-### **Step 3: Build Your Pipeline**
-
-The left sidebar shows all available operations organized by category:
-
-**Try these beginner-friendly operations:**
-
-1. **Basic Operations → Adjustments → Brightness**
-   - Click "Brightness"
-   - Adjust the slider to make image brighter/darker
-   
-2. **Basic Operations → Filters → Grayscale**
-   - Click "Grayscale"
-   - Converts image to black & white
-
-3. **OpenCV → Filtering → Gaussian Blur**
-   - Click "Gaussian Blur"
-   - Adjust kernel size to control blur amount
-
-### **Step 4: Process Images**
-
-**Batch Mode (Multiple Images):**
-1. Select multiple images
-2. Build your pipeline
-3. Click **"Apply Pipeline"**
-4. Wait for processing to complete
-5. Click on results to inspect them
-
-**Live Mode (Single Image):**
-1. Select **exactly one** image
-2. Toggle **"Live Processing"** ON
-3. Build your pipeline - see results update instantly!
-4. Adjust parameters in real-time
+- upload one or more images;
+- chain operations from a library of 77 (adjustments, filters, OpenCV, scikit-image, stylize effects, and
+  more) into a pipeline;
+- preview a single image live as you change parameters, or process many images in batch;
+- save pipelines to your account and reuse them.
 
 ---
 
-## 🎨 **Understanding the Interface**
+## Your first pipeline (5 minutes)
 
-### **Main Sections**
+### Step 1: Upload images
+
+1. Go to `http://localhost:3000/app`.
+2. Click **Upload Image(s)** and pick one or more files in the file dialog. JPEG, PNG, BMP and TIFF are
+   supported, up to 50 MB each and 20 per upload.
+3. The images appear in the image list. **Gallery** shows all of them.
+
+### Step 2: Select images
+
+- Click images to select them.
+- Select **one** image for Live Processing, or several for batch processing.
+
+### Step 3: Build your pipeline
+
+The operations sidebar is grouped by library and category. Click an operation to add it to the pipeline.
+Some good first operations:
+
+1. **Basic → Adjustments → Brightness:** drag the slider to brighten or darken.
+2. **Basic → Filters → Grayscale:** converts to black and white.
+3. **Basic → Blur & Sharpen → Gaussian Blur:** the radius controls the blur amount.
+
+### Step 4: Process
+
+**Live Processing (one image)**
+1. Select exactly one image.
+2. Turn on the **Live Processing** toggle.
+3. Add operations and adjust parameters. The preview updates as you go.
+
+**Batch (several images)**
+1. Select the images.
+2. Build the pipeline.
+3. Click **Apply Pipeline**. Click **Stop** to cancel a run.
+4. Click a result to inspect it.
+
+---
+
+## The interface
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│  [Logo] [Nav] [Session Status] [Theme] [User]          │  ← Header
-├─────────┬──────────────────────────────────────────────┤
-│ SIDEBAR │  MAIN CONTENT AREA                           │
-│         │                                               │
-│ Opera-  │  📤 Upload | Gallery | Apply Pipeline       │
-│ tions   │                                               │
-│ Library │  🔧 Pipeline (Your Operations)               │
-│         │                                               │
-│ Search  │  🖼️ Results Grid / Inspector                 │
-│ Filter  │                                               │
-│         │                                               │
-└─────────┴──────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│  Logo · Nav · Connection · Load · Save · Theme · Account     │  ← Header
+├─────────────┬────────────────────────────────────────────────┤
+│ OPERATIONS  │  Upload Image(s) · Gallery · Apply Pipeline    │
+│             │  Live Processing toggle                        │
+│ Search      │                                                │
+│ Libraries   │  Pipeline (your steps)                         │
+│ Categories  │                                                │
+│             │  Results / Inspector                           │
+└─────────────┴────────────────────────────────────────────────┘
 ```
 
-### **Operations Sidebar**
-- **Search bar** at top - quickly find operations
-- **Three main libraries:**
-  - **Basic Operations** - Simple adjustments and filters
-  - **OpenCV** - Professional computer vision operations
-  - **Scikit-Image** - Scientific image processing
-- **Expandable categories** - click to open/close
+### Header
+- **Connection badge:** shows whether the backend is reachable.
+- **Load / Save:** your saved pipelines (requires signing in).
+- Theme toggle (light/dark) and account menu.
 
-### **Pipeline Section**
-- Shows your current pipeline steps in order
-- **Drag to reorder** steps
-- **Adjust parameters** for each operation
-- **Undo/Redo** buttons for easy experimentation
-- **Reset** button to clear pipeline
+### Operations sidebar
+- **Search** at the top (Ctrl+K).
+- Grouped by library: **Basic**, **OpenCV**, **Scikit-Image**, **Stylize**. Click a category to expand it.
 
-### **Results Area**
-- **Grid view**: Shows all processed results
-- **Inspector view**: Compare before/after, zoom, pan
-- **Step-by-step view**: See intermediate results
+### Pipeline
+- Steps run top to bottom. Each step shows its parameters, and an error banner if that step failed (the other
+  steps still run).
+- Reorder steps with the up/down buttons or **Alt+Arrow** keys.
+- **Undo / Redo** and **Reset**. The pipeline is kept when you reload the page.
 
----
+### Interactive parameters
+Some operations take input from the image itself. For example, **Flood Fill** needs a seed point, **Crop**
+and **Inpaint Region** need a dragged rectangle, and color parameters have an eyedropper. Picking works on the
+live preview, so turn on Live Processing with one image selected and use the Normal view. Then click the
+step's pick button and click or drag on the image.
 
-## 💡 **Pro Tips**
-
-### **1. Use Live Processing for Experimentation**
-- Select one image
-- Enable "Live Processing"
-- Adjust parameters and see instant results
-- Much faster than batch processing for testing!
-
-### **2. Save Your Pipelines**
-- Built something great? Save it!
-- Click user menu → **"Save"**
-- Give it a name and description
-- Load it later with **"Load"** button
-
-### **3. Keyboard Shortcuts**
-- **Ctrl+K** or **Ctrl+/** - Focus search bar
-- **Ctrl+Z** - Undo last pipeline change
-- **Ctrl+Y** - Redo pipeline change
-- **Escape** - Close modals/lightbox
-
-### **4. Gallery Features**
-- Click **"Gallery"** to see all uploaded images
-- Select/deselect images in bulk
-- Delete images you don't need
-- View full-resolution images
-
-### **5. Inspector Mode**
-- Click any processed result to inspect it
-- **Normal view**: Side-by-side comparison
-- **Slider view**: Interactive before/after slider
-- **Zoom/Pan**: Mouse wheel to zoom, drag to pan
+### Results and Inspector
+- **Grid:** all processed results, with downloads.
+- **Inspector:** compare stages of a result in **Normal**, **Slider** (before/after) or **Difference** view,
+  see intermediate steps, and download them.
 
 ---
 
-## 🔨 **Common Workflows**
+## Tips
 
-### **Workflow 1: Basic Photo Enhancement**
-
-1. Upload portrait photo
-2. Add operations:
-   - Brightness (+10)
-   - Contrast (+15)
-   - Sharpen (amount: 1.5)
-3. Apply Pipeline
-4. Save result!
-
-### **Workflow 2: Artistic Effects**
-
-1. Upload landscape photo
-2. Add operations:
-   - Saturation (+30)
-   - Vignette (strength: 0.5)
-   - Gaussian Blur (kernel: 3) on edges
-3. Experiment with parameters in Live mode
-4. Save your custom pipeline for reuse
-
-### **Workflow 3: Batch Processing**
-
-1. Upload 20 product photos
-2. Build consistent pipeline:
-   - Resize to 1024x1024
-   - Brightness (+5)
-   - Sharpen (amount: 1.2)
-3. Select all images
-4. Apply Pipeline
-5. Download all results!
+1. **Experiment in Live mode.** It only recomputes from the step you changed, so tweaking parameters is fast.
+2. **Save pipelines.** Sign in, then use **Save** in the header to name your pipeline. **Load** brings it back.
+3. **Keyboard shortcuts:**
+   - **Ctrl+K** or **Ctrl+/**: focus operation search
+   - **Ctrl+Z** / **Ctrl+Y**: undo / redo a pipeline change
+   - **Escape**: close the top-most dialog or lightbox
+4. **Gallery:** select or deselect images in bulk, delete images, and open a full-size view. In the full-size
+   view, the mouse wheel zooms and dragging pans (keyboard controls too).
 
 ---
 
-## 📊 **Understanding Processing Modes**
+## Example workflows
 
-### **Batch Processing**
-- Process multiple images with same pipeline
-- Shows progress bar
-- Can cancel anytime
-- Results appear in grid
-- Good for: Processing many images at once
+**Basic photo enhancement**
+1. Upload a portrait.
+2. Add Brightness (+10), Contrast (+15) and Sharpen (Level: Medium).
+3. Fine-tune in Live mode, then download the result.
 
-### **Live Processing**
-- Real-time preview of single image
-- Instant parameter updates
-- See each pipeline step individually
-- Perfect for: Experimenting and fine-tuning
+**Artistic look**
+1. Upload a landscape.
+2. Add Saturation (+30), Vignette, and a light Gaussian Blur.
+3. Experiment in Live mode, then save the pipeline for reuse.
 
----
-
-## 🎓 **Learning Path**
-
-### **Beginner (Week 1)**
-1. Upload images ✅
-2. Try basic operations (Brightness, Contrast, Grayscale)
-3. Learn live processing mode
-4. Save your first pipeline
-
-### **Intermediate (Week 2)**
-1. Explore OpenCV operations
-2. Build multi-step pipelines
-3. Use batch processing
-4. Create an account and save pipelines
-
-### **Advanced (Week 3+)**
-1. Use advanced operations (Edge Detection, Morphology)
-2. Combine operations creatively
-3. Build reusable pipeline templates
-4. Share pipelines with others
+**Batch processing**
+1. Upload up to 20 product photos.
+2. Build one pipeline, for example Resize (scale factor), Brightness (+5) and Sharpen.
+3. Select all images and click **Apply Pipeline**.
+4. Download the results from the grid.
 
 ---
 
-## 📚 **Next Steps**
+## Processing modes
 
-- **[Adding Custom Operations](ADDING_OPERATIONS.md)** - Extend PixelFlow with your own operations
-- **[Admin Panel Guide](ADMIN_PANEL.md)** - Manage users, quotas, and settings
-- **[API Reference](API_REFERENCE.md)** - Use PixelFlow via API
-- **[Deployment Guide](DEPLOYMENT.md)** - Deploy to production
-
----
-
-## 🆘 **Need Help?**
-
-- Check [Troubleshooting](../INSTALLATION.md#troubleshooting) section
-- Read [API Documentation](API_REFERENCE.md)
-- Visit [GitHub Issues](https://github.com/Mauryantitans/PixelFlow/issues)
+| | Live Processing | Batch |
+|---|---|---|
+| Images | Exactly one | Any selection |
+| Updates | As you edit (debounced) | When you click Apply Pipeline |
+| Speed | Reuses unchanged earlier steps | Full run per image, one run at a time, can be stopped |
+| Best for | Experimenting, interactive picks | Applying a finished pipeline to many images |
 
 ---
 
-**Happy image processing! 🎨**
+## Learning path
+
+- **Beginner:** upload images; try Brightness, Contrast and Grayscale; learn Live Processing.
+- **Intermediate:** create an account and save pipelines; explore OpenCV and Scikit-Image operations; use
+  batch mode.
+- **Advanced:** edge detection, morphology and segmentation; interactive operations (Flood Fill, Crop,
+  Inpaint Region); build reusable pipelines.
+
+---
+
+## Next steps
+
+- [Adding Custom Operations](ADDING_OPERATIONS.md)
+- [Admin Panel Guide](ADMIN_PANEL.md)
+- [API Reference](API_REFERENCE.md)
+- [Deployment Guide](../deployment/DEPLOYMENT_GUIDE.md)
+
+## Need help?
+
+- [Troubleshooting](../INSTALLATION.md#troubleshooting)
+- [GitHub Issues](https://github.com/Mauryantitans/PixelFlow/issues)
