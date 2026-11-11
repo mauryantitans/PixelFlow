@@ -37,7 +37,7 @@ const ParamControl: React.FC<ParamControlProps> = ({ spec, value, stepId, contro
     armPicker(p);
     window.requestAnimationFrame(() => {
       if (!document.querySelector('[data-testid="preview-picker-overlay"]')) {
-        announce('Turn on Live Processing with one image selected, then pick on the preview image.');
+        announce('No preview to pick on. Turn on Live Processing with one image selected and use the Normal view, then try again.');
       }
     });
   };
