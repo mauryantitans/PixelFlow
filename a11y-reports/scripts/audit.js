@@ -381,6 +381,12 @@ async function newPage(browser) {
   const page = await ctx.newPage();
   await page.setViewport({ width: VW, height: VH });
   page.on('dialog', (d) => d.accept());
+  // UI_THEME=verdant (etc.) audits one of the appearance themes instead of Classic.
+  if (process.env.UI_THEME) {
+    await page.evaluateOnNewDocument((t) => {
+      try { localStorage.setItem('pixelflow_ui_theme', t); } catch (e) { /* ignore */ }
+    }, process.env.UI_THEME);
+  }
   return page;
 }
 
