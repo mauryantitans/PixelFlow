@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { GoogleSignIn } from './GoogleSignIn';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 
 interface RegisterProps {
   onSwitchToLogin?: () => void;
@@ -10,6 +11,7 @@ interface RegisterProps {
 export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
   const { register } = useAuth();
   const navigate = useNavigate();
+  useDocumentTitle('Create account');
   const [formData, setFormData] = useState({
     email: '',
     username: '',
@@ -18,6 +20,8 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
     full_name: '',
   });
   const [error, setError] = useState('');
+  // Which field the current error is about, so it can be marked aria-invalid.
+  const passwordError = /password/i.test(error);
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,14 +63,14 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 px-4 py-8">
+    <main id="main-content" className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 px-4 py-8">
       <div className="max-w-md w-full bg-white dark:bg-zinc-900 rounded-lg shadow-xl dark:shadow-black/50 border-2 border-slate-300 dark:border-zinc-800 p-8">
         <div className="text-center mb-8">
           {/* Custom Icon */}
           <div className="flex justify-center mb-4">
             <img 
               src="/PixelFlow_Icon.png" 
-              alt="PixelFlow" 
+              alt="" 
               className="w-16 h-16 rounded-lg"
             />
           </div>
@@ -75,11 +79,19 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
           <p className="text-slate-600 dark:text-slate-300 mt-2">Create your account</p>
         </div>
 
-        {error && (
-          <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-md">
-            {error}
-          </div>
-        )}
+        {/* Always-present live region so the error is announced when it appears
+
+
+            (WCAG 3.3.1 Error Identification, 4.1.3 Status Messages). */}
+
+
+        <div id="register-error" role="alert" aria-live="assertive" className={error ? "mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-md" : 'sr-only'}>
+
+
+          {error}
+
+
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -88,12 +100,15 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
             </label>
             <input
               id="email"
+              aria-invalid={!!error && !passwordError}
+              aria-describedby={!!error && !passwordError ? 'register-error' : undefined}
+              autoComplete="email"
               name="email"
               type="email"
               required
               value={formData.email}
               onChange={handleChange}
-              className="w-full px-3 py-2 bg-white dark:bg-zinc-800 border border-slate-300 dark:border-zinc-700 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 bg-white dark:bg-zinc-800 border border-slate-500 dark:border-zinc-500 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="you@example.com"
               disabled={loading}
             />
@@ -105,12 +120,15 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
             </label>
             <input
               id="username"
+              aria-invalid={!!error && !passwordError}
+              aria-describedby={!!error && !passwordError ? 'register-error' : undefined}
+              autoComplete="username"
               name="username"
               type="text"
               required
               value={formData.username}
               onChange={handleChange}
-              className="w-full px-3 py-2 bg-white dark:bg-zinc-800 border border-slate-300 dark:border-zinc-700 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 bg-white dark:bg-zinc-800 border border-slate-500 dark:border-zinc-500 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="username"
               disabled={loading}
             />
@@ -122,11 +140,12 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
             </label>
             <input
               id="full_name"
+              autoComplete="name"
               name="full_name"
               type="text"
               value={formData.full_name}
               onChange={handleChange}
-              className="w-full px-3 py-2 bg-white dark:bg-zinc-800 border border-slate-300 dark:border-zinc-700 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 bg-white dark:bg-zinc-800 border border-slate-500 dark:border-zinc-500 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="John Doe"
               disabled={loading}
             />
@@ -138,16 +157,19 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
             </label>
             <input
               id="password"
+              aria-invalid={passwordError}
+              aria-describedby={passwordError ? 'register-error password-hint' : 'password-hint'}
+              autoComplete="new-password"
               name="password"
               type="password"
               required
               value={formData.password}
               onChange={handleChange}
-              className="w-full px-3 py-2 bg-white dark:bg-zinc-800 border border-slate-300 dark:border-zinc-700 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 bg-white dark:bg-zinc-800 border border-slate-500 dark:border-zinc-500 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="••••••••"
               disabled={loading}
             />
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Minimum 8 characters</p>
+            <p id="password-hint" className="text-xs text-slate-600 dark:text-slate-400 mt-1">Minimum 8 characters</p>
           </div>
 
           <div>
@@ -156,12 +178,15 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
             </label>
             <input
               id="confirmPassword"
+              aria-invalid={passwordError}
+              aria-describedby={passwordError ? 'register-error' : undefined}
+              autoComplete="new-password"
               name="confirmPassword"
               type="password"
               required
               value={formData.confirmPassword}
               onChange={handleChange}
-              className="w-full px-3 py-2 bg-white dark:bg-zinc-800 border border-slate-300 dark:border-zinc-700 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 bg-white dark:bg-zinc-800 border border-slate-500 dark:border-zinc-500 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="••••••••"
               disabled={loading}
             />
@@ -182,7 +207,7 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
             <div className="w-full border-t border-slate-300 dark:border-zinc-700"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white dark:bg-zinc-900 text-slate-500 dark:text-slate-400">Or continue with</span>
+            <span className="px-2 bg-white dark:bg-zinc-900 text-slate-600 dark:text-slate-400">Or continue with</span>
           </div>
         </div>
 
@@ -206,6 +231,6 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
           </div>
         )}
       </div>
-    </div>
+    </main>
   );
 };

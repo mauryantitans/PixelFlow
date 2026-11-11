@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Save } from 'lucide-react';
+import { useDialog } from '../hooks/useDialog';
 import { pipelineService } from '../services/auth';
 import { PipelineStep } from '../types';
 
@@ -23,6 +24,8 @@ export const SavePipelineModal: React.FC<SavePipelineModalProps> = ({
   const [tags, setTags] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const dialogRef = useDialog<HTMLDivElement>(isOpen, onClose);
 
   if (!isOpen) return null;
 
@@ -74,28 +77,40 @@ export const SavePipelineModal: React.FC<SavePipelineModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="save-pipeline-title"
+        tabIndex={-1}
+        className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center space-x-2">
-            <Save className="w-5 h-5 text-blue-600" />
-            <h2 className="text-xl font-bold text-gray-900">Save Pipeline</h2>
+            <Save aria-hidden="true" className="w-5 h-5 text-blue-600" />
+            <h2 id="save-pipeline-title" className="text-xl font-bold text-gray-900">Save Pipeline</h2>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            aria-label="Close save pipeline dialog"
+            className="text-gray-600 hover:text-gray-600 transition-colors"
           >
-            <X className="w-6 h-6" />
+            <X aria-hidden="true" className="w-6 h-6" />
           </button>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {error && (
-            <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm">
-              {error}
-            </div>
-          )}
+          {/* Always-present live region so the error is announced when it appears
+
+              (WCAG 3.3.1 Error Identification, 4.1.3 Status Messages). */}
+
+          <div id="save-pipeline-error" role="alert" aria-live="assertive" className={error ? "p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm" : 'sr-only'}>
+
+            {error}
+
+          </div>
 
           {/* Pipeline info */}
           <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
@@ -115,7 +130,7 @@ export const SavePipelineModal: React.FC<SavePipelineModalProps> = ({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g., Instagram-style filter"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               required
               disabled={loading}
             />
@@ -132,7 +147,7 @@ export const SavePipelineModal: React.FC<SavePipelineModalProps> = ({
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Describe what this pipeline does..."
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              className="w-full px-3 py-2 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
               disabled={loading}
             />
           </div>
@@ -146,7 +161,7 @@ export const SavePipelineModal: React.FC<SavePipelineModalProps> = ({
               id="category"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               disabled={loading}
             >
               <option value="">Select a category</option>
@@ -170,7 +185,7 @@ export const SavePipelineModal: React.FC<SavePipelineModalProps> = ({
               value={tags}
               onChange={(e) => setTags(e.target.value)}
               placeholder="e.g., vintage, blur, black-white"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               disabled={loading}
             />
           </div>
@@ -182,12 +197,12 @@ export const SavePipelineModal: React.FC<SavePipelineModalProps> = ({
               type="checkbox"
               checked={isPublic}
               onChange={(e) => setIsPublic(e.target.checked)}
-              className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-500 rounded"
               disabled={loading}
             />
             <label htmlFor="is_public" className="ml-2 block text-sm text-gray-700">
               <span className="font-medium">Make this pipeline public</span>
-              <p className="text-gray-500 text-xs mt-1">
+              <p className="text-gray-600 text-xs mt-1">
                 Other users will be able to view and use this pipeline
               </p>
             </label>

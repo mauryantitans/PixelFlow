@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, FolderOpen, Users, Lock, Calendar, Layers, Trash2, Copy, Eye, EyeOff } from 'lucide-react';
+import { useDialog } from '../hooks/useDialog';
+import { handleTabListKeyDown } from '../utils/tabs';
 import { pipelineService } from '../services/auth';
 import { SavedPipeline } from '../types';
 
@@ -120,24 +122,34 @@ export const LoadPipelineModal: React.FC<LoadPipelineModalProps> = ({
     });
   };
 
+  const dialogRef = useDialog<HTMLDivElement>(isOpen, onClose);
+
   if (!isOpen) return null;
 
   const pipelines = activeTab === 'my' ? userPipelines : publicPipelines;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] flex flex-col">
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="load-pipeline-title"
+        tabIndex={-1}
+        className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center space-x-2">
-            <FolderOpen className="w-5 h-5 text-blue-600" />
-            <h2 className="text-xl font-bold text-gray-900">Load Pipeline</h2>
+            <FolderOpen aria-hidden="true" className="w-5 h-5 text-blue-600" />
+            <h2 id="load-pipeline-title" className="text-xl font-bold text-gray-900">Load Pipeline</h2>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            aria-label="Close load pipeline dialog"
+            className="text-gray-600 hover:text-gray-600 transition-colors"
           >
-            <X className="w-6 h-6" />
+            <X aria-hidden="true" className="w-6 h-6" />
           </button>
         </div>
 
@@ -149,8 +161,19 @@ export const LoadPipelineModal: React.FC<LoadPipelineModalProps> = ({
         )}
 
         {/* Tabs */}
-        <div className="flex border-b border-gray-200">
+        <div
+          role="tablist"
+          aria-label="Pipeline lists"
+          onKeyDown={(e) => handleTabListKeyDown(e, ['my', 'public'] as const, activeTab, setActiveTab, 'load-tab')}
+          className="flex border-b border-gray-200"
+        >
           <button
+            type="button"
+            role="tab"
+            id="load-tab-my"
+            aria-selected={activeTab === 'my'}
+            aria-controls="load-tabpanel"
+            tabIndex={activeTab === 'my' ? 0 : -1}
             onClick={() => setActiveTab('my')}
             className={`flex-1 px-6 py-3 text-sm font-medium transition-colors ${
               activeTab === 'my'
@@ -159,11 +182,17 @@ export const LoadPipelineModal: React.FC<LoadPipelineModalProps> = ({
             }`}
           >
             <div className="flex items-center justify-center space-x-2">
-              <Lock size={16} />
+              <Lock aria-hidden="true" size={16} />
               <span>My Pipelines</span>
             </div>
           </button>
           <button
+            type="button"
+            role="tab"
+            id="load-tab-public"
+            aria-selected={activeTab === 'public'}
+            aria-controls="load-tabpanel"
+            tabIndex={activeTab === 'public' ? 0 : -1}
             onClick={() => setActiveTab('public')}
             className={`flex-1 px-6 py-3 text-sm font-medium transition-colors ${
               activeTab === 'public'
@@ -172,34 +201,44 @@ export const LoadPipelineModal: React.FC<LoadPipelineModalProps> = ({
             }`}
           >
             <div className="flex items-center justify-center space-x-2">
-              <Users size={16} />
+              <Users aria-hidden="true" size={16} />
               <span>Public Pipelines</span>
             </div>
           </button>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6">
-          {error && (
-            <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm mb-4">
-              {error}
-            </div>
-          )}
+        <div
+          role="tabpanel"
+          id="load-tabpanel"
+          aria-labelledby={`load-tab-${activeTab}`}
+          tabIndex={0}
+          className="flex-1 overflow-y-auto p-6"
+        >
+          {/* Always-present live region so the error is announced when it appears
+
+              (WCAG 3.3.1 Error Identification, 4.1.3 Status Messages). */}
+
+          <div id="load-pipeline-error" role="alert" aria-live="assertive" className={error ? "p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm mb-4" : 'sr-only'}>
+
+            {error}
+
+          </div>
 
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <div className="text-center" role="status">
+                <div aria-hidden="true" className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
                 <p className="text-gray-600">Loading pipelines...</p>
               </div>
             </div>
           ) : pipelines.length === 0 ? (
             <div className="text-center py-12">
-              <FolderOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <FolderOpen aria-hidden="true" className="w-16 h-16 text-gray-600 mx-auto mb-4" />
               <p className="text-gray-600 font-medium mb-2">
                 {activeTab === 'my' ? 'No saved pipelines yet' : 'No public pipelines available'}
               </p>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-600">
                 {activeTab === 'my' 
                   ? 'Create your first pipeline and save it!' 
                   : 'Check back later for community pipelines'}
@@ -230,9 +269,9 @@ export const LoadPipelineModal: React.FC<LoadPipelineModalProps> = ({
                     )}
                   </div>
 
-                  <div className="flex items-center space-x-4 text-xs text-gray-500 mb-3">
+                  <div className="flex items-center space-x-4 text-xs text-gray-600 mb-3">
                     <div className="flex items-center space-x-1">
-                      <Layers size={14} />
+                      <Layers aria-hidden="true" size={14} />
                       <span>{pipeline.pipeline_data?.length || 0} operations</span>
                     </div>
                     
@@ -245,13 +284,13 @@ export const LoadPipelineModal: React.FC<LoadPipelineModalProps> = ({
                     )}
                     
                     <div className="flex items-center space-x-1">
-                      <Calendar size={14} />
+                      <Calendar aria-hidden="true" size={14} />
                       <span>{formatDate(pipeline.created_at)}</span>
                     </div>
                     
                     {pipeline.usage_count > 0 && (
                       <div className="flex items-center space-x-1">
-                        <Users size={14} />
+                        <Users aria-hidden="true" size={14} />
                         <span>{pipeline.usage_count} uses</span>
                       </div>
                     )}
@@ -274,9 +313,10 @@ export const LoadPipelineModal: React.FC<LoadPipelineModalProps> = ({
                   <div className="flex items-center space-x-2 pt-2 border-t border-gray-100">
                     <button
                       onClick={(e) => handleLoadPipeline(pipeline, e)}
+                      aria-label={`Load ${pipeline.name}`}
                       className="flex-1 flex items-center justify-center space-x-1 px-3 py-2 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors"
                     >
-                      <FolderOpen size={14} />
+                      <FolderOpen aria-hidden="true" size={14} />
                       <span>Load</span>
                     </button>
 
@@ -286,8 +326,9 @@ export const LoadPipelineModal: React.FC<LoadPipelineModalProps> = ({
                           onClick={(e) => handleTogglePublic(pipeline, e)}
                           className="flex items-center justify-center space-x-1 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
                           title={pipeline.is_public ? 'Make private' : 'Make public'}
+                          aria-label={`${pipeline.is_public ? 'Make private' : 'Make public'}: ${pipeline.name}`}
                         >
-                          {pipeline.is_public ? <EyeOff size={14} /> : <Eye size={14} />}
+                          {pipeline.is_public ? <EyeOff aria-hidden="true" size={14} /> : <Eye aria-hidden="true" size={14} />}
                           <span className="hidden sm:inline">
                             {pipeline.is_public ? 'Private' : 'Public'}
                           </span>
@@ -297,16 +338,18 @@ export const LoadPipelineModal: React.FC<LoadPipelineModalProps> = ({
                           onClick={(e) => handleDuplicate(pipeline, e)}
                           className="flex items-center justify-center space-x-1 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
                           title="Duplicate"
+                          aria-label={`Duplicate ${pipeline.name}`}
                         >
-                          <Copy size={14} />
+                          <Copy aria-hidden="true" size={14} />
                         </button>
 
                         <button
                           onClick={(e) => handleDelete(pipeline.id, e)}
                           className="flex items-center justify-center space-x-1 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors"
                           title="Delete"
+                          aria-label={`Delete ${pipeline.name}`}
                         >
-                          <Trash2 size={14} />
+                          <Trash2 aria-hidden="true" size={14} />
                         </button>
                       </>
                     )}
@@ -316,8 +359,9 @@ export const LoadPipelineModal: React.FC<LoadPipelineModalProps> = ({
                         onClick={(e) => handleDuplicate(pipeline, e)}
                         className="flex items-center justify-center space-x-1 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
                         title="Duplicate to My Pipelines"
+                        aria-label={`Duplicate ${pipeline.name} to My Pipelines`}
                       >
-                        <Copy size={14} />
+                        <Copy aria-hidden="true" size={14} />
                         <span className="hidden sm:inline">Duplicate</span>
                       </button>
                     )}

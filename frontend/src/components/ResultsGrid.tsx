@@ -103,8 +103,8 @@ const ResultsGridComponent: React.FC<ResultsGridProps> = ({
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <div className="text-center text-gray-400 dark:text-gray-500">
-          <LucideReact.Image className="w-16 h-16 mx-auto mb-4" />
+        <div className="text-center text-gray-600 dark:text-gray-400" role="status">
+          <LucideReact.Image aria-hidden="true" className="w-16 h-16 mx-auto mb-4" />
           <p className="font-semibold text-lg mb-2">Processing...</p>
           <p className="text-sm">Results will appear when ready</p>
         </div>
@@ -115,8 +115,8 @@ const ResultsGridComponent: React.FC<ResultsGridProps> = ({
   if (results.length === 0) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <div className="text-center text-gray-400 dark:text-gray-500">
-          <LucideReact.Image className="w-16 h-16 mx-auto mb-4" />
+        <div className="text-center text-gray-600 dark:text-gray-400">
+          <LucideReact.Image aria-hidden="true" className="w-16 h-16 mx-auto mb-4" />
           <p className="font-semibold text-lg mb-2">Processed results will appear here</p>
           <p className="text-sm">Apply a pipeline to your selected images</p>
         </div>
@@ -128,9 +128,9 @@ const ResultsGridComponent: React.FC<ResultsGridProps> = ({
     <>
       <div className="flex-1 flex flex-col">
         <div className="p-4 border-b border-gray-200 dark:border-zinc-700 flex items-center justify-between">
-          <h3 className="text-lg font-bold text-zinc-900 dark:text-white">
+          <h2 className="text-lg font-bold text-zinc-900 dark:text-white">
             Results ({results.length})
-          </h3>
+          </h2>
           
           <div className="flex items-center gap-2">
             <button
@@ -138,23 +138,23 @@ const ResultsGridComponent: React.FC<ResultsGridProps> = ({
               className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
               title="Reset results"
             >
-              <LucideReact.RotateCcw className="w-4 h-4" />
+              <LucideReact.RotateCcw aria-hidden="true" className="w-4 h-4" />
               <span>Reset</span>
             </button>
             
             <button
               onClick={handleDownloadAll}
               disabled={downloading}
-              className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {downloading ? (
                 <>
-                  <LucideReact.Loader2 className="w-4 h-4 animate-spin" />
+                  <LucideReact.Loader2 aria-hidden="true" className="w-4 h-4 animate-spin" />
                   <span>Creating ZIP...</span>
                 </>
               ) : (
                 <>
-                  <LucideReact.Download className="w-4 h-4" />
+                  <LucideReact.Download aria-hidden="true" className="w-4 h-4" />
                   <span>Download All</span>
                 </>
               )}
@@ -185,21 +185,23 @@ const ResultsGridComponent: React.FC<ResultsGridProps> = ({
                 />
                 
                 {/* Hover overlay with actions */}
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-2">
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity flex items-center justify-center space-x-2">
                   <button
                     onClick={(e) => handleDownloadSingle(result, index, e)}
                     className="p-2 bg-white/90 dark:bg-zinc-800/90 rounded-full hover:bg-white dark:hover:bg-zinc-700 transition-colors"
                     title="Download"
+                    aria-label={`Download result ${index + 1}`}
                   >
-                    <LucideReact.Download className="w-4 h-4 text-gray-900 dark:text-white" />
+                    <LucideReact.Download aria-hidden="true" className="w-4 h-4 text-gray-900 dark:text-white" />
                   </button>
                   
                   <button
                     onClick={(e) => handleShowAnalytics(result, index, e)}
                     className="p-2 bg-white/90 dark:bg-zinc-800/90 rounded-full hover:bg-white dark:hover:bg-zinc-700 transition-colors"
                     title="Analytics"
+                    aria-label={`Analytics for result ${index + 1}`}
                   >
-                    <LucideReact.BarChart3 className="w-4 h-4 text-gray-900 dark:text-white" />
+                    <LucideReact.BarChart3 aria-hidden="true" className="w-4 h-4 text-gray-900 dark:text-white" />
                   </button>
                   
                   <button
@@ -209,14 +211,15 @@ const ResultsGridComponent: React.FC<ResultsGridProps> = ({
                     }}
                     className="p-2 bg-white/90 dark:bg-zinc-800/90 rounded-full hover:bg-white dark:hover:bg-zinc-700 transition-colors"
                     title="Inspect"
+                    aria-label={`Inspect result ${index + 1}`}
                   >
-                    <LucideReact.Eye className="w-4 h-4 text-gray-900 dark:text-white" />
+                    <LucideReact.Eye aria-hidden="true" className="w-4 h-4 text-gray-900 dark:text-white" />
                   </button>
                 </div>
               </div>
               
               <div className="p-2">
-                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
                   Result {index + 1}
                 </p>
               </div>

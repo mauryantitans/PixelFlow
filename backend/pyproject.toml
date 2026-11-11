@@ -44,4 +44,7 @@ check_untyped_defs = true
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 addopts = "-q"
+# Make `import app` work when CI runs plain `pytest` from backend/
+# (without this, tests/conftest.py fails with ModuleNotFoundError: app).
+pythonpath = ["."]
 filterwarnings = ["ignore::DeprecationWarning"]

@@ -1,0 +1,44 @@
+{
+  "state": "modal-analytics",
+  "tabStops": 6,
+  "noVisibleFocus": 0,
+  "focusEscapedDialog": 6,
+  "steps": [
+    {
+      "tag": "button",
+      "name": "Remove step",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Preview this step",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Method details",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "select",
+      "name": "Low\nMedium\nHigh",
+      "visibleFocus": true,
+      "insideDialog": false
+    }
+  ]
+}

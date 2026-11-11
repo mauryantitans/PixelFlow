@@ -1,0 +1,32 @@
+{
+  "state": "modal-analytics",
+  "tabStops": 4,
+  "noVisibleFocus": 0,
+  "focusEscapedDialog": 0,
+  "steps": [
+    {
+      "tag": "button",
+      "name": "Close image analytics",
+      "visibleFocus": true,
+      "insideDialog": true
+    },
+    {
+      "tag": "button",
+      "name": "Close",
+      "visibleFocus": true,
+      "insideDialog": true
+    },
+    {
+      "tag": "button",
+      "name": "Close image analytics",
+      "visibleFocus": true,
+      "insideDialog": true
+    },
+    {
+      "tag": "button",
+      "name": "Close",
+      "visibleFocus": true,
+      "insideDialog": true
+    }
+  ]
+}

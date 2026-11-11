@@ -1,4 +1,9 @@
+import os
+import time
+
 from sqlalchemy import create_engine
+from sqlalchemy.engine import make_url
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from .config import settings
@@ -31,14 +36,65 @@ def get_db():
     finally:
         db.close()
 
-def init_db():
-    """
-    Initialize database tables
-    """
+def _safe_db_target(url: str) -> str:
+    """The database URL with the password masked, safe to put in logs."""
     try:
-        logger.info("Creating database tables...")
-        Base.metadata.create_all(bind=engine)
-        logger.info("Database tables created successfully!")
-    except Exception as e:
-        logger.error(f"Error creating database tables: {e}")
-        raise
+        return make_url(url).render_as_string(hide_password=True)
+    except Exception:
+        return "<unparseable DATABASE_URL>"
+
+
+def _connection_hint(error: Exception) -> str:
+    msg = str(error).lower()
+    if "could not translate host name" in msg or "name or service not known" in msg:
+        return (
+            "The database host name does not resolve. On Render this usually means the "
+            "Postgres instance was deleted or has expired (free databases expire), or the "
+            "web service is in a different region than the database. Create/attach a "
+            "database and update DATABASE_URL (use the Internal URL only when both are in "
+            "the same region)."
+        )
+    if "password authentication failed" in msg:
+        return "The database rejected the credentials in DATABASE_URL."
+    if "connection refused" in msg or "timeout" in msg:
+        return "The database is not accepting connections yet (starting, suspended or wrong port)."
+    return "Check that DATABASE_URL points at a running database."
+
+
+def init_db(retries: int | None = None, base_delay: float | None = None):
+    """
+    Initialize database tables.
+
+    Transient connection errors (database still starting, DNS not yet
+    propagated after creating a database) are retried with exponential
+    backoff. If the database is still unreachable, a clear error that names the
+    host (password masked) and a likely cause is logged before re-raising, so
+    the deploy log explains why startup failed.
+    """
+    retries = int(os.environ.get("DB_CONNECT_RETRIES", "5")) if retries is None else retries
+    base_delay = float(os.environ.get("DB_CONNECT_BASE_DELAY", "1")) if base_delay is None else base_delay
+    target = _safe_db_target(settings.DATABASE_URL)
+
+    for attempt in range(1, retries + 1):
+        try:
+            logger.info("Creating database tables...")
+            Base.metadata.create_all(bind=engine)
+            logger.info("Database tables created successfully!")
+            return
+        except OperationalError as e:
+            if attempt < retries:
+                delay = base_delay * (2 ** (attempt - 1))
+                logger.warning(
+                    f"Database not reachable at {target} (attempt {attempt}/{retries}); "
+                    f"retrying in {delay:.0f}s: {e.orig if hasattr(e, 'orig') else e}"
+                )
+                time.sleep(delay)
+                continue
+            logger.error(
+                f"Could not connect to the database at {target} after {retries} attempts. "
+                f"{_connection_hint(e)} Original error: {e.orig if hasattr(e, 'orig') else e}"
+            )
+            raise
+        except Exception as e:
+            logger.error(f"Error creating database tables: {e}")
+            raise

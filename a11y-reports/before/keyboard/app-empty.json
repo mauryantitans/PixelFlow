@@ -1,0 +1,188 @@
+{
+  "state": "app-empty",
+  "tabStops": 30,
+  "noVisibleFocus": 0,
+  "focusEscapedDialog": null,
+  "steps": [
+    {
+      "tag": "button",
+      "name": "PixelFlow\nImage Processing Pipeline Buil",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Home",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "App",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "a",
+      "name": "Docs",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "a",
+      "name": "Source",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Switch to dark mode",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Sign In",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "input",
+      "name": "Search operations... (Ctrl+K)",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "summary",
+      "name": "Basic Operations",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "summary",
+      "name": "Adjustments",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Brightness\nAdjust image brightness",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Contrast\nAdjust image contrast",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Saturation\nAdjust color saturation",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Exposure\nAdjust image exposure",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Hue Rotate\nRotate hue around the color w",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Detail Enhance\nEnhance fine detail (edge",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Temperature\nWarm/cool color temperature ",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "summary",
+      "name": "Filters",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Grayscale\nConvert to grayscale",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Sepia\nApply sepia tone effect",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Invert\nInvert image colors",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Solarize\nApply solarization effect",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Posterize\nReduce number of colors",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "summary",
+      "name": "Blur & Sharpen",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "summary",
+      "name": "Effects",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "summary",
+      "name": "Stylize",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "summary",
+      "name": "OpenCV",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "summary",
+      "name": "Scikit-Image",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Reset",
+      "visibleFocus": true,
+      "insideDialog": null
+    }
+  ]
+}

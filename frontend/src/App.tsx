@@ -18,8 +18,12 @@ import Inspector from './components/Inspector';
 import GalleryModal from './components/GalleryModal';
 import './index.css';
 import MethodDetailsModal from './components/MethodDetailsModal';
+import { useDocumentTitle } from './hooks/useDocumentTitle';
+import { useDialog } from './hooks/useDialog';
+import { announce } from './utils/announce';
 
 const App: React.FC = () => {
+  useDocumentTitle('Workspace');
   const { status, updateStatus } = useStatus();
   const {
     images,
@@ -264,6 +268,7 @@ const App: React.FC = () => {
     // Seed default params from the operation schema (single source of truth).
     const params = getDefaults(operationName);
     addStep(operationName, params);
+    announce(`Added ${operationName} as step ${pipeline.length + 1} of ${pipeline.length + 1}`);
     // Live re-processing is driven by the live useEffect (single trigger).
   };
   
@@ -302,6 +307,12 @@ const App: React.FC = () => {
   const closeLightbox = () => {
     setLightboxState(prev => ({ ...prev, isOpen: false }));
   };
+
+  const closeQuotaPopup = () => setQuotaPopup({ show: false, type: 'quota', message: '' });
+
+  // Accessible dialogs: focus trap, Escape to close, focus returned on close.
+  const lightboxRef = useDialog<HTMLDivElement>(lightboxState.isOpen, closeLightbox);
+  const quotaRef = useDialog<HTMLDivElement>(quotaPopup.show, closeQuotaPopup);
   
   // Keyboard shortcuts
   useKeyboardShortcuts({
@@ -309,23 +320,21 @@ const App: React.FC = () => {
     'ctrl+/': () => document.getElementById('operationSearch')?.focus(),
     'ctrl+z': () => canUndo && undo(),
     'ctrl+y': () => canRedo && redo(),
-    'escape': () => {
-      if (galleryModal.isOpen) galleryModal.closeModal();
-      if (lightboxState.isOpen) closeLightbox();
-    }
+    // Escape is handled per dialog by useDialog (it closes only the top-most
+    // dialog; previously one Escape closed the lightbox AND the gallery).
   });
 
   // Helper function for status colors
   const getStatusTextColor = (type: 'info' | 'processing' | 'success' | 'error' | 'warning') => {
     switch (type) {
       case 'processing':
-        return 'text-blue-600 dark:text-blue-400';
+        return 'text-blue-700 dark:text-blue-400';
       case 'success':
-        return 'text-green-600 dark:text-green-400';
+        return 'text-green-700 dark:text-green-400';
       case 'error':
         return 'text-red-600 dark:text-red-400';
       case 'warning':
-        return 'text-yellow-600 dark:text-yellow-400';
+        return 'text-amber-700 dark:text-yellow-400';
       case 'info':
       default:
         return 'text-slate-700 dark:text-slate-300';
@@ -469,12 +478,34 @@ const App: React.FC = () => {
           container.style.cursor = scale > 1 ? 'grab' : 'default';
         };
         
+        // Keyboard alternative to wheel-zoom and drag-pan (WCAG 2.1.1).
+        const handleKey = (e: KeyboardEvent) => {
+          const step = e.shiftKey ? 100 : 30;
+          let handled = true;
+          if (e.key === '+' || e.key === '=') scale = Math.min(10, scale * 1.25);
+          else if (e.key === '-' || e.key === '_') scale = Math.max(1, scale / 1.25);
+          else if (e.key === '0') { scale = 1; pointX = 0; pointY = 0; }
+          else if (e.key === 'ArrowLeft' && scale > 1) pointX += step;
+          else if (e.key === 'ArrowRight' && scale > 1) pointX -= step;
+          else if (e.key === 'ArrowUp' && scale > 1) pointY += step;
+          else if (e.key === 'ArrowDown' && scale > 1) pointY -= step;
+          else handled = false;
+          if (!handled) return;
+          e.preventDefault();
+          if (scale === 1) { pointX = 0; pointY = 0; }
+          setTransform();
+          announce(`Zoom ${Math.round(scale * 100)}%`);
+        };
+        const dialog = container.closest('[role="dialog"]') as HTMLElement | null;
+        dialog?.addEventListener('keydown', handleKey);
+
         container.addEventListener('wheel', handleWheel);
         container.addEventListener('mousedown', handleMouseDown);
         document.addEventListener('mousemove', handleMouseMove);
         document.addEventListener('mouseup', handleMouseUp);
         
         return () => {
+          dialog?.removeEventListener('keydown', handleKey);
           container.removeEventListener('wheel', handleWheel);
           container.removeEventListener('mousedown', handleMouseDown);
           document.removeEventListener('mousemove', handleMouseMove);
@@ -485,51 +516,57 @@ const App: React.FC = () => {
   }, [lightboxState.isOpen]);
 
   return (
-    <div className="flex bg-slate-50 dark:bg-zinc-950 min-h-screen">
+    <main id="main-content" tabIndex={-1} className="flex bg-slate-50 dark:bg-zinc-950 min-h-screen focus:outline-none">
+      <h1 className="sr-only">PixelFlow image processing workspace</h1>
       {/* Operations Sidebar */}
-      <aside className={`h-screen sticky top-0 bg-white dark:bg-zinc-900 p-4 flex flex-col border-r-2 border-slate-300 dark:border-zinc-800 flex-shrink-0 transition-all duration-300 relative ${
+      <section aria-label="Operations" className={`h-screen sticky top-0 bg-white dark:bg-zinc-900 p-4 flex flex-col border-r-2 border-slate-300 dark:border-zinc-800 flex-shrink-0 transition-all duration-300 relative ${
         ui.sidebarCollapsed ? 'w-16' : 'w-80'
       }`}>
         
         <div className="flex items-center justify-between mb-4">
           {!ui.sidebarCollapsed && (
-            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">Operations</h2>
+            <h2 id="operations-heading" className="text-xl font-bold text-slate-900 dark:text-slate-50">Operations</h2>
           )}
           <button
             onClick={toggleSidebar}
+            aria-label={ui.sidebarCollapsed ? 'Expand operations panel' : 'Collapse operations panel'}
+            aria-expanded={!ui.sidebarCollapsed}
+            aria-controls="operations-panel"
+            title={ui.sidebarCollapsed ? 'Expand operations panel' : 'Collapse operations panel'}
             className="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-zinc-800 text-slate-600 dark:text-slate-300"
           >
-            <LucideReact.PanelLeftClose className="w-5 h-5" />
+            <LucideReact.PanelLeftClose aria-hidden="true" className="w-5 h-5" />
           </button>
         </div>
         
         {!ui.sidebarCollapsed && (
-          <div className="flex-grow flex flex-col min-h-0">
+          <div id="operations-panel" className="flex-grow flex flex-col min-h-0">
             {/* Search Bar */}
             <div className="relative mb-4">
+              <label htmlFor="operationSearch" className="sr-only">Search operations</label>
               <input
-                type="text"
+                type="search"
                 id="operationSearch"
                 placeholder="Search operations... (Ctrl+K)"
                 value={operationSearch}
                 onChange={(e) => setOperationSearch(e.target.value)}
                 className="input-field pr-10"
               />
-              <LucideReact.Search className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <LucideReact.Search aria-hidden="true" className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-600 dark:text-gray-400" />
             </div>
             
             {/* Enhanced Operations List */}
             <div className="flex-grow overflow-y-auto space-y-1 pr-1">
               {(opsLoading || opsError) && (
-                <div className="p-3 text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                <div role={opsError ? 'alert' : 'status'} className="p-3 text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2">
                   {opsLoading ? (
                     <>
-                      <LucideReact.Loader2 className="w-4 h-4 animate-spin" />
+                      <LucideReact.Loader2 aria-hidden="true" className="w-4 h-4 animate-spin" />
                       Loading operations…
                     </>
                   ) : (
                     <>
-                      <LucideReact.AlertTriangle className="w-4 h-4 text-red-500" />
+                      <LucideReact.AlertTriangle aria-hidden="true" className="w-4 h-4 text-red-700 dark:text-red-400" />
                       Couldn't load operations: {opsError}
                     </>
                   )}
@@ -544,13 +581,13 @@ const App: React.FC = () => {
                   <details open={libraryIndex < 1} className="operation-group">
                     <summary className="library-header">
                       <div className="flex items-center">
-                        {libraryName === 'OpenCV' && <LucideReact.Camera className="library-icon" />}
-                        {libraryName === 'Scikit-Image' && <LucideReact.Microscope className="library-icon" />}
-                        {libraryName === 'Basic Operations' && <LucideReact.Sliders className="library-icon" />}
-                        {libraryName === 'Search Results' && <LucideReact.Search className="library-icon" />}
+                        {libraryName === 'OpenCV' && <LucideReact.Camera aria-hidden="true" className="library-icon" />}
+                        {libraryName === 'Scikit-Image' && <LucideReact.Microscope aria-hidden="true" className="library-icon" />}
+                        {libraryName === 'Basic Operations' && <LucideReact.Sliders aria-hidden="true" className="library-icon" />}
+                        {libraryName === 'Search Results' && <LucideReact.Search aria-hidden="true" className="library-icon" />}
                         {libraryName}
                       </div>
-                      <LucideReact.ChevronDown className="chevron-icon" />
+                      <LucideReact.ChevronDown aria-hidden="true" className="chevron-icon" />
                     </summary>
                     
                     <div className="space-y-2 mt-2">
@@ -559,20 +596,20 @@ const App: React.FC = () => {
                           <details open={categoryIndex < 2} className="operation-group">
                             <summary className="category-header">
                               <div className="flex items-center">
-                                {categoryName === 'Adjustments' && <LucideReact.SlidersHorizontal className="w-3 h-3 mr-1" />}
-                                {categoryName === 'Filters' && <LucideReact.Filter className="w-3 h-3 mr-1" />}
-                                {categoryName === 'Blur & Sharpen' && <LucideReact.Focus className="w-3 h-3 mr-1" />}
-                                {categoryName === 'Effects' && <LucideReact.Sparkles className="w-3 h-3 mr-1" />}
-                                {categoryName === 'Filtering' && <LucideReact.Grid className="w-3 h-3 mr-1" />}
-                                {categoryName === 'Edge Detection' && <LucideReact.Scan className="w-3 h-3 mr-1" />}
-                                {categoryName === 'Enhancement' && <LucideReact.Sun className="w-3 h-3 mr-1" />}
-                                {categoryName === 'Restoration' && <LucideReact.Wrench className="w-3 h-3 mr-1" />}
-                                {categoryName === 'Found Operations' && <LucideReact.Search className="w-3 h-3 mr-1" />}
+                                {categoryName === 'Adjustments' && <LucideReact.SlidersHorizontal aria-hidden="true" className="w-3 h-3 mr-1" />}
+                                {categoryName === 'Filters' && <LucideReact.Filter aria-hidden="true" className="w-3 h-3 mr-1" />}
+                                {categoryName === 'Blur & Sharpen' && <LucideReact.Focus aria-hidden="true" className="w-3 h-3 mr-1" />}
+                                {categoryName === 'Effects' && <LucideReact.Sparkles aria-hidden="true" className="w-3 h-3 mr-1" />}
+                                {categoryName === 'Filtering' && <LucideReact.Grid aria-hidden="true" className="w-3 h-3 mr-1" />}
+                                {categoryName === 'Edge Detection' && <LucideReact.Scan aria-hidden="true" className="w-3 h-3 mr-1" />}
+                                {categoryName === 'Enhancement' && <LucideReact.Sun aria-hidden="true" className="w-3 h-3 mr-1" />}
+                                {categoryName === 'Restoration' && <LucideReact.Wrench aria-hidden="true" className="w-3 h-3 mr-1" />}
+                                {categoryName === 'Found Operations' && <LucideReact.Search aria-hidden="true" className="w-3 h-3 mr-1" />}
                                 {!['Adjustments', 'Filters', 'Blur & Sharpen', 'Effects', 'Filtering', 'Edge Detection', 'Enhancement', 'Restoration', 'Found Operations'].includes(categoryName) && 
-                                <LucideReact.Folder className="w-3 h-3 mr-1" />}
+                                <LucideReact.Folder aria-hidden="true" className="w-3 h-3 mr-1" />}
                                 <span className="text-slate-700 dark:text-slate-300">{categoryName}</span>
                               </div>
-                              <LucideReact.ChevronDown className="w-3 h-3 chevron-icon" />
+                              <LucideReact.ChevronDown aria-hidden="true" className="w-3 h-3 chevron-icon" />
                             </summary>
                             
                             <div className="grid grid-cols-2 gap-1.5 mt-2">
@@ -582,12 +619,20 @@ const App: React.FC = () => {
                               ).map((op: string) => (
                                 <button
                                   key={op}
+                                  type="button"
+                                  data-op={op}
                                   onClick={() => handleAddOperation(op)}
+                                  aria-label={`Add ${op}`}
+                                  aria-describedby={getOp(op)?.description ? `op-desc-${op.replace(/[^a-zA-Z0-9]/g, '-')}` : undefined}
                                   className="operation-btn-enhanced group"
                                 >
                                   {op}
                                   {getOp(op)?.description && (
-                                    <div className="operation-tooltip">
+                                    <div
+                                      id={`op-desc-${op.replace(/[^a-zA-Z0-9]/g, '-')}`}
+                                      aria-hidden="true"
+                                      className="operation-tooltip"
+                                    >
                                       {getOp(op)?.description}
                                     </div>
                                   )}
@@ -604,24 +649,30 @@ const App: React.FC = () => {
             </div>
           </div>
         )}
-      </aside>
+      </section>
       
       {/* Main Content */}
-      <main className="flex-1 flex flex-col min-h-screen">
-        {/* Header */}
-        <header className="flex items-center justify-between p-4 border-b-2 border-slate-300 dark:border-zinc-800 bg-white dark:bg-zinc-900 sticky top-0 z-40">
+      <div className="flex-1 flex flex-col min-h-screen">
+        {/* Toolbar */}
+        <div className="flex items-center justify-between p-4 border-b-2 border-slate-300 dark:border-zinc-800 bg-white dark:bg-zinc-900 sticky top-0 z-40">
           <div className="flex items-center gap-4">
-            <label htmlFor="upload-image" className="btn-primary cursor-pointer">
-              Upload Image(s)
-            </label>
+            {/* The real file input stays in the tab order (it used to be
+                display:none, so keyboard users could not upload). It is
+                visually hidden and the label is styled as the button. */}
             <input
               type="file"
               id="upload-image"
-              className="hidden"
+              className="sr-only peer"
               accept="image/*"
               multiple
               onChange={handleFileUpload}
             />
+            <label
+              htmlFor="upload-image"
+              className="btn-primary cursor-pointer peer-focus-visible:outline peer-focus-visible:outline-[3px] peer-focus-visible:outline-offset-2 peer-focus-visible:outline-blue-700 dark:peer-focus-visible:outline-blue-300"
+            >
+              Upload Image(s)
+            </label>
             {images.length > 0 && (
               <button
                 onClick={galleryModal.openModal}
@@ -639,7 +690,7 @@ const App: React.FC = () => {
             >
               {batchLoading ? (
                 <>
-                  <div className="relative w-5 h-5 flex items-center justify-center">
+                  <div className="relative w-5 h-5 flex items-center justify-center" aria-hidden="true">
                     {/* Outer static circle */}
                     <div className="absolute inset-0 border-2 border-black/40 rounded-full"></div>
                     {/* Rotating circle - animated spinner */}
@@ -655,15 +706,16 @@ const App: React.FC = () => {
             </button>
           </div>
 
-          {/* Status Display */}
-          <div className="flex-1 text-center px-4">
+          {/* Status Display — a polite live region, so upload/processing/
+              error messages are read out without moving focus (WCAG 4.1.3). */}
+          <div className="flex-1 text-center px-4" role="status" aria-live="polite" aria-atomic="true">
             {status.text && (
               <span className={`text-sm flex items-center justify-center gap-2 transition-colors duration-200 font-medium ${getStatusTextColor(status.type)}`}>
-                {status.type === 'processing' && <LucideReact.Loader2 className="w-4 h-4 animate-spin" />}
-                {status.type === 'success' && <LucideReact.CheckCircle className="w-4 h-4" />}
-                {status.type === 'error' && <LucideReact.AlertTriangle className="w-4 h-4" />}
-                {status.type === 'warning' && <LucideReact.AlertCircle className="w-4 h-4" />}
-                {status.type === 'info' && status.text.includes('Live mode') && <LucideReact.Zap className="w-4 h-4" />}
+                {status.type === 'processing' && <LucideReact.Loader2 aria-hidden="true" className="w-4 h-4 animate-spin" />}
+                {status.type === 'success' && <LucideReact.CheckCircle aria-hidden="true" className="w-4 h-4" />}
+                {status.type === 'error' && <LucideReact.AlertTriangle aria-hidden="true" className="w-4 h-4" />}
+                {status.type === 'warning' && <LucideReact.AlertCircle aria-hidden="true" className="w-4 h-4" />}
+                {status.type === 'info' && status.text.includes('Live mode') && <LucideReact.Zap aria-hidden="true" className="w-4 h-4" />}
                 {status.text}
               </span>
             )}
@@ -672,39 +724,42 @@ const App: React.FC = () => {
           <div className="flex items-center gap-4">
             {/* Live Processing Toggle - FIXED */}
             <div className="flex items-center gap-3">
-              <span className="text-sm font-medium text-slate-900 dark:text-slate-50">Live Processing</span>
+              <label htmlFor="live-toggle" className="text-sm font-medium text-slate-900 dark:text-slate-50">Live Processing</label>
               <div className="relative inline-block w-10 align-middle select-none">
                 <input
                   type="checkbox"
+                  id="live-toggle"
+                  role="switch"
+                  aria-describedby={selectedCount !== 1 ? 'live-toggle-hint' : undefined}
                   checked={liveProcessingEnabled}
                   onChange={(e) => handleLiveToggle(e.target.checked)}
                   disabled={selectedCount !== 1}
                   className="toggle-checkbox"
                 />
-                <label className="toggle-label"></label>
+                <label htmlFor="live-toggle" className="toggle-label" aria-hidden="true"></label>
               </div>
               {selectedCount !== 1 && (
-                <span className="text-xs text-slate-500 dark:text-slate-400">
+                <span id="live-toggle-hint" className="text-xs text-slate-600 dark:text-slate-400">
                   (Select 1 image)
                 </span>
               )}
             </div>
           </div>
-        </header>
+        </div>
         
         {/* Content Area */}
         <div className="flex-1 p-6 flex flex-col gap-6">
           {/* Pipeline Section */}
-          <div className="bg-white dark:bg-zinc-900 rounded-lg p-4 border-2 border-slate-300 dark:border-zinc-800">
+          <section aria-labelledby="pipeline-heading" className="bg-white dark:bg-zinc-900 rounded-lg p-4 border-2 border-slate-300 dark:border-zinc-800">
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center gap-4">
-                <h3 className="text-lg font-bold text-slate-900 dark:text-slate-50">
+                <h2 id="pipeline-heading" tabIndex={-1} className="focus:outline-none text-lg font-bold text-slate-900 dark:text-slate-50">
                   Pipeline ({pipeline.length} steps)
-                </h3>
+                </h2>
                 {/* Timing Display */}
                 {((liveProcessingEnabled && liveTimingData.total_time > 0) || (!liveProcessingEnabled && batchTimingData.total_time > 0)) && (
                   <div className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
-                    <LucideReact.Clock className="w-3 h-3" />
+                    <LucideReact.Clock aria-hidden="true" className="w-3 h-3" />
                     {liveProcessingEnabled 
                       ? `${(liveTimingData.total_time * 1000).toFixed(0)}ms`
                       : `${(batchTimingData.total_time).toFixed(2)}s total`
@@ -717,27 +772,27 @@ const App: React.FC = () => {
               <button
               onClick={undo}
               disabled={!canUndo}
-              className="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 transition-colors flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 transition-colors flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
               title="Undo (Ctrl+Z)"
               >
-              <LucideReact.Undo2 className="w-3 h-3" />
+              <LucideReact.Undo2 aria-hidden="true" className="w-3 h-3" />
               Undo
               </button>
               <button
               onClick={redo}
               disabled={!canRedo}
-              className="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 transition-colors flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 transition-colors flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
               title="Redo (Ctrl+Y)"
               >
-              <LucideReact.Redo2 className="w-3 h-3" />
+              <LucideReact.Redo2 aria-hidden="true" className="w-3 h-3" />
               Redo
               </button>
               <div className="w-px h-4 bg-slate-300 dark:bg-zinc-700"></div>
               <button
               onClick={resetPipeline}
-              className="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 transition-colors flex items-center gap-1"
+              className="text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 transition-colors flex items-center gap-1"
               >
-              <LucideReact.RotateCcw className="w-3 h-3" />
+              <LucideReact.RotateCcw aria-hidden="true" className="w-3 h-3" />
               Reset
               </button>
               </div>
@@ -745,8 +800,8 @@ const App: React.FC = () => {
             
             <div className="space-y-2">
               {pipeline.length === 0 ? (
-                <p className="text-sm text-center py-4 text-slate-500 dark:text-slate-400">
-                  Add operations from the left panel
+                <p className="text-sm text-center py-4 text-slate-600 dark:text-slate-400">
+                  Add operations from the left panel. Each step can be reordered with its Move up / Move down buttons or Alt+Arrow keys.
                 </p>
               ) : (
                 pipeline.map((step, index) => {
@@ -772,8 +827,17 @@ const App: React.FC = () => {
                       step={step}
                       index={index}
                       totalSteps={pipeline.length}
-                      onRemove={() => removeStep(index)}
-                      onMove={moveStep}
+                      onRemove={() => {
+                        const label = getOp(step.name)?.label ?? step.name;
+                        removeStep(index);
+                        announce(`Removed ${label}. ${pipeline.length - 1} steps left.`);
+                        // The focused button is gone; put focus somewhere sensible.
+                        window.requestAnimationFrame(() => document.getElementById('pipeline-heading')?.focus());
+                      }}
+                      onMove={(from, to) => {
+                        moveStep(from, to);
+                        announce(`${getOp(step.name)?.label ?? step.name} moved to position ${to + 1} of ${pipeline.length}`);
+                      }}
                       onParameterChange={handleParameterChange}
                       onPreview={() => {
                         if (liveProcessingEnabled) {
@@ -794,10 +858,10 @@ const App: React.FC = () => {
                 })
               )}
             </div>
-          </div>
+          </section>
           
           {/* Results Section - IMPROVED */}
-          <div className="flex-1 bg-white dark:bg-zinc-900 rounded-lg border-2 border-slate-300 dark:border-zinc-800 flex flex-col">
+          <section aria-label="Results" className="flex-1 bg-white dark:bg-zinc-900 rounded-lg border-2 border-slate-300 dark:border-zinc-800 flex flex-col">
             {ui.currentView === 'grid' && (
               <ResultsGridComponent
                 results={batchResults}
@@ -841,9 +905,9 @@ const App: React.FC = () => {
                 }}
               />
             )}
-          </div>
+          </section>
         </div>
-      </main>
+      </div>
       
       {/* Gallery Modal */}
       <GalleryModal
@@ -864,7 +928,14 @@ const App: React.FC = () => {
           className="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-4"
           onClick={closeLightbox}
         >
-          <div className="relative w-full h-full flex justify-center items-center">
+          <div
+            ref={lightboxRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Image viewer: ${lightboxState.filename}`}
+            tabIndex={-1}
+            className="relative w-full h-full flex justify-center items-center"
+          >
             <div 
               className="zoom-container w-full h-full flex justify-center items-center"
               onClick={(e) => e.stopPropagation()}
@@ -877,53 +948,49 @@ const App: React.FC = () => {
               />
             </div>
             
+            <p className="absolute bottom-4 left-4 text-xs text-white bg-black/70 px-2 py-1 rounded">
+              Keyboard: + / − to zoom, arrow keys to pan, 0 to reset, Esc to close
+            </p>
             {/* Zoom Controls */}
             <div className="absolute bottom-4 right-4 bg-gray-900/50 backdrop-blur-sm rounded-lg text-white flex items-center text-xs">
               <button 
+                type="button"
+                aria-label="Zoom out"
                 className="p-3 hover:bg-white/20 rounded-l-lg"
                 onClick={(e) => {
                   e.stopPropagation();
-                  const container = document.querySelector('.zoom-container');
-                  const img = container?.querySelector('.zoomable-image') as HTMLElement;
-                  if (img) {
-                    const currentScale = parseFloat(img.style.transform.match(/scale\(([^)]+)\)/)?.[1] || '1');
-                    const newScale = Math.max(1, currentScale / 1.5);
-                    img.style.transform = `scale(${newScale})`;
-                    if (newScale === 1) {
-                      img.style.transform = 'translate(0px, 0px) scale(1)';
-                    }
-                  }
+                  // Share zoom state with the wheel/keyboard handlers.
+                  (e.currentTarget.closest('[role="dialog"]') as HTMLElement | null)?.dispatchEvent(
+                    new KeyboardEvent('keydown', { key: '-', bubbles: true })
+                  );
                 }}
               >
-                <LucideReact.ZoomOut className="w-4 h-4" />
+                <LucideReact.ZoomOut aria-hidden="true" className="w-4 h-4" />
               </button>
-              <span className="px-3 font-mono">Zoom</span>
+              <span className="px-3 font-mono" aria-hidden="true">Zoom</span>
               <button 
+                type="button"
+                aria-label="Zoom in"
                 className="p-3 hover:bg-white/20 rounded-r-lg"
                 onClick={(e) => {
                   e.stopPropagation();
-                  const container = document.querySelector('.zoom-container');
-                  const img = container?.querySelector('.zoomable-image') as HTMLElement;
-                  if (img) {
-                    const currentScale = parseFloat(img.style.transform.match(/scale\(([^)]+)\)/)?.[1] || '1');
-                    const newScale = Math.min(10, currentScale * 1.5);
-                    const rect = img.getBoundingClientRect();
-                    const centerX = rect.width / 2;
-                    const centerY = rect.height / 2;
-                    img.style.transformOrigin = `${centerX}px ${centerY}px`;
-                    img.style.transform = `scale(${newScale})`;
-                  }
+                  // Share zoom state with the wheel/keyboard handlers.
+                  (e.currentTarget.closest('[role="dialog"]') as HTMLElement | null)?.dispatchEvent(
+                    new KeyboardEvent('keydown', { key: '+', bubbles: true })
+                  );
                 }}
               >
-                <LucideReact.ZoomIn className="w-4 h-4" />
+                <LucideReact.ZoomIn aria-hidden="true" className="w-4 h-4" />
               </button>
             </div>
             
             <button
+              type="button"
               onClick={closeLightbox}
+              aria-label="Close image viewer"
               className="absolute top-4 right-4 p-2 bg-black/50 text-white rounded-full hover:bg-black/70"
             >
-              <LucideReact.X className="w-6 h-6" />
+              <LucideReact.X aria-hidden="true" className="w-6 h-6" />
             </button>
           </div>
         </div>
@@ -940,18 +1007,26 @@ const App: React.FC = () => {
       {/* Quota/Limit Exceeded Popup */}
       {quotaPopup.show && (
         <div className="fixed inset-0 bg-black/60 z-[200] flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-2xl max-w-md w-full p-6 border-2 border-red-500">
+          <div
+            ref={quotaRef}
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="quota-dialog-title"
+            aria-describedby="quota-dialog-message"
+            tabIndex={-1}
+            className="bg-white dark:bg-zinc-900 rounded-xl shadow-2xl max-w-md w-full p-6 border-2 border-red-500"
+          >
             <div className="flex items-start space-x-4">
               <div className="flex-shrink-0">
                 <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
-                  <LucideReact.AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
+                  <LucideReact.AlertTriangle aria-hidden="true" className="w-6 h-6 text-red-600 dark:text-red-400" />
                 </div>
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-bold text-slate-900 dark:text-slate-50 mb-2">
+                <h2 id="quota-dialog-title" className="text-lg font-bold text-slate-900 dark:text-slate-50 mb-2">
                   {quotaPopup.type === 'quota' ? 'Storage Quota Exceeded' : 'Image Limit Reached'}
-                </h3>
-                <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">
+                </h2>
+                <p id="quota-dialog-message" className="text-sm text-slate-600 dark:text-slate-300 mb-4">
                   {quotaPopup.message}
                 </p>
                 
@@ -1018,7 +1093,8 @@ const App: React.FC = () => {
             
             <div className="mt-6 flex justify-end">
               <button
-                onClick={() => setQuotaPopup({ show: false, type: 'quota', message: '' })}
+                onClick={closeQuotaPopup}
+                data-autofocus
                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
               >
                 Got it
@@ -1027,7 +1103,7 @@ const App: React.FC = () => {
           </div>
         </div>
       )}
-    </div>
+    </main>
   );
 };
 

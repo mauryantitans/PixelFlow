@@ -24,11 +24,19 @@ services:
     healthCheckPath: /health
 
     envVars:
+      # ── Runtime ──────────────────────────────────────────────────────────────
+      # Render ignores runtime.txt. Without this, a new/synced service builds on
+      # Render's default Python (3.13), which has no wheels for the pinned
+      # numpy/scikit-image/PyWavelets/psycopg2 versions, so the build fails.
+      # (The live service already sets PYTHON_VERSION=3.11.9 by hand.)
+      - key: PYTHON_VERSION
+        value: 3.11.9
+
       # ── Application ──────────────────────────────────────────────────────────
       - key: APP_NAME
         value: PixelFlow
       - key: VERSION
-        value: 1.1.0
+        value: 1.2.0
       - key: DEBUG
         value: false
 
@@ -92,3 +100,7 @@ databases:
     plan: free
     region: oregon          # keep same region as the web service to minimise latency
     postgresMajorVersion: 16
+    # NOTE: Render's free Postgres expires 30 days after creation and is then
+    # deleted. When that happens the web service crash-loops on startup with
+    # 'could not translate host name "dpg-...-a"'. Create a new database (or
+    # use a paid plan) and point DATABASE_URL at it.

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { X, BarChart3, Info } from 'lucide-react';
+import { useDialog } from '../hooks/useDialog';
 import { calculateHistogram, calculateImageStats } from '../utils/download';
 
 interface ImageAnalyticsProps {
@@ -78,7 +79,7 @@ export const ImageAnalytics: React.FC<ImageAnalyticsProps> = ({
               );
             })}
           </svg>
-          <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+          <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mt-1">
             <span>0</span>
             <span>128</span>
             <span>255</span>
@@ -88,22 +89,32 @@ export const ImageAnalytics: React.FC<ImageAnalyticsProps> = ({
     );
   };
 
+  const dialogRef = useDialog<HTMLDivElement>(isOpen, onClose);
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4">
-      <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="image-analytics-title"
+        tabIndex={-1}
+        className="bg-white dark:bg-zinc-900 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-zinc-700 sticky top-0 bg-white dark:bg-zinc-900 z-10">
           <div className="flex items-center space-x-2">
-            <BarChart3 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Image Analytics</h2>
+            <BarChart3 aria-hidden="true" className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <h2 id="image-analytics-title" className="text-xl font-bold text-gray-900 dark:text-white">Image Analytics</h2>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            aria-label="Close image analytics"
+            className="text-gray-600 hover:text-gray-600 dark:hover:text-gray-300 transition-colors dark:text-gray-400"
           >
-            <X className="w-6 h-6" />
+            <X aria-hidden="true" className="w-6 h-6" />
           </button>
         </div>
 
@@ -111,8 +122,8 @@ export const ImageAnalytics: React.FC<ImageAnalyticsProps> = ({
         <div className="p-6">
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <div className="text-center" role="status">
+                <div aria-hidden="true" className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
                 <p className="text-gray-600 dark:text-gray-400">Analyzing image...</p>
               </div>
             </div>
@@ -124,25 +135,25 @@ export const ImageAnalytics: React.FC<ImageAnalyticsProps> = ({
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Image Information</h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="bg-gray-50 dark:bg-zinc-800 p-4 rounded-lg border border-gray-200 dark:border-zinc-700">
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Dimensions</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Dimensions</p>
                       <p className="text-lg font-semibold text-gray-900 dark:text-white">
                         {stats.width} × {stats.height}
                       </p>
                     </div>
                     <div className="bg-gray-50 dark:bg-zinc-800 p-4 rounded-lg border border-gray-200 dark:border-zinc-700">
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Total Pixels</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Total Pixels</p>
                       <p className="text-lg font-semibold text-gray-900 dark:text-white">
                         {stats.pixels.toLocaleString()}
                       </p>
                     </div>
                     <div className="bg-gray-50 dark:bg-zinc-800 p-4 rounded-lg border border-gray-200 dark:border-zinc-700">
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Aspect Ratio</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Aspect Ratio</p>
                       <p className="text-lg font-semibold text-gray-900 dark:text-white">
                         {(stats.width / stats.height).toFixed(2)}
                       </p>
                     </div>
                     <div className="bg-gray-50 dark:bg-zinc-800 p-4 rounded-lg border border-gray-200 dark:border-zinc-700">
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">File Name</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">File Name</p>
                       <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
                         {imageName}
                       </p>
@@ -222,7 +233,7 @@ export const ImageAnalytics: React.FC<ImageAnalyticsProps> = ({
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center space-x-2">
                     <span>Histograms</span>
                     <div className="group relative">
-                      <Info size={16} className="text-gray-400 cursor-help" />
+                      <Info aria-hidden="true" size={16} className="text-gray-600 cursor-help dark:text-gray-400" />
                       <div className="hidden group-hover:block absolute left-0 top-full mt-1 w-64 p-2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs rounded shadow-lg z-10">
                         Histograms show the distribution of pixel values across different color channels.
                       </div>

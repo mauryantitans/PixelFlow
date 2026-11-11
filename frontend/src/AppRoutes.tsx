@@ -33,6 +33,7 @@ const AppRoutes: React.FC = () => {
               element={
                 <PickerProvider>
                   <div className="min-h-screen">
+                    <a href="#main-content" className="skip-link">Skip to main content</a>
                     <Header />
                     <App />
                   </div>

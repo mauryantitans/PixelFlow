@@ -1,0 +1,957 @@
+[
+  {
+    "state": "route-landing",
+    "url": "http://localhost:3000/",
+    "mode": "navigation",
+    "lighthouse": 91,
+    "lighthouseFailed": [
+      "heading-order",
+      "link-in-text-block"
+    ]
+  },
+  {
+    "state": "route-auth",
+    "url": "http://localhost:3000/auth",
+    "mode": "navigation",
+    "lighthouse": 100,
+    "lighthouseFailed": []
+  },
+  {
+    "state": "route-app",
+    "url": "http://localhost:3000/app",
+    "mode": "navigation",
+    "lighthouse": 74,
+    "lighthouseFailed": [
+      "button-name",
+      "color-contrast",
+      "label"
+    ]
+  },
+  {
+    "state": "landing",
+    "url": "http://localhost:3000/",
+    "renderedTheme": "light",
+    "lighthouse": 91,
+    "lighthouseFailed": [
+      "heading-order",
+      "link-in-text-block"
+    ],
+    "axe": {
+      "light": {
+        "rules": [
+          "heading-order(moderate:1)",
+          "landmark-one-main(moderate:1)",
+          "link-in-text-block(serious:1)",
+          "region(moderate:30)"
+        ],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 1,
+          "moderate": 32,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [
+          "heading-order(moderate:1)",
+          "landmark-one-main(moderate:1)",
+          "region(moderate:30)"
+        ],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 32,
+          "minor": 0
+        }
+      }
+    },
+    "keyboard": {
+      "tabStops": 24,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": null
+    }
+  },
+  {
+    "state": "auth-login",
+    "url": "http://localhost:3000/auth",
+    "renderedTheme": "dark",
+    "lighthouse": 100,
+    "lighthouseFailed": [],
+    "axe": {
+      "dark": {
+        "rules": [
+          "landmark-one-main(moderate:1)",
+          "region(moderate:5)"
+        ],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 6,
+          "minor": 0
+        }
+      },
+      "light": {
+        "rules": [
+          "landmark-one-main(moderate:1)",
+          "region(moderate:5)"
+        ],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 6,
+          "minor": 0
+        }
+      }
+    },
+    "keyboard": {
+      "tabStops": 4,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": null
+    }
+  },
+  {
+    "state": "auth-register",
+    "url": "http://localhost:3000/auth",
+    "renderedTheme": "dark",
+    "lighthouse": 100,
+    "lighthouseFailed": [],
+    "axe": {
+      "dark": {
+        "rules": [
+          "landmark-one-main(moderate:1)",
+          "region(moderate:8)"
+        ],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 9,
+          "minor": 0
+        }
+      },
+      "light": {
+        "rules": [
+          "landmark-one-main(moderate:1)",
+          "region(moderate:8)"
+        ],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 9,
+          "minor": 0
+        }
+      }
+    },
+    "keyboard": {
+      "tabStops": 7,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": null
+    }
+  },
+  {
+    "state": "auth-login-error",
+    "url": "http://localhost:3000/auth",
+    "renderedTheme": "dark",
+    "lighthouse": 100,
+    "lighthouseFailed": [],
+    "axe": {
+      "dark": {
+        "rules": [
+          "landmark-one-main(moderate:1)",
+          "region(moderate:6)"
+        ],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 7,
+          "minor": 0
+        }
+      },
+      "light": {
+        "rules": [
+          "landmark-one-main(moderate:1)",
+          "region(moderate:6)"
+        ],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 7,
+          "minor": 0
+        }
+      }
+    },
+    "keyboard": {
+      "tabStops": 4,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": null
+    }
+  },
+  {
+    "state": "app-empty",
+    "url": "http://localhost:3000/app",
+    "renderedTheme": "light",
+    "lighthouse": 74,
+    "lighthouseFailed": [
+      "button-name",
+      "color-contrast",
+      "label"
+    ],
+    "axe": {
+      "light": {
+        "rules": [
+          "button-name(critical:1)",
+          "color-contrast(serious:2)",
+          "label(critical:1)",
+          "region(moderate:2)"
+        ],
+        "nodesByImpact": {
+          "critical": 2,
+          "serious": 2,
+          "moderate": 2,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [
+          "button-name(critical:1)",
+          "color-contrast(serious:2)",
+          "label(critical:1)",
+          "region(moderate:2)"
+        ],
+        "nodesByImpact": {
+          "critical": 2,
+          "serious": 2,
+          "moderate": 2,
+          "minor": 0
+        }
+      }
+    },
+    "keyboard": {
+      "tabStops": 30,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": null
+    }
+  },
+  {
+    "state": "app-pipeline",
+    "url": "http://localhost:3000/app",
+    "renderedTheme": "light",
+    "lighthouse": 62,
+    "lighthouseFailed": [
+      "button-name",
+      "color-contrast",
+      "label",
+      "select-name",
+      "target-size"
+    ],
+    "axe": {
+      "light": {
+        "rules": [
+          "button-name(critical:9)",
+          "color-contrast(serious:11)",
+          "label(critical:5)",
+          "region(moderate:2)",
+          "select-name(critical:1)"
+        ],
+        "nodesByImpact": {
+          "critical": 15,
+          "serious": 11,
+          "moderate": 2,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [
+          "button-name(critical:9)",
+          "color-contrast(serious:2)",
+          "label(critical:5)",
+          "region(moderate:2)",
+          "select-name(critical:1)"
+        ],
+        "nodesByImpact": {
+          "critical": 15,
+          "serious": 2,
+          "moderate": 2,
+          "minor": 0
+        }
+      }
+    },
+    "keyboard": {
+      "tabStops": 59,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": null
+    }
+  },
+  {
+    "state": "modal-gallery",
+    "url": "http://localhost:3000/app",
+    "renderedTheme": "light",
+    "lighthouse": 62,
+    "lighthouseFailed": [
+      "button-name",
+      "color-contrast",
+      "label",
+      "select-name",
+      "target-size"
+    ],
+    "axe": {
+      "light": {
+        "rules": [
+          "button-name(critical:10)",
+          "color-contrast(serious:11)",
+          "label(critical:5)",
+          "region(moderate:6)",
+          "select-name(critical:1)"
+        ],
+        "nodesByImpact": {
+          "critical": 16,
+          "serious": 11,
+          "moderate": 6,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [
+          "button-name(critical:10)",
+          "color-contrast(serious:2)",
+          "label(critical:5)",
+          "region(moderate:6)",
+          "select-name(critical:1)"
+        ],
+        "nodesByImpact": {
+          "critical": 16,
+          "serious": 2,
+          "moderate": 6,
+          "minor": 0
+        }
+      }
+    },
+    "keyboard": {
+      "tabStops": 25,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": 25
+    }
+  },
+  {
+    "state": "modal-lightbox",
+    "url": "http://localhost:3000/app",
+    "renderedTheme": "light",
+    "lighthouse": 62,
+    "lighthouseFailed": [
+      "button-name",
+      "color-contrast",
+      "label",
+      "select-name",
+      "target-size"
+    ],
+    "axe": {
+      "light": {
+        "rules": [
+          "button-name(critical:13)",
+          "color-contrast(serious:11)",
+          "label(critical:5)",
+          "region(moderate:8)",
+          "select-name(critical:1)"
+        ],
+        "nodesByImpact": {
+          "critical": 19,
+          "serious": 11,
+          "moderate": 8,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [
+          "button-name(critical:13)",
+          "color-contrast(serious:2)",
+          "label(critical:5)",
+          "region(moderate:8)",
+          "select-name(critical:1)"
+        ],
+        "nodesByImpact": {
+          "critical": 19,
+          "serious": 2,
+          "moderate": 8,
+          "minor": 0
+        }
+      }
+    },
+    "keyboard": {
+      "tabStops": 24,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": 21
+    }
+  },
+  {
+    "state": "modal-method-details",
+    "url": "http://localhost:3000/app",
+    "renderedTheme": "light",
+    "lighthouse": 62,
+    "lighthouseFailed": [
+      "button-name",
+      "color-contrast",
+      "label",
+      "select-name",
+      "target-size"
+    ],
+    "axe": {
+      "light": {
+        "rules": [
+          "button-name(critical:10)",
+          "color-contrast(serious:11)",
+          "label(critical:5)",
+          "region(moderate:9)",
+          "select-name(critical:1)"
+        ],
+        "nodesByImpact": {
+          "critical": 16,
+          "serious": 11,
+          "moderate": 9,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [
+          "button-name(critical:10)",
+          "color-contrast(serious:2)",
+          "label(critical:5)",
+          "region(moderate:9)",
+          "select-name(critical:1)"
+        ],
+        "nodesByImpact": {
+          "critical": 16,
+          "serious": 2,
+          "moderate": 9,
+          "minor": 0
+        }
+      }
+    },
+    "keyboard": {
+      "tabStops": 25,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": 25
+    }
+  },
+  {
+    "state": "app-results",
+    "url": "http://localhost:3000/app",
+    "renderedTheme": "light",
+    "lighthouse": 62,
+    "lighthouseFailed": [
+      "button-name",
+      "color-contrast",
+      "label",
+      "select-name",
+      "target-size"
+    ],
+    "axe": {
+      "light": {
+        "rules": [
+          "button-name(critical:10)",
+          "color-contrast(serious:10)",
+          "label(critical:5)",
+          "region(moderate:9)",
+          "select-name(critical:1)"
+        ],
+        "nodesByImpact": {
+          "critical": 16,
+          "serious": 10,
+          "moderate": 9,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [
+          "button-name(critical:10)",
+          "color-contrast(serious:1)",
+          "label(critical:5)",
+          "region(moderate:9)",
+          "select-name(critical:1)"
+        ],
+        "nodesByImpact": {
+          "critical": 16,
+          "serious": 1,
+          "moderate": 9,
+          "minor": 0
+        }
+      }
+    },
+    "keyboard": {
+      "tabStops": 5,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": null
+    }
+  },
+  {
+    "state": "modal-analytics",
+    "url": "http://localhost:3000/app",
+    "renderedTheme": "light",
+    "lighthouse": 62,
+    "lighthouseFailed": [
+      "button-name",
+      "color-contrast",
+      "label",
+      "select-name",
+      "target-size"
+    ],
+    "axe": {
+      "light": {
+        "rules": [
+          "button-name(critical:11)",
+          "color-contrast(serious:9)",
+          "label(critical:5)",
+          "region(moderate:9)",
+          "select-name(critical:1)"
+        ],
+        "nodesByImpact": {
+          "critical": 17,
+          "serious": 9,
+          "moderate": 9,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [
+          "button-name(critical:11)",
+          "color-contrast(serious:1)",
+          "label(critical:5)",
+          "region(moderate:9)",
+          "select-name(critical:1)"
+        ],
+        "nodesByImpact": {
+          "critical": 17,
+          "serious": 1,
+          "moderate": 9,
+          "minor": 0
+        }
+      }
+    },
+    "keyboard": {
+      "tabStops": 6,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": 6
+    }
+  },
+  {
+    "state": "app-inspector",
+    "url": "http://localhost:3000/app",
+    "renderedTheme": "light",
+    "lighthouse": 62,
+    "lighthouseFailed": [
+      "button-name",
+      "color-contrast",
+      "label",
+      "select-name",
+      "target-size"
+    ],
+    "axe": {
+      "light": {
+        "rules": [
+          "button-name(critical:10)",
+          "color-contrast(serious:9)",
+          "label(critical:5)",
+          "region(moderate:9)",
+          "select-name(critical:1)"
+        ],
+        "nodesByImpact": {
+          "critical": 16,
+          "serious": 9,
+          "moderate": 9,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [
+          "button-name(critical:10)",
+          "label(critical:5)",
+          "region(moderate:9)",
+          "select-name(critical:1)"
+        ],
+        "nodesByImpact": {
+          "critical": 16,
+          "serious": 0,
+          "moderate": 9,
+          "minor": 0
+        }
+      }
+    },
+    "keyboard": {
+      "tabStops": 7,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": null
+    }
+  },
+  {
+    "state": "app-inspector-slider",
+    "url": "http://localhost:3000/app",
+    "renderedTheme": "light",
+    "lighthouse": 62,
+    "lighthouseFailed": [
+      "button-name",
+      "color-contrast",
+      "label",
+      "select-name",
+      "target-size"
+    ],
+    "axe": {
+      "light": {
+        "rules": [
+          "button-name(critical:10)",
+          "color-contrast(serious:9)",
+          "label(critical:5)",
+          "region(moderate:9)",
+          "select-name(critical:1)"
+        ],
+        "nodesByImpact": {
+          "critical": 16,
+          "serious": 9,
+          "moderate": 9,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [
+          "button-name(critical:10)",
+          "label(critical:5)",
+          "region(moderate:9)",
+          "select-name(critical:1)"
+        ],
+        "nodesByImpact": {
+          "critical": 16,
+          "serious": 0,
+          "moderate": 9,
+          "minor": 0
+        }
+      }
+    },
+    "keyboard": {
+      "tabStops": 18,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": null
+    }
+  },
+  {
+    "state": "app-live",
+    "url": "http://localhost:3000/app",
+    "renderedTheme": "light",
+    "lighthouse": 62,
+    "lighthouseFailed": [
+      "button-name",
+      "color-contrast",
+      "label",
+      "select-name",
+      "target-size"
+    ],
+    "axe": {
+      "light": {
+        "rules": [
+          "button-name(critical:10)",
+          "color-contrast(serious:10)",
+          "label(critical:5)",
+          "region(moderate:9)",
+          "select-name(critical:1)"
+        ],
+        "nodesByImpact": {
+          "critical": 16,
+          "serious": 10,
+          "moderate": 9,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [
+          "button-name(critical:10)",
+          "label(critical:5)",
+          "region(moderate:9)",
+          "select-name(critical:1)"
+        ],
+        "nodesByImpact": {
+          "critical": 16,
+          "serious": 0,
+          "moderate": 9,
+          "minor": 0
+        }
+      }
+    },
+    "keyboard": {
+      "tabStops": 59,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": null
+    }
+  },
+  {
+    "state": "app-signed-in",
+    "url": "http://localhost:3000/app",
+    "renderedTheme": "light",
+    "lighthouse": 74,
+    "lighthouseFailed": [
+      "button-name",
+      "color-contrast",
+      "label"
+    ],
+    "axe": {
+      "light": {
+        "rules": [
+          "button-name(critical:3)",
+          "color-contrast(serious:2)",
+          "label(critical:1)",
+          "region(moderate:1)"
+        ],
+        "nodesByImpact": {
+          "critical": 4,
+          "serious": 2,
+          "moderate": 1,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [
+          "button-name(critical:3)",
+          "color-contrast(serious:2)",
+          "label(critical:1)",
+          "region(moderate:1)"
+        ],
+        "nodesByImpact": {
+          "critical": 4,
+          "serious": 2,
+          "moderate": 1,
+          "minor": 0
+        }
+      }
+    },
+    "keyboard": {
+      "tabStops": 36,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": null
+    }
+  },
+  {
+    "state": "menu-user",
+    "url": "http://localhost:3000/app",
+    "renderedTheme": "light",
+    "lighthouse": 74,
+    "lighthouseFailed": [
+      "button-name",
+      "color-contrast",
+      "label"
+    ],
+    "axe": {
+      "light": {
+        "rules": [
+          "button-name(critical:3)",
+          "color-contrast(serious:2)",
+          "label(critical:1)",
+          "region(moderate:2)"
+        ],
+        "nodesByImpact": {
+          "critical": 4,
+          "serious": 2,
+          "moderate": 2,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [
+          "button-name(critical:3)",
+          "color-contrast(serious:2)",
+          "label(critical:1)",
+          "region(moderate:2)"
+        ],
+        "nodesByImpact": {
+          "critical": 4,
+          "serious": 2,
+          "moderate": 2,
+          "minor": 0
+        }
+      }
+    },
+    "keyboard": {
+      "tabStops": 37,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": null
+    }
+  },
+  {
+    "state": "modal-save-pipeline",
+    "url": "http://localhost:3000/app",
+    "renderedTheme": "light",
+    "lighthouse": 76,
+    "lighthouseFailed": [
+      "button-name",
+      "color-contrast",
+      "label"
+    ],
+    "axe": {
+      "light": {
+        "rules": [
+          "button-name(critical:4)",
+          "color-contrast(serious:2)",
+          "label(critical:1)",
+          "region(moderate:8)"
+        ],
+        "nodesByImpact": {
+          "critical": 5,
+          "serious": 2,
+          "moderate": 8,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [
+          "button-name(critical:4)",
+          "color-contrast(serious:2)",
+          "label(critical:1)",
+          "region(moderate:8)"
+        ],
+        "nodesByImpact": {
+          "critical": 5,
+          "serious": 2,
+          "moderate": 8,
+          "minor": 0
+        }
+      }
+    },
+    "keyboard": {
+      "tabStops": 25,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": 18
+    }
+  },
+  {
+    "state": "modal-load-pipeline",
+    "url": "http://localhost:3000/app",
+    "renderedTheme": "light",
+    "lighthouse": 74,
+    "lighthouseFailed": [
+      "button-name",
+      "color-contrast",
+      "label"
+    ],
+    "axe": {
+      "light": {
+        "rules": [
+          "button-name(critical:4)",
+          "color-contrast(serious:2)",
+          "label(critical:1)",
+          "region(moderate:4)"
+        ],
+        "nodesByImpact": {
+          "critical": 5,
+          "serious": 2,
+          "moderate": 4,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [
+          "button-name(critical:4)",
+          "color-contrast(serious:2)",
+          "label(critical:1)",
+          "region(moderate:4)"
+        ],
+        "nodesByImpact": {
+          "critical": 5,
+          "serious": 2,
+          "moderate": 4,
+          "minor": 0
+        }
+      }
+    },
+    "keyboard": {
+      "tabStops": 25,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": 21
+    }
+  },
+  {
+    "state": "modal-admin",
+    "url": "http://localhost:3000/app",
+    "renderedTheme": "light",
+    "lighthouse": 74,
+    "lighthouseFailed": [
+      "button-name",
+      "color-contrast",
+      "label"
+    ],
+    "axe": {
+      "light": {
+        "rules": [
+          "button-name(critical:2)",
+          "color-contrast(serious:2)",
+          "label(critical:8)",
+          "region(moderate:4)"
+        ],
+        "nodesByImpact": {
+          "critical": 10,
+          "serious": 2,
+          "moderate": 4,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [
+          "button-name(critical:2)",
+          "color-contrast(serious:2)",
+          "label(critical:8)",
+          "region(moderate:4)"
+        ],
+        "nodesByImpact": {
+          "critical": 10,
+          "serious": 2,
+          "moderate": 4,
+          "minor": 0
+        }
+      }
+    },
+    "keyboard": {
+      "tabStops": 25,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": 10
+    }
+  },
+  {
+    "state": "modal-admin-pin",
+    "url": "http://localhost:3000/app",
+    "renderedTheme": "light",
+    "lighthouse": 74,
+    "lighthouseFailed": [
+      "button-name",
+      "color-contrast",
+      "label"
+    ],
+    "axe": {
+      "light": {
+        "rules": [
+          "button-name(critical:2)",
+          "color-contrast(serious:2)",
+          "label(critical:2)",
+          "region(moderate:9)"
+        ],
+        "nodesByImpact": {
+          "critical": 4,
+          "serious": 2,
+          "moderate": 9,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [
+          "button-name(critical:2)",
+          "color-contrast(serious:2)",
+          "label(critical:2)",
+          "region(moderate:9)"
+        ],
+        "nodesByImpact": {
+          "critical": 4,
+          "serious": 2,
+          "moderate": 9,
+          "minor": 0
+        }
+      }
+    },
+    "keyboard": {
+      "tabStops": 24,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": 23
+    }
+  }
+]

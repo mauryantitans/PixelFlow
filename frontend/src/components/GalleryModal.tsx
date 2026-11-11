@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import * as LucideReact from 'lucide-react';
+import { useDialog } from '../hooks/useDialog';
 import { ImageData } from '../types';
 import { MasonryUtils } from '../utils/index';
 
@@ -64,22 +65,9 @@ const GalleryModal: React.FC<GalleryModalProps> = ({
     }
   }, [isOpen, images]);
 
-  // Handle escape key
-  useEffect(() => {
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        onClose();
-      }
-    };
+  // Escape, focus trap and focus return are handled by useDialog.
 
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
-    }
-
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, [isOpen, onClose]);
+  const dialogRef = useDialog<HTMLDivElement>(isOpen, onClose);
 
   if (!isOpen) return null;
 
@@ -87,10 +75,16 @@ const GalleryModal: React.FC<GalleryModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-8">
-      <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-xl w-full max-w-4xl h-full max-h-[80vh] flex flex-col">
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="gallery-title"
+        tabIndex={-1}
+        className="bg-white dark:bg-zinc-900 rounded-lg shadow-xl w-full max-w-4xl h-full max-h-[80vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-zinc-700 flex-shrink-0">
-          <h2 className="text-xl font-bold text-zinc-900 dark:text-white">
+          <h2 id="gallery-title" className="text-xl font-bold text-zinc-900 dark:text-white">
             Image Gallery ({images.length})
           </h2>
           <div className="flex items-center gap-2">
@@ -101,15 +95,15 @@ const GalleryModal: React.FC<GalleryModalProps> = ({
                 onClick={onDeleteSelected}
                 className="btn-sm bg-red-600 hover:bg-red-700 text-white flex items-center gap-1"
               >
-                <LucideReact.Trash2 className="w-4 h-4" />
+                <LucideReact.Trash2 aria-hidden="true" className="w-4 h-4" />
                 Delete Selected ({selectedCount})
               </button>
             )}
-            <div className="text-sm text-gray-600 dark:text-gray-400 px-2">
+            <div className="text-sm text-gray-600 dark:text-gray-400 px-2" role="status">
               {selectedCount} selected
             </div>
-            <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700">
-              <LucideReact.X className="w-6 h-6 text-zinc-800 dark:text-white" />
+            <button type="button" onClick={onClose} aria-label="Close gallery" className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700">
+              <LucideReact.X aria-hidden="true" className="w-6 h-6 text-zinc-800 dark:text-white" />
             </button>
           </div>
         </div>
@@ -118,8 +112,8 @@ const GalleryModal: React.FC<GalleryModalProps> = ({
         <div className="flex-1 min-h-0">
           {images.length === 0 ? (
             <div className="flex items-center justify-center h-full">
-              <div className="text-center text-gray-400 dark:text-gray-500">
-                <LucideReact.Image className="w-16 h-16 mx-auto mb-4" />
+              <div className="text-center text-gray-600 dark:text-gray-400">
+                <LucideReact.Image aria-hidden="true" className="w-16 h-16 mx-auto mb-4" />
                 <p className="font-semibold text-lg mb-2">No images uploaded</p>
                 <p className="text-sm">Upload some images to get started</p>
               </div>
@@ -128,75 +122,90 @@ const GalleryModal: React.FC<GalleryModalProps> = ({
             <div className="h-full overflow-y-auto">
               <div 
                 ref={gridRef}
+                role="list"
+                aria-label="Uploaded images. Press a thumbnail to select or deselect it."
                 className="relative p-6"
                 style={{ minHeight: '400px' }}
               >
                 {images.map((image, index) => (
                   <div
                     key={image.id}
-                    className={`gallery-thumb absolute rounded-md overflow-hidden bg-white dark:bg-zinc-800 shadow-sm transition-shadow duration-200 cursor-pointer group ${
+                    role="listitem"
+                    className={`gallery-thumb absolute rounded-md overflow-hidden bg-white dark:bg-zinc-800 shadow-sm transition-shadow duration-200 group ${
                         image.selected ? 'selected' : ''
                     }`}
                     data-id={image.id}
                     data-image-index={index}
-                    onClick={() => onImageSelect(image.id)}
                     style={{ width: '120px' }}
+                  >
+                    {/* The whole thumbnail is a real toggle button, so it can be
+                        selected with Tab + Enter/Space (it was a clickable div). */}
+                    <button
+                      type="button"
+                      onClick={() => onImageSelect(image.id)}
+                      aria-pressed={!!image.selected}
+                      className="block w-full text-left cursor-pointer"
                     >
-                    <div className="relative">
+                      <span className="relative block">
                         <img
-                        src={image.thumbnailDataUrl || image.dataUrl}
-                        alt={image.filename}
-                        className="w-full h-auto block"
-                        loading="lazy"
+                          src={image.thumbnailDataUrl || image.dataUrl}
+                          alt=""
+                          className="w-full h-auto block"
+                          loading="lazy"
                         />
-                        
-                        {/* Hover Controls - Using group-hover */}
-                        <div className="absolute top-1 left-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20">
-                        <button
-                            onClick={(e) => {
-                            e.stopPropagation();
-                            onImageView(index);
-                            }}
-                            className="p-1 bg-blue-600/90 text-white rounded hover:bg-blue-700 shadow-lg backdrop-blur-sm"
-                            title="View full size"
-                        >
-                            <LucideReact.ZoomIn className="w-3 h-3" />
-                        </button>
-                        <button
-                            onClick={(e) => {
-                            e.stopPropagation();
-                            onImageRemove(image.id);
-                            }}
-                            className="p-1 bg-red-600/90 text-white rounded hover:bg-red-700 shadow-lg backdrop-blur-sm"
-                            title="Delete image"
-                        >
-                            <LucideReact.Trash2 className="w-3 h-3" />
-                        </button>
-                        </div>
 
                         {/* Selection Border */}
                         {image.selected && (
-                        <div className="absolute inset-0 border-4 border-blue-500 rounded-md pointer-events-none"></div>
+                          <span className="absolute inset-0 border-4 border-blue-500 rounded-md pointer-events-none"></span>
                         )}
 
                         {/* Selection Indicator */}
-                        <div className={`absolute top-1 right-1 bg-blue-600 rounded-full p-1 transition-opacity z-10 ${
-                        image.selected ? 'opacity-100' : 'opacity-0'
+                        <span className={`absolute top-1 right-1 bg-blue-600 rounded-full p-1 transition-opacity z-10 ${
+                          image.selected ? 'opacity-100' : 'opacity-0'
                         }`}>
-                        <LucideReact.Check className="w-3 h-3 text-white" />
-                        </div>
-                    </div>
+                          <LucideReact.Check aria-hidden="true" className="w-3 h-3 text-white" />
+                        </span>
+                      </span>
 
-                    {/* Image Info */}
-                    <div className="p-2">
-                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate" title={image.filename}>
-                        {image.filename}
-                        </p>
-                        <p className="text-xs text-gray-400 dark:text-gray-500">
-                        {image.width} × {image.height}
-                        </p>
+                      {/* Image Info */}
+                      <span className="block p-2">
+                        <span className="block text-xs text-gray-600 dark:text-gray-400 truncate" title={image.filename}>
+                          {image.filename}
+                        </span>
+                        <span className="block text-xs text-gray-600 dark:text-gray-400">
+                          {image.width} × {image.height}
+                        </span>
+                      </span>
+                    </button>
+
+                    {/* Hover / focus controls */}
+                    <div className="absolute top-1 left-1 flex gap-1 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-200 z-20">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onImageView(index);
+                        }}
+                        className="p-1 bg-blue-700 text-white rounded hover:bg-blue-800 shadow-lg"
+                        title="View full size"
+                        aria-label={`View full size: ${image.filename}`}
+                      >
+                        <LucideReact.ZoomIn aria-hidden="true" className="w-3 h-3" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onImageRemove(image.id);
+                        }}
+                        className="p-1 bg-red-700 text-white rounded hover:bg-red-800 shadow-lg"
+                        title="Delete image"
+                        aria-label={`Delete image: ${image.filename}`}
+                      >
+                        <LucideReact.Trash2 aria-hidden="true" className="w-3 h-3" />
+                      </button>
                     </div>
-                    </div>
+                  </div>
                 ))}
               </div>
             </div>

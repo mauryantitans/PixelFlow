@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { usePipelineContext } from '../contexts/PipelineContext';
 import { useTheme, useSessionHeartbeat } from '../hooks';
@@ -8,6 +8,7 @@ import { SavePipelineModal } from './SavePipelineModal';
 import { LoadPipelineModal } from './LoadPipelineModal';
 import { AdminPanel } from './AdminPanel';
 import { SavedPipeline } from '../types';
+import { announce } from '../utils/announce';
 
 export const Header: React.FC = () => {
   const { user, logout, isAuthenticated } = useAuth();
@@ -23,6 +24,33 @@ export const Header: React.FC = () => {
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const isOnApp = location.pathname === '/app';
+
+  // Account menu keyboard support (WAI-ARIA menu button pattern):
+  // Enter/Space/ArrowDown opens and focuses the first item, Up/Down/Home/End
+  // move between items, Escape closes and returns focus to the button.
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const menuItems = () => Array.from(menuRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? []);
+
+  useEffect(() => {
+    if (showMenu) window.requestAnimationFrame(() => menuItems()[0]?.focus());
+  }, [showMenu]);
+
+  const closeMenu = (returnFocus = true) => {
+    setShowMenu(false);
+    if (returnFocus) menuButtonRef.current?.focus();
+  };
+
+  const onMenuKeyDown = (e: React.KeyboardEvent) => {
+    const items = menuItems();
+    const i = items.indexOf(document.activeElement as HTMLElement);
+    if (e.key === 'ArrowDown') { e.preventDefault(); items[(i + 1) % items.length]?.focus(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); items[(i - 1 + items.length) % items.length]?.focus(); }
+    else if (e.key === 'Home') { e.preventDefault(); items[0]?.focus(); }
+    else if (e.key === 'End') { e.preventDefault(); items[items.length - 1]?.focus(); }
+    else if (e.key === 'Escape') { e.preventDefault(); closeMenu(); }
+    else if (e.key === 'Tab') { closeMenu(false); }
+  };
 
   const handleSave = () => {
     if (!isAuthenticated) {
@@ -70,55 +98,59 @@ export const Header: React.FC = () => {
 
   const showNotification = (message: string, type: 'success' | 'error') => {
     setNotification({ message, type });
+    // The toast is visual only; announce it for screen-reader users too.
+    announce(message, type === 'error' ? 'assertive' : 'polite');
     setTimeout(() => setNotification(null), 3000);
   };
 
   return (
     <>
-      <div className="bg-white dark:bg-zinc-900 border-b border-slate-300 dark:border-zinc-800 px-6 py-3 relative z-50">
+      <header className="bg-white dark:bg-zinc-900 border-b border-slate-300 dark:border-zinc-800 px-6 py-3 relative z-50">
         <div className="flex items-center justify-between">
           {/* Logo and Title */}
           <div className="flex items-center space-x-6">
-            <button 
-              onClick={() => navigate('/')}
-              className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
+            <Link
+              to="/"
+              className="flex items-center space-x-3 hover:opacity-80 transition-opacity rounded-md"
             >
               <img 
                 src="/PixelFlow_Icon.png" 
-                alt="PixelFlow" 
+                alt="" 
                 className="w-10 h-10 rounded-lg"
               />
               <div className="flex flex-col">
-                <h1 className="text-xl font-bold text-slate-900 dark:text-slate-50 leading-tight">PixelFlow</h1>
-                <span className="text-xs text-slate-500 dark:text-slate-400 leading-tight">Image Processing Pipeline Builder</span>
+                <span className="text-xl font-bold text-slate-900 dark:text-slate-50 leading-tight">PixelFlow</span>
+                <span className="text-xs text-slate-600 dark:text-slate-400 leading-tight">Image Processing Pipeline Builder</span>
               </div>
-            </button>
+            </Link>
 
             {/* Navigation Links */}
-            <nav className="hidden md:flex items-center space-x-1">
-              <button
-                onClick={() => navigate('/')}
+            <nav aria-label="Main" className="hidden md:flex items-center space-x-1">
+              <Link
+                to="/"
+                aria-current={!isOnApp ? 'page' : undefined}
                 className={`flex items-center space-x-1.5 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                   !isOnApp
                     ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
                     : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-zinc-800'
                 }`}
               >
-                <Home size={16} />
+                <Home aria-hidden="true" size={16} />
                 <span>Home</span>
-              </button>
+              </Link>
 
-              <button
-                onClick={() => navigate('/app')}
+              <Link
+                to="/app"
+                aria-current={isOnApp ? 'page' : undefined}
                 className={`flex items-center space-x-1.5 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                   isOnApp
                     ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
                     : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-zinc-800'
                 }`}
               >
-                <Zap size={16} />
+                <Zap aria-hidden="true" size={16} />
                 <span>App</span>
-              </button>
+              </Link>
 
               <a
                 href="https://github.com/Mauryantitans/PixelFlow/blob/React_FastAPI/README.md"
@@ -126,7 +158,7 @@ export const Header: React.FC = () => {
                 rel="noopener noreferrer"
                 className="flex items-center space-x-1.5 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-md transition-colors"
               >
-                <BookOpen size={16} />
+                <BookOpen aria-hidden="true" size={16} />
                 <span>Docs</span>
               </a>
 
@@ -136,7 +168,7 @@ export const Header: React.FC = () => {
                 rel="noopener noreferrer"
                 className="flex items-center space-x-1.5 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-md transition-colors"
               >
-                <Github size={16} />
+                <Github aria-hidden="true" size={16} />
                 <span>Source</span>
               </a>
             </nav>
@@ -159,8 +191,9 @@ export const Header: React.FC = () => {
               onClick={toggleTheme}
               className="p-2 rounded-md hover:bg-slate-100 dark:hover:bg-zinc-800 text-slate-600 dark:text-slate-300 transition-colors"
               title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
             >
-              {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              {theme === 'dark' ? <Sun aria-hidden="true" className="w-5 h-5" /> : <Moon aria-hidden="true" className="w-5 h-5" />}
             </button>
 
             {/* Vertical Divider */}
@@ -176,7 +209,7 @@ export const Header: React.FC = () => {
                   className="flex items-center space-x-1.5 px-3 py-1.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-md transition-colors"
                   title="Load Pipeline"
                 >
-                  <FolderOpen size={16} />
+                  <FolderOpen aria-hidden="true" size={16} />
                   <span className="hidden sm:inline">Load</span>
                 </button>
 
@@ -185,7 +218,7 @@ export const Header: React.FC = () => {
                   className="flex items-center space-x-1.5 px-3 py-1.5 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors shadow-sm"
                   title="Save Pipeline"
                 >
-                  <Save size={16} />
+                  <Save aria-hidden="true" size={16} />
                   <span className="hidden sm:inline">Save</span>
                 </button>
               </>
@@ -196,23 +229,34 @@ export const Header: React.FC = () => {
                 {/* User Menu */}
                 <div className="relative">
                   <button
+                    ref={menuButtonRef}
+                    type="button"
                     onClick={() => setShowMenu(!showMenu)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'ArrowDown' && !showMenu) { e.preventDefault(); setShowMenu(true); }
+                    }}
+                    aria-haspopup="menu"
+                    aria-expanded={showMenu}
+                    aria-controls="account-menu"
                     className="flex items-center space-x-2 px-3 py-1.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-md transition-colors"
                   >
                     {user.profile_picture ? (
                       <img 
                         src={user.profile_picture} 
-                        alt={user.username}
+                        alt=""
                         className="w-7 h-7 rounded-full object-cover"
                       />
                     ) : (
-                      <div className="w-7 h-7 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
+                      <div aria-hidden="true" className="w-7 h-7 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
                         <span className="text-white text-xs font-semibold">
                           {user.username.charAt(0).toUpperCase()}
                         </span>
                       </div>
                     )}
-                    <span className="hidden sm:inline max-w-[120px] truncate font-medium text-slate-900 dark:text-slate-50">
+                    {/* Name comes from the content so it always includes the
+                        visible username (WCAG 2.5.3 Label in Name). */}
+                    <span className="sr-only">Account menu for </span>
+                    <span className="sr-only sm:not-sr-only sm:inline-block max-w-[120px] truncate font-medium text-slate-900 dark:text-slate-50">
                       {user.username}
                     </span>
                   </button>
@@ -221,14 +265,18 @@ export const Header: React.FC = () => {
                     <>
                       <div
                         className="fixed inset-0 z-40"
+                        aria-hidden="true"
                         onClick={() => setShowMenu(false)}
                       />
-                      <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-zinc-800 rounded-lg shadow-lg dark:shadow-black/40 border border-slate-300 dark:border-zinc-700 py-1 z-50">
+                      <div
+                        ref={menuRef}
+                        onKeyDown={onMenuKeyDown}
+                        className="absolute right-0 mt-2 w-56 bg-white dark:bg-zinc-800 rounded-lg shadow-lg dark:shadow-black/40 border border-slate-300 dark:border-zinc-700 py-1 z-50">
                         <div className="px-4 py-3 border-b border-slate-300 dark:border-zinc-700">
                           <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">
                             {user.full_name || user.username}
                           </p>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                          <p className="text-xs text-slate-600 dark:text-slate-400 truncate mt-0.5">
                             {user.email}
                           </p>
                           {user.is_admin && (
@@ -238,23 +286,33 @@ export const Header: React.FC = () => {
                           )}
                         </div>
 
+                        <div id="account-menu" role="menu" aria-label={`Account: ${user.username}`}>
                         {user.is_admin && (
                           <>
                             <button
+                              type="button"
+                              role="menuitem"
+                              tabIndex={-1}
                               onClick={() => {
-                                setShowAdminPanel(true);
+                                // Park focus on the menu button first so the
+                                // dialog can return focus there when it closes.
+                                menuButtonRef.current?.focus();
                                 setShowMenu(false);
+                                setShowAdminPanel(true);
                               }}
                               className="w-full flex items-center space-x-2 px-4 py-2 text-sm text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors"
                             >
-                              <Settings size={16} />
+                              <Settings aria-hidden="true" size={16} />
                               <span>Admin Tools</span>
                             </button>
-                            <div className="border-t border-slate-300 dark:border-zinc-700 my-1"></div>
+                            <div role="separator" className="border-t border-slate-300 dark:border-zinc-700 my-1"></div>
                           </>
                         )}
 
                         <button
+                          type="button"
+                          role="menuitem"
+                          tabIndex={-1}
                           onClick={async () => {
                             await logout();
                             setShowMenu(false);
@@ -262,9 +320,10 @@ export const Header: React.FC = () => {
                           }}
                           className="w-full flex items-center space-x-2 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                         >
-                          <LogOut size={16} />
+                          <LogOut aria-hidden="true" size={16} />
                           <span>Logout</span>
                         </button>
+                        </div>
                       </div>
                     </>
                   )}
@@ -276,7 +335,7 @@ export const Header: React.FC = () => {
                 {isOnApp && (
                   <div className="flex items-center space-x-2 px-3 py-1.5 bg-blue-50 dark:bg-blue-900/20 rounded-md border border-blue-200 dark:border-blue-800">
                     <span className="text-xs text-blue-700 dark:text-blue-400 font-medium">
-                      👋 Guest Mode
+                      <span aria-hidden="true">👋 </span>Guest Mode
                     </span>
                   </div>
                 )}
@@ -284,7 +343,7 @@ export const Header: React.FC = () => {
                   onClick={() => navigate('/auth')}
                   className="flex items-center space-x-1.5 px-4 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors shadow-sm"
                 >
-                  <LogIn size={16} />
+                  <LogIn aria-hidden="true" size={16} />
                   <span>Sign In</span>
                 </button>
               </>
@@ -294,15 +353,15 @@ export const Header: React.FC = () => {
 
         {/* Notification Toast */}
         {notification && (
-          <div className={`absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-4 py-2 rounded-lg shadow-lg z-50 animate-fade-in ${
+          <div aria-hidden="true" className={`absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-4 py-2 rounded-lg shadow-lg z-50 animate-fade-in ${
             notification.type === 'success' 
-              ? 'bg-green-500 dark:bg-green-600' 
-              : 'bg-red-500 dark:bg-red-600'
+              ? 'bg-green-700 dark:bg-green-700' 
+              : 'bg-red-700 dark:bg-red-700'
           } text-white text-sm font-medium`}>
             {notification.message}
           </div>
         )}
-      </div>
+      </header>
 
       {/* Modals */}
       {isAuthenticated && (
