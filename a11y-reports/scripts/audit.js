@@ -29,8 +29,11 @@ const APP = process.env.APP_URL || 'http://localhost:3000';
 const CHROME = process.env.CHROME_PATH || '/opt/pw-browsers/chromium';
 const OUT = path.join(__dirname, '..', PHASE);
 const ONLY = process.env.ONLY ? process.env.ONLY.split(',') : null;
+// Viewport, e.g. VIEWPORT=320x640 for the WCAG 1.4.10 Reflow run (default desktop).
+const [VW, VH] = (process.env.VIEWPORT || '1440x900').split('x').map(Number);
+const MOBILE = VW < 768;
 
-for (const d of ['lighthouse', 'axe', 'keyboard']) fs.mkdirSync(path.join(OUT, d), { recursive: true });
+for (const d of ['lighthouse', 'axe', 'keyboard', 'layout', ...(MOBILE ? ['screenshots'] : [])]) fs.mkdirSync(path.join(OUT, d), { recursive: true });
 
 /** Keep violations/incomplete in full; trim data: URIs and reduce passes/inapplicable to id + count. */
 function compactAxe(r) {
@@ -80,8 +83,8 @@ let lh;
 
 const LH_FLAGS = {
   onlyCategories: ['accessibility'],
-  formFactor: 'desktop',
-  screenEmulation: { mobile: false, width: 1440, height: 900, deviceScaleFactor: 1, disabled: false },
+  formFactor: MOBILE ? 'mobile' : 'desktop',
+  screenEmulation: { mobile: MOBILE, width: VW, height: VH, deviceScaleFactor: MOBILE ? 2 : 1, disabled: false },
   throttlingMethod: 'provided',
 };
 const LH_CONFIG = { extends: 'lighthouse:default', settings: LH_FLAGS };
@@ -117,7 +120,16 @@ async function openAccountMenu(page, username) {
   try {
     await clickSel(page, 'button[aria-controls="account-menu"]');
   } catch {
-    await clickText(page, username);
+    // Old markup: on narrow screens only the avatar initial is visible.
+    const ok = await page.evaluate((u) => {
+      const b = [...document.querySelectorAll('header button, button')].find((x) => {
+        const t = (x.innerText || '').trim();
+        return t.split('\n').map((s) => s.trim()).includes(u) || t === u.charAt(0).toUpperCase();
+      });
+      if (b) b.click();
+      return !!b;
+    }, username);
+    if (!ok) throw new Error(`account menu button for ${username} not found`);
   }
 }
 
@@ -213,6 +225,101 @@ async function keyboardWalk(page, name, isModal) {
   return res;
 }
 
+/**
+ * Layout checks that axe/Lighthouse do not cover:
+ *  - reflow (WCAG 1.4.10): horizontal page overflow at the current viewport,
+ *    and the elements that stick out (images/canvas are exempt: 2-D content);
+ *  - text spacing (1.4.12): apply the WCAG override values and count text
+ *    that becomes clipped (overflow hidden) and was not clipped before;
+ *  - text resize (1.4.4, desktop runs only): root font-size 200%, same checks.
+ */
+async function layoutChecks(page) {
+  const measure = () =>
+    page.evaluate(() => {
+      const vw = window.innerWidth;
+      const overflowX = Math.max(0, document.documentElement.scrollWidth - vw);
+      const isExempt = (el) => !!el.closest('img, canvas, svg, video, [role="img"], [data-reflow-exempt]');
+      const inScroller = (el) => {
+        for (let p = el.parentElement; p && p !== document.body; p = p.parentElement) {
+          const ox = getComputedStyle(p).overflowX;
+          if (ox === 'auto' || ox === 'scroll' || ox === 'hidden' || ox === 'clip') return true;
+        }
+        return false;
+      };
+      const desc = (el) => {
+        const cls = (el.getAttribute('class') || '').split(/\s+/).slice(0, 4).join('.');
+        const txt = (el.innerText || el.getAttribute('aria-label') || '').trim().slice(0, 40);
+        return `${el.tagName.toLowerCase()}${el.id ? '#' + el.id : ''}${cls ? '.' + cls : ''} "${txt}"`;
+      };
+      const all = [...document.body.querySelectorAll('*')];
+      const visible = (el) => {
+        const r = el.getBoundingClientRect();
+        if (r.width <= 1 || r.height <= 1) return false;
+        const cs = getComputedStyle(el);
+        return cs.visibility !== 'hidden' && cs.display !== 'none' && cs.clip !== 'rect(0px, 0px, 0px, 0px)';
+      };
+      const offenders = all
+        .filter((el) => visible(el) && !isExempt(el) && !inScroller(el))
+        .filter((el) => el.getBoundingClientRect().right > vw + 1)
+        // keep only the outermost offenders
+        .filter((el, _, arr) => !arr.some((o) => o !== el && o.contains(el)))
+        .slice(0, 8)
+        .map((el) => `${desc(el)} right=${Math.round(el.getBoundingClientRect().right)}`);
+      // Text that is clipped by an overflow:hidden box.
+      const clipped = new Set();
+      for (const el of all) {
+        if (!visible(el) || isExempt(el)) continue;
+        const hasText = [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());
+        if (!hasText) continue;
+        if (el.closest('.sr-only, [aria-hidden="true"]')) continue;
+        for (let p = el, i = 0; p && i < 3; p = p.parentElement, i++) {
+          const cs = getComputedStyle(p);
+          const hides = ['hidden', 'clip'].includes(cs.overflowX) || ['hidden', 'clip'].includes(cs.overflowY);
+          if (hides && (p.scrollWidth > p.clientWidth + 1 || p.scrollHeight > p.clientHeight + 1)) {
+            // ellipsis truncation that is intentional (full text in title/aria) is reported separately
+            clipped.add(desc(el));
+            break;
+          }
+        }
+      }
+      return { overflowX, offenders, clipped: [...clipped] };
+    });
+
+  const base = await measure();
+  const res = { viewport: `${VW}x${VH}`, reflow: { overflowX: base.overflowX, offenders: base.offenders } };
+
+  // 1.4.12 Text Spacing override (the exact values from the success criterion).
+  await page.evaluate(() => {
+    const st = document.createElement('style');
+    st.id = '__wcag_text_spacing';
+    st.textContent = `* { line-height: 1.5 !important; letter-spacing: 0.12em !important; word-spacing: 0.16em !important; } p { margin-bottom: 2em !important; }`;
+    document.head.appendChild(st);
+  });
+  await sleep(150);
+  const ts = await measure();
+  await page.evaluate(() => document.getElementById('__wcag_text_spacing')?.remove());
+  res.textSpacing = {
+    newlyClipped: ts.clipped.filter((c) => !base.clipped.includes(c)),
+    newOverflowX: Math.max(0, ts.overflowX - base.overflowX),
+  };
+
+  if (!MOBILE) {
+    // 1.4.4 Resize Text: 200% root font size (Tailwind sizes are rem-based).
+    await page.evaluate(() => (document.documentElement.style.fontSize = '200%'));
+    await sleep(250);
+    const big = await measure();
+    await page.evaluate(() => (document.documentElement.style.fontSize = ''));
+    res.text200 = {
+      newlyClipped: big.clipped.filter((c) => !base.clipped.includes(c)),
+      overflowX: big.overflowX,
+      offenders: big.offenders,
+    };
+  }
+  res.alreadyClipped = base.clipped;
+  await sleep(150);
+  return res;
+}
+
 async function audit(page, name, { modal = false } = {}) {
   if (ONLY && !ONLY.includes(name)) return;
   await sleep(600);
@@ -247,16 +354,32 @@ async function audit(page, name, { modal = false } = {}) {
   }
   await setTheme(page, theme);
 
+  if (MOBILE) {
+    await page.screenshot({ path: path.join(OUT, 'screenshots', `${name}.jpg`), type: 'jpeg', quality: 60 });
+  }
+  try {
+    const lay = await layoutChecks(page);
+    fs.writeFileSync(path.join(OUT, 'layout', `${name}.json`), JSON.stringify(lay, null, 2));
+    row.layout = {
+      overflowX: lay.reflow.overflowX,
+      textSpacingClipped: lay.textSpacing.newlyClipped.length,
+      text200Clipped: lay.text200 ? lay.text200.newlyClipped.length : null,
+      text200OverflowX: lay.text200 ? lay.text200.overflowX : null,
+    };
+  } catch (e) {
+    row.layoutError = String(e.message || e);
+  }
+
   const kb = await keyboardWalk(page, name, modal);
   row.keyboard = { tabStops: kb.tabStops, noVisibleFocus: kb.noVisibleFocus, focusEscapedDialog: kb.focusEscapedDialog };
   summary.push(row);
-  console.log(JSON.stringify({ state: name, lighthouse: row.lighthouse, axe: row.axe, keyboard: row.keyboard }));
+  console.log(JSON.stringify({ state: name, lighthouse: row.lighthouse, axe: Object.fromEntries(Object.entries(row.axe).map(([t, v]) => [t, v.rules])), keyboard: row.keyboard, layout: row.layout }));
 }
 
 async function newPage(browser) {
   const ctx = await browser.createBrowserContext();
   const page = await ctx.newPage();
-  await page.setViewport({ width: 1440, height: 900 });
+  await page.setViewport({ width: VW, height: VH });
   page.on('dialog', (d) => d.accept());
   return page;
 }
@@ -425,6 +548,14 @@ async function lighthouseNavigation(url, name) {
     await clickSel(page, 'input[type="checkbox"].sr-only, #admin-user-data-toggle');
     await page.waitForFunction(() => /Admin PIN/.test(document.body.innerText), { timeout: 10000 });
     await audit(page, 'modal-admin-pin', { modal: true });
+
+    // Enter/create the (local test) PIN and audit the user-data view behind it.
+    await page.focus('input[inputmode="numeric"]');
+    await page.keyboard.type(process.env.ADMIN_PIN || '2468');
+    await page.keyboard.press('Enter');
+    await waitText(page, 'Users Overview', 20000);
+    await sleep(800);
+    await audit(page, 'modal-admin-userdata', { modal: true });
     await page.close();
   } finally {
     await browser.close();
