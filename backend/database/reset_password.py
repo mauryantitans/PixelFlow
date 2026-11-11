@@ -8,7 +8,7 @@ from pathlib import Path
 from getpass import getpass
 
 # Add the app directory to Python path
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # backend/, so "app" imports
 
 try:
     from app.core.database import SessionLocal

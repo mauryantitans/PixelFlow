@@ -53,6 +53,7 @@ backend/*.db
 
 # Database Backups
 backend/backups/
+backend/database/backups/
 *.sql
 *.dump
 

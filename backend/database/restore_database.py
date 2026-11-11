@@ -11,6 +11,7 @@ import sys
 import subprocess
 from pathlib import Path
 from dotenv import load_dotenv
+from sqlalchemy.engine import make_url
 import logging
 
 # Setup logging
@@ -21,13 +22,29 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Load environment
-env_path = Path(__file__).parent / ".env"
+env_path = Path(__file__).resolve().parent.parent / ".env"  # backend/.env, same as the app
 load_dotenv(dotenv_path=env_path)
 
 # Settings
 BACKUP_DIR = Path(__file__).parent / "backups"
 DATABASE_URL = os.environ.get("DATABASE_URL")
 USE_SQLITE = os.environ.get("USE_SQLITE", "False").lower() == "true"
+
+
+def _pg_conn():
+    """(host, port, user, dbname, env) for pg_dump/psql, from DATABASE_URL.
+
+    Uses SQLAlchemy's URL parser, so postgres:// URLs, missing ports and
+    query options such as ?sslmode=require all work.
+    """
+    url = make_url(DATABASE_URL.replace("postgres://", "postgresql://", 1))
+    env = os.environ.copy()
+    if url.password:
+        env["PGPASSWORD"] = url.password
+    sslmode = url.query.get("sslmode")
+    if sslmode:
+        env["PGSSLMODE"] = sslmode if isinstance(sslmode, str) else sslmode[0]
+    return url.host or "localhost", str(url.port or 5432), url.username or "", url.database or "", env
 
 
 def list_available_backups():
@@ -53,7 +70,7 @@ def list_available_backups():
 
 def restore_sqlite(backup_file: Path):
     """Restore SQLite database from backup"""
-    sqlite_path = Path(__file__).parent / "pixelflow.db"
+    sqlite_path = Path(__file__).resolve().parent.parent / "pixelflow.db"  # the app's SQLite file
     
     logger.info(f"🔄 Restoring SQLite database...")
     logger.info(f"📁 Source: {backup_file}")
@@ -97,20 +114,8 @@ def restore_postgresql(backup_file: Path):
         logger.error("❌ Invalid PostgreSQL DATABASE_URL!")
         return False
     
-    # Parse DATABASE_URL
     try:
-        url = DATABASE_URL.replace("postgresql://", "")
-        user_pass, host_db = url.split("@")
-        user, password = user_pass.split(":")
-        host_port_db = host_db.split("/")
-        host_port = host_port_db[0].split(":")
-        
-        db_user = user
-        db_pass = password
-        db_host = host_port[0]
-        db_port = host_port[1] if len(host_port) > 1 else "5432"
-        db_name = host_port_db[1]
-        
+        db_host, db_port, db_user, db_name, env = _pg_conn()
     except Exception as e:
         logger.error(f"❌ Failed to parse DATABASE_URL: {e}")
         return False
@@ -119,9 +124,6 @@ def restore_postgresql(backup_file: Path):
     logger.info(f"📁 Backup file: {backup_file}")
     logger.info(f"⚠️  WARNING: This will DROP all existing tables!")
     
-    # Set password environment variable
-    env = os.environ.copy()
-    env["PGPASSWORD"] = db_pass
     
     try:
         # Run psql to restore

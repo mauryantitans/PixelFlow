@@ -8,7 +8,7 @@ This script checks if all rules in business_rules.py are actually enforced.
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # backend/, so "app" imports
 
 print("\n" + "="*70)
 print("🔍 VERIFYING BUSINESS RULES IMPLEMENTATION")

@@ -6,7 +6,7 @@ Migrate data from SQLite to PostgreSQL
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # backend/, so "app" imports
 
 from app.core.config import settings
 from app.core.database import engine, Base
@@ -18,7 +18,7 @@ def migrate():
     """Migrate data from SQLite to PostgreSQL"""
     
     # SQLite connection
-    sqlite_path = Path(__file__).parent / "pixelflow.db"
+    sqlite_path = Path(__file__).resolve().parent.parent / "pixelflow.db"  # the app's SQLite file (backend/)
     sqlite_url = f"sqlite:///{sqlite_path}"
     sqlite_engine = create_engine(sqlite_url)
     SQLiteSession = sessionmaker(bind=sqlite_engine)
