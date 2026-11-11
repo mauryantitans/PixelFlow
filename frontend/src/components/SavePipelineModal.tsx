@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Save } from 'lucide-react';
+import { useDialog } from '../hooks/useDialog';
 import { pipelineService } from '../services/auth';
 import { PipelineStep } from '../types';
 
@@ -23,6 +24,8 @@ export const SavePipelineModal: React.FC<SavePipelineModalProps> = ({
   const [tags, setTags] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const dialogRef = useDialog<HTMLDivElement>(isOpen, onClose);
 
   if (!isOpen) return null;
 
@@ -74,12 +77,18 @@ export const SavePipelineModal: React.FC<SavePipelineModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="save-pipeline-title"
+        tabIndex={-1}
+        className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center space-x-2">
             <Save aria-hidden="true" className="w-5 h-5 text-blue-600" />
-            <h2 className="text-xl font-bold text-gray-900">Save Pipeline</h2>
+            <h2 id="save-pipeline-title" className="text-xl font-bold text-gray-900">Save Pipeline</h2>
           </div>
           <button
             type="button"

@@ -19,6 +19,7 @@ import GalleryModal from './components/GalleryModal';
 import './index.css';
 import MethodDetailsModal from './components/MethodDetailsModal';
 import { useDocumentTitle } from './hooks/useDocumentTitle';
+import { useDialog } from './hooks/useDialog';
 
 const App: React.FC = () => {
   useDocumentTitle('Workspace');
@@ -304,6 +305,12 @@ const App: React.FC = () => {
   const closeLightbox = () => {
     setLightboxState(prev => ({ ...prev, isOpen: false }));
   };
+
+  const closeQuotaPopup = () => setQuotaPopup({ show: false, type: 'quota', message: '' });
+
+  // Accessible dialogs: focus trap, Escape to close, focus returned on close.
+  const lightboxRef = useDialog<HTMLDivElement>(lightboxState.isOpen, closeLightbox);
+  const quotaRef = useDialog<HTMLDivElement>(quotaPopup.show, closeQuotaPopup);
   
   // Keyboard shortcuts
   useKeyboardShortcuts({
@@ -311,10 +318,8 @@ const App: React.FC = () => {
     'ctrl+/': () => document.getElementById('operationSearch')?.focus(),
     'ctrl+z': () => canUndo && undo(),
     'ctrl+y': () => canRedo && redo(),
-    'escape': () => {
-      if (galleryModal.isOpen) galleryModal.closeModal();
-      if (lightboxState.isOpen) closeLightbox();
-    }
+    // Escape is handled per dialog by useDialog (it closes only the top-most
+    // dialog; previously one Escape closed the lightbox AND the gallery).
   });
 
   // Helper function for status colors
@@ -883,7 +888,14 @@ const App: React.FC = () => {
           className="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-4"
           onClick={closeLightbox}
         >
-          <div className="relative w-full h-full flex justify-center items-center">
+          <div
+            ref={lightboxRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Image viewer: ${lightboxState.filename}`}
+            tabIndex={-1}
+            className="relative w-full h-full flex justify-center items-center"
+          >
             <div 
               className="zoom-container w-full h-full flex justify-center items-center"
               onClick={(e) => e.stopPropagation()}
@@ -965,7 +977,15 @@ const App: React.FC = () => {
       {/* Quota/Limit Exceeded Popup */}
       {quotaPopup.show && (
         <div className="fixed inset-0 bg-black/60 z-[200] flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-2xl max-w-md w-full p-6 border-2 border-red-500">
+          <div
+            ref={quotaRef}
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="quota-dialog-title"
+            aria-describedby="quota-dialog-message"
+            tabIndex={-1}
+            className="bg-white dark:bg-zinc-900 rounded-xl shadow-2xl max-w-md w-full p-6 border-2 border-red-500"
+          >
             <div className="flex items-start space-x-4">
               <div className="flex-shrink-0">
                 <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
@@ -976,7 +996,7 @@ const App: React.FC = () => {
                 <h2 id="quota-dialog-title" className="text-lg font-bold text-slate-900 dark:text-slate-50 mb-2">
                   {quotaPopup.type === 'quota' ? 'Storage Quota Exceeded' : 'Image Limit Reached'}
                 </h2>
-                <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">
+                <p id="quota-dialog-message" className="text-sm text-slate-600 dark:text-slate-300 mb-4">
                   {quotaPopup.message}
                 </p>
                 
@@ -1043,7 +1063,8 @@ const App: React.FC = () => {
             
             <div className="mt-6 flex justify-end">
               <button
-                onClick={() => setQuotaPopup({ show: false, type: 'quota', message: '' })}
+                onClick={closeQuotaPopup}
+                data-autofocus
                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
               >
                 Got it

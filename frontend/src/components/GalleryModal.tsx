@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import * as LucideReact from 'lucide-react';
+import { useDialog } from '../hooks/useDialog';
 import { ImageData } from '../types';
 import { MasonryUtils } from '../utils/index';
 
@@ -64,22 +65,9 @@ const GalleryModal: React.FC<GalleryModalProps> = ({
     }
   }, [isOpen, images]);
 
-  // Handle escape key
-  useEffect(() => {
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        onClose();
-      }
-    };
+  // Escape, focus trap and focus return are handled by useDialog.
 
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
-    }
-
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, [isOpen, onClose]);
+  const dialogRef = useDialog<HTMLDivElement>(isOpen, onClose);
 
   if (!isOpen) return null;
 
@@ -87,10 +75,16 @@ const GalleryModal: React.FC<GalleryModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-8">
-      <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-xl w-full max-w-4xl h-full max-h-[80vh] flex flex-col">
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="gallery-title"
+        tabIndex={-1}
+        className="bg-white dark:bg-zinc-900 rounded-lg shadow-xl w-full max-w-4xl h-full max-h-[80vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-zinc-700 flex-shrink-0">
-          <h2 className="text-xl font-bold text-zinc-900 dark:text-white">
+          <h2 id="gallery-title" className="text-xl font-bold text-zinc-900 dark:text-white">
             Image Gallery ({images.length})
           </h2>
           <div className="flex items-center gap-2">

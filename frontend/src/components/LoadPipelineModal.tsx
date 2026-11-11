@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, FolderOpen, Users, Lock, Calendar, Layers, Trash2, Edit2, Copy, Eye, EyeOff } from 'lucide-react';
+import { useDialog } from '../hooks/useDialog';
 import { pipelineService } from '../services/auth';
 import { SavedPipeline } from '../types';
 
@@ -117,18 +118,26 @@ export const LoadPipelineModal: React.FC<LoadPipelineModalProps> = ({
     });
   };
 
+  const dialogRef = useDialog<HTMLDivElement>(isOpen, onClose);
+
   if (!isOpen) return null;
 
   const pipelines = activeTab === 'my' ? userPipelines : publicPipelines;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] flex flex-col">
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="load-pipeline-title"
+        tabIndex={-1}
+        className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center space-x-2">
             <FolderOpen aria-hidden="true" className="w-5 h-5 text-blue-600" />
-            <h2 className="text-xl font-bold text-gray-900">Load Pipeline</h2>
+            <h2 id="load-pipeline-title" className="text-xl font-bold text-gray-900">Load Pipeline</h2>
           </div>
           <button
             type="button"

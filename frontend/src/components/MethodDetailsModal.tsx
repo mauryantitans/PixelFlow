@@ -1,5 +1,6 @@
 import React from 'react';
 import * as LucideReact from 'lucide-react';
+import { useDialog } from '../hooks/useDialog';
 import { OperationSpecDTO } from '../types';
 
 interface MethodDetailsModalProps {
@@ -17,16 +18,23 @@ const MethodDetailsModal: React.FC<MethodDetailsModalProps> = ({
   config,
   onClose
 }) => {
+  const dialogRef = useDialog<HTMLDivElement>(isOpen && !!config, onClose);
   if (!isOpen || !config) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="method-details-title"
+        tabIndex={-1}
+        className="bg-white dark:bg-zinc-900 rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-zinc-700">
           <div className="flex items-center gap-2">
             <LucideReact.Info aria-hidden="true" className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-            <h2 className="text-xl font-bold text-zinc-900 dark:text-white">
+            <h2 id="method-details-title" className="text-xl font-bold text-zinc-900 dark:text-white">
               {operationName}
             </h2>
           </div>

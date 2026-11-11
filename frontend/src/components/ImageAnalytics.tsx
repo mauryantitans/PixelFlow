@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { X, BarChart3, Info } from 'lucide-react';
+import { useDialog } from '../hooks/useDialog';
 import { calculateHistogram, calculateImageStats } from '../utils/download';
 
 interface ImageAnalyticsProps {
@@ -85,16 +86,24 @@ export const ImageAnalytics: React.FC<ImageAnalyticsProps> = ({
     );
   };
 
+  const dialogRef = useDialog<HTMLDivElement>(isOpen, onClose);
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4">
-      <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="image-analytics-title"
+        tabIndex={-1}
+        className="bg-white dark:bg-zinc-900 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-zinc-700 sticky top-0 bg-white dark:bg-zinc-900 z-10">
           <div className="flex items-center space-x-2">
             <BarChart3 aria-hidden="true" className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Image Analytics</h2>
+            <h2 id="image-analytics-title" className="text-xl font-bold text-gray-900 dark:text-white">Image Analytics</h2>
           </div>
           <button
             type="button"

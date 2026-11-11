@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import * as LucideReact from 'lucide-react';
+import { useDialog } from '../hooks/useDialog';
 import { Settings, Database, Trash2, HardDrive, Clock, Shield, RefreshCw, X, Save, Check, Lock } from 'lucide-react';
 import axios from 'axios';
 
@@ -508,13 +509,28 @@ Type DELETE to confirm.`)) {
     }
   };
 
+  const cancelPinDialog = () => {
+    setShowPinDialog(false);
+    setPin('');
+    setShowUserData(false); // Turn toggle back off if user cancels
+  };
+  const panelRef = useDialog<HTMLDivElement>(isOpen && !!editedSettings, onClose);
+  const pinRef = useDialog<HTMLDivElement>(isOpen && showPinDialog, cancelPinDialog);
+
   if (!isOpen || !editedSettings) return null;
 
   const hasChanges = settings && editedSettings && JSON.stringify(settings) !== JSON.stringify(editedSettings);
 
   return (
     <div className="fixed inset-0 bg-black/60 z-[300] flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-2xl w-full max-w-6xl h-[90vh] flex flex-col border-2 border-slate-300 dark:border-zinc-800">
+      <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="admin-tools-title"
+        tabIndex={-1}
+        className="bg-white dark:bg-zinc-900 rounded-xl shadow-2xl w-full max-w-6xl h-[90vh] flex flex-col border-2 border-slate-300 dark:border-zinc-800"
+      >
         {/* Header */}
         <div className="flex-shrink-0 flex items-center justify-between p-6 border-b border-slate-300 dark:border-zinc-800">
           <div className="flex items-center space-x-3">
@@ -522,7 +538,7 @@ Type DELETE to confirm.`)) {
               <Settings aria-hidden="true" className="w-6 h-6 text-purple-600 dark:text-purple-400" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">Admin Tools</h2>
+              <h2 id="admin-tools-title" className="text-xl font-bold text-slate-900 dark:text-slate-50">Admin Tools</h2>
               <p className="text-sm text-slate-600 dark:text-slate-400">
                 Last updated: {lastRefresh.toLocaleTimeString()} {refreshing && '• Updating...'}
               </p>
@@ -1427,7 +1443,15 @@ Type DELETE to confirm.`)) {
       {/* PIN Dialog */}
       {showPinDialog && (
         <div className="fixed inset-0 bg-black/80 z-[400] flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-2xl max-w-md w-full p-6">
+          <div
+            ref={pinRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="admin-pin-title"
+            aria-describedby="admin-pin-help"
+            tabIndex={-1}
+            className="bg-white dark:bg-zinc-900 rounded-xl shadow-2xl max-w-md w-full p-6"
+          >
             <div className="text-center mb-6">
               <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Lock aria-hidden="true" className="w-8 h-8 text-purple-600 dark:text-purple-400" />
@@ -1453,7 +1477,7 @@ Type DELETE to confirm.`)) {
               onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
               placeholder={hasPinSet ? "Enter your PIN" : "Create a PIN (4-6 digits)"}
               className="w-full px-4 py-3 bg-white dark:bg-zinc-800 border-2 border-slate-500 dark:border-zinc-500 rounded-lg text-center text-2xl tracking-widest mb-6 text-slate-900 dark:text-slate-50"
-              autoFocus
+              data-autofocus
               onKeyPress={(e) => {
                 if (e.key === 'Enter' && pin.length >= 4) {
                   handlePinSubmit();
@@ -1463,11 +1487,7 @@ Type DELETE to confirm.`)) {
 
             <div className="flex space-x-3">
               <button
-                onClick={() => {
-                  setShowPinDialog(false);
-                  setPin('');
-                  setShowUserData(false); // Turn toggle back off if user cancels
-                }}
+                onClick={cancelPinDialog}
                 className="flex-1 px-4 py-2 bg-slate-200 dark:bg-zinc-700 hover:bg-slate-300 dark:hover:bg-zinc-600 rounded-lg text-slate-900 dark:text-slate-50"
               >
                 Cancel
