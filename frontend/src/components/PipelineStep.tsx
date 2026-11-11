@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import * as LucideReact from 'lucide-react';
 import { PipelineStep, StepErrorDTO } from '../types';
 import { useOperationSchema } from '../contexts/OperationSchemaContext';
@@ -35,33 +35,71 @@ const PipelineStepComponent: React.FC<PipelineStepProps> = ({
   const op = getOp(step.name);
   const stepLabel = op?.label ?? step.name;
 
+  const upRef = useRef<HTMLButtonElement>(null);
+  const downRef = useRef<HTMLButtonElement>(null);
+
+  // Keyboard-friendly reordering: this list is reordered with buttons (and
+  // Alt+Arrow keys) rather than drag-and-drop, so it works without a mouse.
+  // After a move, keep focus on the moved step; if the button just pressed
+  // became disabled (step reached the top/bottom), focus the other one.
+  const keepFocus = (preferred: React.RefObject<HTMLButtonElement>, fallback: React.RefObject<HTMLButtonElement>) => {
+    window.requestAnimationFrame(() => {
+      const target = preferred.current && !preferred.current.disabled ? preferred.current : fallback.current;
+      target?.focus();
+    });
+  };
+
   const handleMoveUp = () => {
-    if (index > 0) onMove(index, index - 1);
+    if (index > 0) {
+      onMove(index, index - 1);
+      keepFocus(upRef, downRef);
+    }
   };
 
   const handleMoveDown = () => {
-    if (index < totalSteps - 1) onMove(index, index + 1);
+    if (index < totalSteps - 1) {
+      onMove(index, index + 1);
+      keepFocus(downRef, upRef);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!e.altKey) return;
+    if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      handleMoveUp();
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      handleMoveDown();
+    }
   };
 
   return (
-    <div className="pipeline-step flex items-center gap-3">
+    <div
+      className="pipeline-step flex items-center gap-3"
+      onKeyDown={handleKeyDown}
+    >
       {/* Reorder Controls */}
       <div className="flex flex-col gap-1">
         <button
+          ref={upRef}
           type="button"
           onClick={handleMoveUp}
           disabled={index === 0}
           aria-label={`Move ${stepLabel} up`}
+          aria-keyshortcuts="Alt+ArrowUp"
           title="Move up"
           className="reorder-btn text-gray-600 hover:text-zinc-800 dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed dark:text-gray-400"
         >
           <LucideReact.ArrowUp aria-hidden="true" className="w-4 h-4" />
         </button>
         <button
+          ref={downRef}
           type="button"
           onClick={handleMoveDown}
           disabled={index === totalSteps - 1}
           aria-label={`Move ${stepLabel} down`}
+          aria-keyshortcuts="Alt+ArrowDown"
           title="Move down"
           className="reorder-btn text-gray-600 hover:text-zinc-800 dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed dark:text-gray-400"
         >

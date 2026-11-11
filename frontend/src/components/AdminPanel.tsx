@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import * as LucideReact from 'lucide-react';
 import { useDialog } from '../hooks/useDialog';
+import { handleTabListKeyDown } from '../utils/tabs';
 import { Settings, Database, Trash2, HardDrive, Clock, Shield, RefreshCw, X, Save, Check, Lock } from 'lucide-react';
 import axios from 'axios';
 
@@ -594,7 +595,14 @@ Type DELETE to confirm.`)) {
         </div>
 
         {/* Tabs */}
-        <div className="flex-shrink-0 flex space-x-1 p-4 border-b border-slate-300 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/50 overflow-x-auto">
+        <div
+          role="tablist"
+          aria-label="Admin sections"
+          onKeyDown={(e) =>
+            handleTabListKeyDown(e, ['limits', 'cleanup', 'storage', 'retention', 'database'] as const, activeTab as any, (id) => setActiveTab(id as any), 'admin-tab')
+          }
+          className="flex-shrink-0 flex space-x-1 p-4 border-b border-slate-300 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/50 overflow-x-auto"
+        >
           {[
             { id: 'limits', icon: Settings, label: 'Limits' },
             { id: 'cleanup', icon: Trash2, label: 'Cleanup' },
@@ -604,6 +612,12 @@ Type DELETE to confirm.`)) {
           ].map(tab => (
             <button
               key={tab.id}
+              type="button"
+              role="tab"
+              id={`admin-tab-${tab.id}`}
+              aria-selected={activeTab === tab.id}
+              aria-controls="admin-tabpanel"
+              tabIndex={activeTab === tab.id ? 0 : -1}
               onClick={() => setActiveTab(tab.id as any)}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
                 activeTab === tab.id
@@ -619,7 +633,13 @@ Type DELETE to confirm.`)) {
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 min-h-0">
+        <div
+          role="tabpanel"
+          id="admin-tabpanel"
+          aria-labelledby={`admin-tab-${activeTab}`}
+          tabIndex={0}
+          className="flex-1 overflow-y-auto p-6 min-h-0"
+        >
           {/* LIMITS TAB */}
           {activeTab === 'limits' && editedSettings && (
             <div className="space-y-6">
@@ -1100,7 +1120,7 @@ Type DELETE to confirm.`)) {
                       onChange={handleToggleUserData}
                       className="sr-only peer"
                     />
-                    <div className="w-full h-full bg-slate-300 dark:bg-zinc-700 peer-checked:bg-blue-600 rounded-full peer transition-all cursor-pointer"></div>
+                    <div className="w-full h-full bg-slate-500 dark:bg-zinc-500 peer-checked:bg-blue-700 rounded-full peer transition-all cursor-pointer peer-focus-visible:outline peer-focus-visible:outline-[3px] peer-focus-visible:outline-offset-2 peer-focus-visible:outline-blue-700 dark:peer-focus-visible:outline-blue-300"></div>
                     <div className="absolute top-0.5 left-0.5 bg-white w-5 h-5 rounded-full transition-all peer-checked:translate-x-6"></div>
                   </label>
                 </div>

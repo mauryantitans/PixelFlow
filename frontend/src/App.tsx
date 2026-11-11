@@ -20,6 +20,7 @@ import './index.css';
 import MethodDetailsModal from './components/MethodDetailsModal';
 import { useDocumentTitle } from './hooks/useDocumentTitle';
 import { useDialog } from './hooks/useDialog';
+import { announce } from './utils/announce';
 
 const App: React.FC = () => {
   useDocumentTitle('Workspace');
@@ -267,6 +268,7 @@ const App: React.FC = () => {
     // Seed default params from the operation schema (single source of truth).
     const params = getDefaults(operationName);
     addStep(operationName, params);
+    announce(`Added ${operationName} as step ${pipeline.length + 1} of ${pipeline.length + 1}`);
     // Live re-processing is driven by the live useEffect (single trigger).
   };
   
@@ -476,12 +478,34 @@ const App: React.FC = () => {
           container.style.cursor = scale > 1 ? 'grab' : 'default';
         };
         
+        // Keyboard alternative to wheel-zoom and drag-pan (WCAG 2.1.1).
+        const handleKey = (e: KeyboardEvent) => {
+          const step = e.shiftKey ? 100 : 30;
+          let handled = true;
+          if (e.key === '+' || e.key === '=') scale = Math.min(10, scale * 1.25);
+          else if (e.key === '-' || e.key === '_') scale = Math.max(1, scale / 1.25);
+          else if (e.key === '0') { scale = 1; pointX = 0; pointY = 0; }
+          else if (e.key === 'ArrowLeft' && scale > 1) pointX += step;
+          else if (e.key === 'ArrowRight' && scale > 1) pointX -= step;
+          else if (e.key === 'ArrowUp' && scale > 1) pointY += step;
+          else if (e.key === 'ArrowDown' && scale > 1) pointY -= step;
+          else handled = false;
+          if (!handled) return;
+          e.preventDefault();
+          if (scale === 1) { pointX = 0; pointY = 0; }
+          setTransform();
+          announce(`Zoom ${Math.round(scale * 100)}%`);
+        };
+        const dialog = container.closest('[role="dialog"]') as HTMLElement | null;
+        dialog?.addEventListener('keydown', handleKey);
+
         container.addEventListener('wheel', handleWheel);
         container.addEventListener('mousedown', handleMouseDown);
         document.addEventListener('mousemove', handleMouseMove);
         document.addEventListener('mouseup', handleMouseUp);
         
         return () => {
+          dialog?.removeEventListener('keydown', handleKey);
           container.removeEventListener('wheel', handleWheel);
           container.removeEventListener('mousedown', handleMouseDown);
           document.removeEventListener('mousemove', handleMouseMove);
@@ -632,17 +656,23 @@ const App: React.FC = () => {
         {/* Toolbar */}
         <div className="flex items-center justify-between p-4 border-b-2 border-slate-300 dark:border-zinc-800 bg-white dark:bg-zinc-900 sticky top-0 z-40">
           <div className="flex items-center gap-4">
-            <label htmlFor="upload-image" className="btn-primary cursor-pointer">
-              Upload Image(s)
-            </label>
+            {/* The real file input stays in the tab order (it used to be
+                display:none, so keyboard users could not upload). It is
+                visually hidden and the label is styled as the button. */}
             <input
               type="file"
               id="upload-image"
-              className="hidden"
+              className="sr-only peer"
               accept="image/*"
               multiple
               onChange={handleFileUpload}
             />
+            <label
+              htmlFor="upload-image"
+              className="btn-primary cursor-pointer peer-focus-visible:outline peer-focus-visible:outline-[3px] peer-focus-visible:outline-offset-2 peer-focus-visible:outline-blue-700 dark:peer-focus-visible:outline-blue-300"
+            >
+              Upload Image(s)
+            </label>
             {images.length > 0 && (
               <button
                 onClick={galleryModal.openModal}
@@ -722,7 +752,7 @@ const App: React.FC = () => {
           <section aria-labelledby="pipeline-heading" className="bg-white dark:bg-zinc-900 rounded-lg p-4 border-2 border-slate-300 dark:border-zinc-800">
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center gap-4">
-                <h2 id="pipeline-heading" className="text-lg font-bold text-slate-900 dark:text-slate-50">
+                <h2 id="pipeline-heading" tabIndex={-1} className="focus:outline-none text-lg font-bold text-slate-900 dark:text-slate-50">
                   Pipeline ({pipeline.length} steps)
                 </h2>
                 {/* Timing Display */}
@@ -770,7 +800,7 @@ const App: React.FC = () => {
             <div className="space-y-2">
               {pipeline.length === 0 ? (
                 <p className="text-sm text-center py-4 text-slate-600 dark:text-slate-400">
-                  Add operations from the left panel
+                  Add operations from the left panel. Each step can be reordered with its Move up / Move down buttons or Alt+Arrow keys.
                 </p>
               ) : (
                 pipeline.map((step, index) => {
@@ -796,8 +826,17 @@ const App: React.FC = () => {
                       step={step}
                       index={index}
                       totalSteps={pipeline.length}
-                      onRemove={() => removeStep(index)}
-                      onMove={moveStep}
+                      onRemove={() => {
+                        const label = getOp(step.name)?.label ?? step.name;
+                        removeStep(index);
+                        announce(`Removed ${label}. ${pipeline.length - 1} steps left.`);
+                        // The focused button is gone; put focus somewhere sensible.
+                        window.requestAnimationFrame(() => document.getElementById('pipeline-heading')?.focus());
+                      }}
+                      onMove={(from, to) => {
+                        moveStep(from, to);
+                        announce(`${getOp(step.name)?.label ?? step.name} moved to position ${to + 1} of ${pipeline.length}`);
+                      }}
                       onParameterChange={handleParameterChange}
                       onPreview={() => {
                         if (liveProcessingEnabled) {
@@ -908,6 +947,9 @@ const App: React.FC = () => {
               />
             </div>
             
+            <p className="absolute bottom-4 left-4 text-xs text-white bg-black/70 px-2 py-1 rounded">
+              Keyboard: + / − to zoom, arrow keys to pan, 0 to reset, Esc to close
+            </p>
             {/* Zoom Controls */}
             <div className="absolute bottom-4 right-4 bg-gray-900/50 backdrop-blur-sm rounded-lg text-white flex items-center text-xs">
               <button 
@@ -916,16 +958,10 @@ const App: React.FC = () => {
                 className="p-3 hover:bg-white/20 rounded-l-lg"
                 onClick={(e) => {
                   e.stopPropagation();
-                  const container = document.querySelector('.zoom-container');
-                  const img = container?.querySelector('.zoomable-image') as HTMLElement;
-                  if (img) {
-                    const currentScale = parseFloat(img.style.transform.match(/scale\(([^)]+)\)/)?.[1] || '1');
-                    const newScale = Math.max(1, currentScale / 1.5);
-                    img.style.transform = `scale(${newScale})`;
-                    if (newScale === 1) {
-                      img.style.transform = 'translate(0px, 0px) scale(1)';
-                    }
-                  }
+                  // Share zoom state with the wheel/keyboard handlers.
+                  (e.currentTarget.closest('[role="dialog"]') as HTMLElement | null)?.dispatchEvent(
+                    new KeyboardEvent('keydown', { key: '-', bubbles: true })
+                  );
                 }}
               >
                 <LucideReact.ZoomOut aria-hidden="true" className="w-4 h-4" />
@@ -937,17 +973,10 @@ const App: React.FC = () => {
                 className="p-3 hover:bg-white/20 rounded-r-lg"
                 onClick={(e) => {
                   e.stopPropagation();
-                  const container = document.querySelector('.zoom-container');
-                  const img = container?.querySelector('.zoomable-image') as HTMLElement;
-                  if (img) {
-                    const currentScale = parseFloat(img.style.transform.match(/scale\(([^)]+)\)/)?.[1] || '1');
-                    const newScale = Math.min(10, currentScale * 1.5);
-                    const rect = img.getBoundingClientRect();
-                    const centerX = rect.width / 2;
-                    const centerY = rect.height / 2;
-                    img.style.transformOrigin = `${centerX}px ${centerY}px`;
-                    img.style.transform = `scale(${newScale})`;
-                  }
+                  // Share zoom state with the wheel/keyboard handlers.
+                  (e.currentTarget.closest('[role="dialog"]') as HTMLElement | null)?.dispatchEvent(
+                    new KeyboardEvent('keydown', { key: '+', bubbles: true })
+                  );
                 }}
               >
                 <LucideReact.ZoomIn aria-hidden="true" className="w-4 h-4" />

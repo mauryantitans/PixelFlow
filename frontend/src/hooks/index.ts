@@ -743,6 +743,17 @@ export function useKeyboardShortcuts(shortcuts: Record<string, () => void>) {
     const handleKeyDown = (event: KeyboardEvent) => {
       const key = event.key.toLowerCase();
       const ctrlKey = event.ctrlKey || event.metaKey;
+
+      // Don't hijack native editing keys (e.g. Ctrl+Z undo) while the user is
+      // typing in a text field; only the "focus search" shortcuts still apply.
+      const target = event.target as HTMLElement | null;
+      const isEditable =
+        !!target &&
+        (target.isContentEditable ||
+          (target.tagName === 'INPUT' && !['checkbox', 'radio', 'range', 'button', 'file', 'color'].includes((target as HTMLInputElement).type)) ||
+          target.tagName === 'TEXTAREA' ||
+          target.tagName === 'SELECT');
+      if (isEditable && !(ctrlKey && (key === 'k' || key === '/'))) return;
       
       let shortcutKey = '';
       if (ctrlKey) shortcutKey += 'ctrl+';

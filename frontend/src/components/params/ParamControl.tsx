@@ -2,6 +2,7 @@ import React from 'react';
 import * as LucideReact from 'lucide-react';
 import { ParamSpecDTO } from '../../types';
 import { usePicker } from '../../contexts/PickerContext';
+import { announce } from '../../utils/announce';
 
 interface ParamControlProps {
   spec: ParamSpecDTO;
@@ -28,8 +29,18 @@ function summarize(type: string, value: any): string {
  * the param's declared `type` from the backend schema.
  */
 const ParamControl: React.FC<ParamControlProps> = ({ spec, value, stepId, controlId, stepLabel, onChange }) => {
-  const { arm, isArmed } = usePicker();
+  const { arm: armPicker, isArmed } = usePicker();
   const armed = isArmed(stepId, spec.name);
+  // Arm the image picker; tell screen-reader/keyboard users if there is no
+  // preview image to pick on yet (picking needs Live Processing).
+  const arm: typeof armPicker = (p) => {
+    armPicker(p);
+    window.requestAnimationFrame(() => {
+      if (!document.querySelector('[data-testid="preview-picker-overlay"]')) {
+        announce('Turn on Live Processing with one image selected, then pick on the preview image.');
+      }
+    });
+  };
 
   switch (spec.type) {
     case 'int':

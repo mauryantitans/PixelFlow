@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, FolderOpen, Users, Lock, Calendar, Layers, Trash2, Edit2, Copy, Eye, EyeOff } from 'lucide-react';
 import { useDialog } from '../hooks/useDialog';
+import { handleTabListKeyDown } from '../utils/tabs';
 import { pipelineService } from '../services/auth';
 import { SavedPipeline } from '../types';
 
@@ -157,8 +158,19 @@ export const LoadPipelineModal: React.FC<LoadPipelineModalProps> = ({
         )}
 
         {/* Tabs */}
-        <div className="flex border-b border-gray-200">
+        <div
+          role="tablist"
+          aria-label="Pipeline lists"
+          onKeyDown={(e) => handleTabListKeyDown(e, ['my', 'public'] as const, activeTab, setActiveTab, 'load-tab')}
+          className="flex border-b border-gray-200"
+        >
           <button
+            type="button"
+            role="tab"
+            id="load-tab-my"
+            aria-selected={activeTab === 'my'}
+            aria-controls="load-tabpanel"
+            tabIndex={activeTab === 'my' ? 0 : -1}
             onClick={() => setActiveTab('my')}
             className={`flex-1 px-6 py-3 text-sm font-medium transition-colors ${
               activeTab === 'my'
@@ -172,6 +184,12 @@ export const LoadPipelineModal: React.FC<LoadPipelineModalProps> = ({
             </div>
           </button>
           <button
+            type="button"
+            role="tab"
+            id="load-tab-public"
+            aria-selected={activeTab === 'public'}
+            aria-controls="load-tabpanel"
+            tabIndex={activeTab === 'public' ? 0 : -1}
             onClick={() => setActiveTab('public')}
             className={`flex-1 px-6 py-3 text-sm font-medium transition-colors ${
               activeTab === 'public'
@@ -187,7 +205,13 @@ export const LoadPipelineModal: React.FC<LoadPipelineModalProps> = ({
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div
+          role="tabpanel"
+          id="load-tabpanel"
+          aria-labelledby={`load-tab-${activeTab}`}
+          tabIndex={0}
+          className="flex-1 overflow-y-auto p-6"
+        >
           {error && (
             <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-md text-sm mb-4">
               {error}

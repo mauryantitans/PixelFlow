@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { usePipelineContext } from '../contexts/PipelineContext';
@@ -23,6 +23,33 @@ export const Header: React.FC = () => {
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const isOnApp = location.pathname === '/app';
+
+  // Account menu keyboard support (WAI-ARIA menu button pattern):
+  // Enter/Space/ArrowDown opens and focuses the first item, Up/Down/Home/End
+  // move between items, Escape closes and returns focus to the button.
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const menuItems = () => Array.from(menuRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? []);
+
+  useEffect(() => {
+    if (showMenu) window.requestAnimationFrame(() => menuItems()[0]?.focus());
+  }, [showMenu]);
+
+  const closeMenu = (returnFocus = true) => {
+    setShowMenu(false);
+    if (returnFocus) menuButtonRef.current?.focus();
+  };
+
+  const onMenuKeyDown = (e: React.KeyboardEvent) => {
+    const items = menuItems();
+    const i = items.indexOf(document.activeElement as HTMLElement);
+    if (e.key === 'ArrowDown') { e.preventDefault(); items[(i + 1) % items.length]?.focus(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); items[(i - 1 + items.length) % items.length]?.focus(); }
+    else if (e.key === 'Home') { e.preventDefault(); items[0]?.focus(); }
+    else if (e.key === 'End') { e.preventDefault(); items[items.length - 1]?.focus(); }
+    else if (e.key === 'Escape') { e.preventDefault(); closeMenu(); }
+    else if (e.key === 'Tab') { closeMenu(false); }
+  };
 
   const handleSave = () => {
     if (!isAuthenticated) {
@@ -199,8 +226,15 @@ export const Header: React.FC = () => {
                 {/* User Menu */}
                 <div className="relative">
                   <button
+                    ref={menuButtonRef}
                     type="button"
                     onClick={() => setShowMenu(!showMenu)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'ArrowDown' && !showMenu) { e.preventDefault(); setShowMenu(true); }
+                    }}
+                    aria-haspopup="menu"
+                    aria-expanded={showMenu}
+                    aria-controls="account-menu"
                     aria-label={`Account menu for ${user.username}`}
                     className="flex items-center space-x-2 px-3 py-1.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-md transition-colors"
                   >
@@ -226,9 +260,13 @@ export const Header: React.FC = () => {
                     <>
                       <div
                         className="fixed inset-0 z-40"
+                        aria-hidden="true"
                         onClick={() => setShowMenu(false)}
                       />
-                      <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-zinc-800 rounded-lg shadow-lg dark:shadow-black/40 border border-slate-300 dark:border-zinc-700 py-1 z-50">
+                      <div
+                        ref={menuRef}
+                        onKeyDown={onMenuKeyDown}
+                        className="absolute right-0 mt-2 w-56 bg-white dark:bg-zinc-800 rounded-lg shadow-lg dark:shadow-black/40 border border-slate-300 dark:border-zinc-700 py-1 z-50">
                         <div className="px-4 py-3 border-b border-slate-300 dark:border-zinc-700">
                           <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">
                             {user.full_name || user.username}
@@ -243,23 +281,33 @@ export const Header: React.FC = () => {
                           )}
                         </div>
 
+                        <div id="account-menu" role="menu" aria-label={`Account: ${user.username}`}>
                         {user.is_admin && (
                           <>
                             <button
+                              type="button"
+                              role="menuitem"
+                              tabIndex={-1}
                               onClick={() => {
-                                setShowAdminPanel(true);
+                                // Park focus on the menu button first so the
+                                // dialog can return focus there when it closes.
+                                menuButtonRef.current?.focus();
                                 setShowMenu(false);
+                                setShowAdminPanel(true);
                               }}
                               className="w-full flex items-center space-x-2 px-4 py-2 text-sm text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors"
                             >
                               <Settings aria-hidden="true" size={16} />
                               <span>Admin Tools</span>
                             </button>
-                            <div className="border-t border-slate-300 dark:border-zinc-700 my-1"></div>
+                            <div role="separator" className="border-t border-slate-300 dark:border-zinc-700 my-1"></div>
                           </>
                         )}
 
                         <button
+                          type="button"
+                          role="menuitem"
+                          tabIndex={-1}
                           onClick={async () => {
                             await logout();
                             setShowMenu(false);
@@ -270,6 +318,7 @@ export const Header: React.FC = () => {
                           <LogOut aria-hidden="true" size={16} />
                           <span>Logout</span>
                         </button>
+                        </div>
                       </div>
                     </>
                   )}

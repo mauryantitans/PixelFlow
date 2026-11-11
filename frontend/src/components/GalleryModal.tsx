@@ -99,7 +99,7 @@ const GalleryModal: React.FC<GalleryModalProps> = ({
                 Delete Selected ({selectedCount})
               </button>
             )}
-            <div className="text-sm text-gray-600 dark:text-gray-400 px-2">
+            <div className="text-sm text-gray-600 dark:text-gray-400 px-2" role="status">
               {selectedCount} selected
             </div>
             <button type="button" onClick={onClose} aria-label="Close gallery" className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700">
@@ -122,77 +122,91 @@ const GalleryModal: React.FC<GalleryModalProps> = ({
             <div className="h-full overflow-y-auto">
               <div 
                 ref={gridRef}
+                role="list"
+                aria-label="Uploaded images. Press a thumbnail to select or deselect it."
                 className="relative p-6"
                 style={{ minHeight: '400px' }}
               >
                 {images.map((image, index) => (
                   <div
                     key={image.id}
-                    className={`gallery-thumb absolute rounded-md overflow-hidden bg-white dark:bg-zinc-800 shadow-sm transition-shadow duration-200 cursor-pointer group ${
+                    role="listitem"
+                    className={`gallery-thumb absolute rounded-md overflow-hidden bg-white dark:bg-zinc-800 shadow-sm transition-shadow duration-200 group ${
                         image.selected ? 'selected' : ''
                     }`}
                     data-id={image.id}
                     data-image-index={index}
-                    onClick={() => onImageSelect(image.id)}
                     style={{ width: '120px' }}
+                  >
+                    {/* The whole thumbnail is a real toggle button, so it can be
+                        selected with Tab + Enter/Space (it was a clickable div). */}
+                    <button
+                      type="button"
+                      onClick={() => onImageSelect(image.id)}
+                      aria-pressed={!!image.selected}
+                      aria-label={`${image.filename}, ${image.width} × ${image.height}`}
+                      className="block w-full text-left cursor-pointer"
                     >
-                    <div className="relative">
+                      <span className="relative block">
                         <img
-                        src={image.thumbnailDataUrl || image.dataUrl}
-                        alt={image.filename}
-                        className="w-full h-auto block"
-                        loading="lazy"
+                          src={image.thumbnailDataUrl || image.dataUrl}
+                          alt=""
+                          className="w-full h-auto block"
+                          loading="lazy"
                         />
-                        
-                        {/* Hover Controls - Using group-hover */}
-                        <div className="absolute top-1 left-1 flex gap-1 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-200 z-20">
-                        <button
-                            onClick={(e) => {
-                            e.stopPropagation();
-                            onImageView(index);
-                            }}
-                            className="p-1 bg-blue-600/90 text-white rounded hover:bg-blue-700 shadow-lg backdrop-blur-sm"
-                            title="View full size"
-                            aria-label={`View full size: ${image.filename}`}
-                        >
-                            <LucideReact.ZoomIn aria-hidden="true" className="w-3 h-3" />
-                        </button>
-                        <button
-                            onClick={(e) => {
-                            e.stopPropagation();
-                            onImageRemove(image.id);
-                            }}
-                            className="p-1 bg-red-600/90 text-white rounded hover:bg-red-700 shadow-lg backdrop-blur-sm"
-                            title="Delete image"
-                            aria-label={`Delete image: ${image.filename}`}
-                        >
-                            <LucideReact.Trash2 aria-hidden="true" className="w-3 h-3" />
-                        </button>
-                        </div>
 
                         {/* Selection Border */}
                         {image.selected && (
-                        <div className="absolute inset-0 border-4 border-blue-500 rounded-md pointer-events-none"></div>
+                          <span className="absolute inset-0 border-4 border-blue-500 rounded-md pointer-events-none"></span>
                         )}
 
                         {/* Selection Indicator */}
-                        <div className={`absolute top-1 right-1 bg-blue-600 rounded-full p-1 transition-opacity z-10 ${
-                        image.selected ? 'opacity-100' : 'opacity-0'
+                        <span className={`absolute top-1 right-1 bg-blue-600 rounded-full p-1 transition-opacity z-10 ${
+                          image.selected ? 'opacity-100' : 'opacity-0'
                         }`}>
-                        <LucideReact.Check aria-hidden="true" className="w-3 h-3 text-white" />
-                        </div>
-                    </div>
+                          <LucideReact.Check aria-hidden="true" className="w-3 h-3 text-white" />
+                        </span>
+                      </span>
 
-                    {/* Image Info */}
-                    <div className="p-2">
-                        <p className="text-xs text-gray-600 dark:text-gray-400 truncate" title={image.filename}>
-                        {image.filename}
-                        </p>
-                        <p className="text-xs text-gray-600 dark:text-gray-400">
-                        {image.width} × {image.height}
-                        </p>
+                      {/* Image Info */}
+                      <span className="block p-2">
+                        <span className="block text-xs text-gray-600 dark:text-gray-400 truncate" title={image.filename}>
+                          {image.filename}
+                        </span>
+                        <span className="block text-xs text-gray-600 dark:text-gray-400">
+                          {image.width} × {image.height}
+                        </span>
+                      </span>
+                    </button>
+
+                    {/* Hover / focus controls */}
+                    <div className="absolute top-1 left-1 flex gap-1 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-200 z-20">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onImageView(index);
+                        }}
+                        className="p-1 bg-blue-700 text-white rounded hover:bg-blue-800 shadow-lg"
+                        title="View full size"
+                        aria-label={`View full size: ${image.filename}`}
+                      >
+                        <LucideReact.ZoomIn aria-hidden="true" className="w-3 h-3" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onImageRemove(image.id);
+                        }}
+                        className="p-1 bg-red-700 text-white rounded hover:bg-red-800 shadow-lg"
+                        title="Delete image"
+                        aria-label={`Delete image: ${image.filename}`}
+                      >
+                        <LucideReact.Trash2 aria-hidden="true" className="w-3 h-3" />
+                      </button>
                     </div>
-                    </div>
+                  </div>
                 ))}
               </div>
             </div>
