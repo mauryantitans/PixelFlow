@@ -156,7 +156,7 @@
     },
     {
       "tag": "input",
-      "name": "step_1794423018619_9asqpc-amount",
+      "name": "step_1794433019872_r5s7kq-amount",
       "visibleFocus": true,
       "insideDialog": null
     },
@@ -228,7 +228,7 @@
     },
     {
       "tag": "input",
-      "name": "step_1794423019597_m4bvm5-threshold",
+      "name": "step_1794433020838_1w5z45-threshold",
       "visibleFocus": true,
       "insideDialog": null
     },
@@ -270,7 +270,7 @@
     },
     {
       "tag": "input",
-      "name": "step_1794423020077_fvciza-fill_color",
+      "name": "step_1794433021306_42vbkz-fill_color",
       "visibleFocus": true,
       "insideDialog": null
     },
@@ -282,7 +282,7 @@
     },
     {
       "tag": "input",
-      "name": "step_1794423020077_fvciza-tolerance",
+      "name": "step_1794433021306_42vbkz-tolerance",
       "visibleFocus": true,
       "insideDialog": null
     },

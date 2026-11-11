@@ -13,7 +13,7 @@
   "orientationAngle": 0,
   "orientationType": "landscape-primary"
  },
- "timestamp": "2026-11-11T18:51:03.040Z",
+ "timestamp": "2026-11-11T21:37:44.518Z",
  "url": "http://localhost:3000/app",
  "toolOptions": {
   "runOnly": {
@@ -157,7 +157,7 @@
     "RGAAv4",
     "RGAA-10.8.1"
    ],
-   "nodeCount": 94
+   "nodeCount": 95
   },
   {
    "id": "aria-prohibited-attr",
@@ -609,7 +609,7 @@
     "RGAAv4",
     "RGAA-9.2.1"
    ],
-   "nodeCount": 239
+   "nodeCount": 238
   },
   {
    "id": "scrollable-region-focusable",

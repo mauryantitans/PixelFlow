@@ -13,7 +13,7 @@
   "orientationAngle": 0,
   "orientationType": "landscape-primary"
  },
- "timestamp": "2026-11-11T18:52:04.158Z",
+ "timestamp": "2026-11-11T21:38:45.635Z",
  "url": "http://localhost:3000/app",
  "toolOptions": {
   "runOnly": {
@@ -160,7 +160,7 @@
     "RGAAv4",
     "RGAA-10.8.1"
    ],
-   "nodeCount": 70
+   "nodeCount": 71
   },
   {
    "id": "aria-prohibited-attr",
@@ -290,7 +290,7 @@
     "RGAAv4",
     "RGAA-11.9.1"
    ],
-   "nodeCount": 31
+   "nodeCount": 34
   },
   {
    "id": "bypass",
@@ -325,7 +325,7 @@
     "RGAAv4",
     "RGAA-3.2.1"
    ],
-   "nodeCount": 77
+   "nodeCount": 89
   },
   {
    "id": "document-title",
@@ -619,7 +619,7 @@
     "RGAAv4",
     "RGAA-7.1.1"
    ],
-   "nodeCount": 41
+   "nodeCount": 44
   },
   {
    "id": "page-has-heading-one",
@@ -649,7 +649,7 @@
     "RGAAv4",
     "RGAA-9.2.1"
    ],
-   "nodeCount": 220
+   "nodeCount": 249
   },
   {
    "id": "scrollable-region-focusable",
@@ -864,7 +864,7 @@
      "all": [],
      "none": [],
      "impact": "serious",
-     "html": "<p class=\"text-sm text-slate-600 dark:text-slate-400\">Last updated: 6:51:48 PM </p>",
+     "html": "<p class=\"text-sm text-slate-600 dark:text-slate-400\">Last updated: 9:38:29 PM </p>",
      "target": [
       ".space-x-3.items-center.flex > div:nth-child(2) > p"
      ],

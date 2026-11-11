@@ -13,7 +13,7 @@
   "orientationAngle": 0,
   "orientationType": "landscape-primary"
  },
- "timestamp": "2026-11-11T18:53:19.839Z",
+ "timestamp": "2026-11-11T21:37:29.870Z",
  "url": "http://localhost:3000/app",
  "toolOptions": {
   "runOnly": {
@@ -157,7 +157,7 @@
     "RGAAv4",
     "RGAA-10.8.1"
    ],
-   "nodeCount": 90
+   "nodeCount": 91
   },
   {
    "id": "aria-prohibited-attr",
@@ -240,7 +240,7 @@
     "EN-9.1.4.12",
     "ACT"
    ],
-   "nodeCount": 2
+   "nodeCount": 3
   },
   {
    "id": "button-name",
@@ -294,7 +294,7 @@
     "RGAAv4",
     "RGAA-3.2.1"
    ],
-   "nodeCount": 62
+   "nodeCount": 63
   },
   {
    "id": "document-title",
@@ -609,7 +609,7 @@
     "RGAAv4",
     "RGAA-9.2.1"
    ],
-   "nodeCount": 233
+   "nodeCount": 232
   },
   {
    "id": "scrollable-region-focusable",

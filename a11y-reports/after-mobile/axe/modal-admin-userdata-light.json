@@ -13,7 +13,7 @@
   "orientationAngle": 0,
   "orientationType": "landscape-primary"
  },
- "timestamp": "2026-11-11T18:48:53.378Z",
+ "timestamp": "2026-11-11T21:41:42.125Z",
  "url": "http://localhost:3000/app",
  "toolOptions": {
   "runOnly": {
@@ -161,7 +161,7 @@
     "RGAAv4",
     "RGAA-10.8.1"
    ],
-   "nodeCount": 70
+   "nodeCount": 71
   },
   {
    "id": "aria-prohibited-attr",
@@ -278,7 +278,7 @@
     "RGAAv4",
     "RGAA-11.9.1"
    ],
-   "nodeCount": 31
+   "nodeCount": 34
   },
   {
    "id": "bypass",
@@ -313,7 +313,7 @@
     "RGAAv4",
     "RGAA-3.2.1"
    ],
-   "nodeCount": 44
+   "nodeCount": 45
   },
   {
    "id": "document-title",
@@ -607,7 +607,7 @@
     "RGAAv4",
     "RGAA-7.1.1"
    ],
-   "nodeCount": 41
+   "nodeCount": 44
   },
   {
    "id": "page-has-heading-one",
@@ -637,7 +637,7 @@
     "RGAAv4",
     "RGAA-9.2.1"
    ],
-   "nodeCount": 220
+   "nodeCount": 249
   },
   {
    "id": "scrollable-region-focusable",

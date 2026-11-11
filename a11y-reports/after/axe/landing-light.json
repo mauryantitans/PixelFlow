@@ -13,7 +13,7 @@
   "orientationAngle": 0,
   "orientationType": "landscape-primary"
  },
- "timestamp": "2026-11-11T18:49:55.412Z",
+ "timestamp": "2026-11-11T21:36:36.380Z",
  "url": "http://localhost:3000/",
  "toolOptions": {
   "runOnly": {
@@ -142,7 +142,7 @@
     "RGAAv4",
     "RGAA-10.8.1"
    ],
-   "nodeCount": 23
+   "nodeCount": 24
   },
   {
    "id": "aria-prohibited-attr",
@@ -543,7 +543,7 @@
     "RGAAv4",
     "RGAA-9.2.1"
    ],
-   "nodeCount": 154
+   "nodeCount": 153
   },
   {
    "id": "skip-link",
@@ -676,7 +676,7 @@
      "all": [],
      "none": [],
      "impact": "serious",
-     "html": "<p class=\"text-xl text-slate-600 dark:text-slate-300 mb-8 max-w-3xl mx-auto\">Build powerful image processing pipelines with 50+ operations from OpenCV and Scikit-Image. No coding required. Real-time preview. Export and share.</p>",
+     "html": "<p class=\"text-xl text-slate-600 dark:text-slate-300 mb-8 max-w-3xl mx-auto\">Build powerful image processing pipelines with 77 operations from OpenCV and Scikit-Image. No coding required. Real-time preview. Export and share.</p>",
      "target": [
       ".max-w-3xl"
      ],

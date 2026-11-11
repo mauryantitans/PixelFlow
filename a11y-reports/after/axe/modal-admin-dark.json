@@ -13,7 +13,7 @@
   "orientationAngle": 0,
   "orientationType": "landscape-primary"
  },
- "timestamp": "2026-11-11T18:51:52.945Z",
+ "timestamp": "2026-11-11T21:38:34.455Z",
  "url": "http://localhost:3000/app",
  "toolOptions": {
   "runOnly": {
@@ -165,7 +165,7 @@
     "RGAAv4",
     "RGAA-10.8.1"
    ],
-   "nodeCount": 69
+   "nodeCount": 70
   },
   {
    "id": "aria-prohibited-attr",
@@ -632,7 +632,7 @@
     "RGAAv4",
     "RGAA-9.2.1"
    ],
-   "nodeCount": 197
+   "nodeCount": 196
   },
   {
    "id": "scrollable-region-focusable",
@@ -800,7 +800,7 @@
      "all": [],
      "none": [],
      "impact": "serious",
-     "html": "<p class=\"text-sm text-slate-600 dark:text-slate-400\">Last updated: 6:51:48 PM </p>",
+     "html": "<p class=\"text-sm text-slate-600 dark:text-slate-400\">Last updated: 9:38:29 PM </p>",
      "target": [
       ".space-x-3.items-center.flex > div:nth-child(2) > p"
      ],
