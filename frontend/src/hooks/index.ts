@@ -308,7 +308,7 @@ export function usePipeline() {
   
   const addStep = useCallback((operationName: string, params: Record<string, any> = {}) => {
     const newStep: PipelineStep = {
-      id: `step_${Date.now()}`,
+      id: `step_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
       name: operationName,
       params
     };

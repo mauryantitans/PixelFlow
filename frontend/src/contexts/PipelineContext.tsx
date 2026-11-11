@@ -57,7 +57,9 @@ export const PipelineProvider: React.FC<PipelineProviderProps> = ({ children }) 
   
   const addStep = useCallback((operationName: string, params: Record<string, any> = {}) => {
     const newStep: PipelineStep = {
-      id: `step_${Date.now()}`,
+      // Date.now() alone collides when two steps are added in the same
+      // millisecond (duplicate React keys; editing one step edited both).
+      id: `step_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
       name: operationName,
       params
     };
