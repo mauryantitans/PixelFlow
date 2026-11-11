@@ -87,3 +87,13 @@ def test_bearer_token_still_works_for_api_clients(client):
     r = client.get("/api/auth/me", headers={"Authorization": f"Bearer {token}"})
     assert r.status_code == 200, r.text
     assert r.json()["email"] == USER["email"]
+
+
+def test_csrf_rejection_still_carries_cors_headers(client):
+    """A 403 from the CSRF middleware must include CORS headers; otherwise the
+    browser hides it and the frontend reports a generic network error."""
+    _register_and_login(client)
+    r = client.post("/api/auth/logout", headers={"Origin": "http://localhost:3000"})
+    assert r.status_code == 403
+    assert r.headers.get("access-control-allow-origin") == "http://localhost:3000"
+    assert r.headers.get("access-control-allow-credentials") == "true"

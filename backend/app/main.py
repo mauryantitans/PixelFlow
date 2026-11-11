@@ -81,6 +81,15 @@ for origin in settings.CORS_ORIGINS:
 if settings.CORS_ORIGIN_REGEX:
     logger.info(f"  ✓ Using regex pattern: {settings.CORS_ORIGIN_REGEX}")
 
+# Add security middlewares
+app.add_middleware(RateLimitMiddleware)
+app.add_middleware(SecurityHeadersMiddleware)
+app.add_middleware(CSRFMiddleware)
+
+# CORS is added LAST so it is the outermost middleware (Starlette runs the
+# most recently added first). That way early 403 (CSRF) and 429 (rate limit)
+# responses still carry Access-Control-Allow-* headers; before, the browser
+# hid them and the frontend only saw a generic network error.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS if settings.CORS_ORIGINS else None,
@@ -90,11 +99,6 @@ app.add_middleware(
     allow_headers=CORSSettings.ALLOW_HEADERS,
     expose_headers=CORSSettings.EXPOSE_HEADERS,
 )
-
-# Add security middlewares
-app.add_middleware(RateLimitMiddleware)
-app.add_middleware(SecurityHeadersMiddleware)
-app.add_middleware(CSRFMiddleware)
 
 # Include API routes
 app.include_router(api_router, prefix="/api")
