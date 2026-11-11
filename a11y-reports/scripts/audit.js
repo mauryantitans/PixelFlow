@@ -112,6 +112,15 @@ async function clickSel(page, sel) {
   if (!ok) throw new Error(`clickSel: ${sel} not found`);
 }
 
+/** Open the account menu (works on both the old and the fixed markup). */
+async function openAccountMenu(page, username) {
+  try {
+    await clickSel(page, 'button[aria-controls="account-menu"]');
+  } catch {
+    await clickText(page, username);
+  }
+}
+
 async function waitText(page, text, timeout = 20000) {
   await page.waitForFunction((t) => document.body.innerText.includes(t), { timeout }, text);
 }
@@ -268,7 +277,7 @@ async function addOp(page, label) {
   await page.type('#operationSearch', label);
   await sleep(200);
   await page.evaluate((label) => {
-    const b = [...document.querySelectorAll('aside button')].find(
+    const b = [...document.querySelectorAll('[data-op], aside button')].find(
       (x) => (x.getAttribute('data-op') || x.childNodes[0]?.textContent || '').trim() === label
     );
     if (!b) throw new Error('op not found ' + label);
@@ -383,11 +392,11 @@ async function lighthouseNavigation(url, name) {
     await addOp(page, 'Grayscale');
     await audit(page, 'app-signed-in');
 
-    await clickText(page, 'a11yuser');
+    await openAccountMenu(page, 'a11yuser');
     await sleep(300);
     await audit(page, 'menu-user');
     await page.keyboard.press('Escape');
-    await clickText(page, 'a11yuser');
+    await openAccountMenu(page, 'a11yuser');
     await sleep(200);
 
     await clickText(page, 'Save');
@@ -405,7 +414,7 @@ async function lighthouseNavigation(url, name) {
     // ---- Admin flow ----
     page = await newPage(browser);
     await login(page, process.env.ADMIN_EMAIL, process.env.ADMIN_PASSWORD);
-    await clickText(page, 'a11yadmin2');
+    await openAccountMenu(page, 'a11yadmin2');
     await sleep(200);
     await clickText(page, 'Admin Tools');
     await waitText(page, 'Pipeline Limits', 20000);
