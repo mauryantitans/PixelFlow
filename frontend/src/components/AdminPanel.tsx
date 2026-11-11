@@ -523,7 +523,7 @@ Type DELETE to confirm.`)) {
             </div>
             <div>
               <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">Admin Tools</h2>
-              <p className="text-sm text-slate-500 dark:text-slate-400">
+              <p className="text-sm text-slate-600 dark:text-slate-400">
                 Last updated: {lastRefresh.toLocaleTimeString()} {refreshing && '• Updating...'}
               </p>
             </div>
@@ -628,9 +628,9 @@ Type DELETE to confirm.`)) {
                       max="100"
                       value={editedSettings.user_limits.free_user_max_pipelines}
                       onChange={(e) => handleSettingChange('user_limits', 'free_user_max_pipelines', parseInt(e.target.value))}
-                      className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-300 dark:border-zinc-600 rounded-md text-slate-900 dark:text-slate-50"
+                      className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-500 dark:border-zinc-500 rounded-md text-slate-900 dark:text-slate-50"
                     />
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
                       Current: {editedSettings.user_limits.free_user_max_pipelines} pipelines
                     </p>
                   </div>
@@ -652,9 +652,9 @@ Type DELETE to confirm.`)) {
                       max="1000"
                       value={editedSettings.user_limits.guest_storage_quota_mb}
                       onChange={(e) => handleSettingChange('user_limits', 'guest_storage_quota_mb', parseInt(e.target.value))}
-                      className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-300 dark:border-zinc-600 rounded-md text-slate-900 dark:text-slate-50"
+                      className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-500 dark:border-zinc-500 rounded-md text-slate-900 dark:text-slate-50"
                     />
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Current: {editedSettings.user_limits.guest_storage_quota_mb}MB</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">Current: {editedSettings.user_limits.guest_storage_quota_mb}MB</p>
                   </div>
                   <div>
                     <label htmlFor="admin-field-3" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
@@ -667,9 +667,9 @@ Type DELETE to confirm.`)) {
                       max="10000"
                       value={editedSettings.user_limits.free_user_storage_quota_mb}
                       onChange={(e) => handleSettingChange('user_limits', 'free_user_storage_quota_mb', parseInt(e.target.value))}
-                      className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-300 dark:border-zinc-600 rounded-md text-slate-900 dark:text-slate-50"
+                      className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-500 dark:border-zinc-500 rounded-md text-slate-900 dark:text-slate-50"
                     />
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Current: {editedSettings.user_limits.free_user_storage_quota_mb}MB</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">Current: {editedSettings.user_limits.free_user_storage_quota_mb}MB</p>
                   </div>
                 </div>
               </div>
@@ -689,7 +689,7 @@ Type DELETE to confirm.`)) {
                       max="500"
                       value={editedSettings.user_limits.guest_max_images_per_session}
                       onChange={(e) => handleSettingChange('user_limits', 'guest_max_images_per_session', parseInt(e.target.value))}
-                      className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-300 dark:border-zinc-600 rounded-md text-slate-900 dark:text-slate-50"
+                      className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-500 dark:border-zinc-500 rounded-md text-slate-900 dark:text-slate-50"
                     />
                   </div>
                   <div>
@@ -703,7 +703,7 @@ Type DELETE to confirm.`)) {
                       max="1000"
                       value={editedSettings.user_limits.free_user_max_images_per_session}
                       onChange={(e) => handleSettingChange('user_limits', 'free_user_max_images_per_session', parseInt(e.target.value))}
-                      className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-300 dark:border-zinc-600 rounded-md text-slate-900 dark:text-slate-50"
+                      className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-500 dark:border-zinc-500 rounded-md text-slate-900 dark:text-slate-50"
                     />
                   </div>
                   <div>
@@ -717,7 +717,7 @@ Type DELETE to confirm.`)) {
                       max="100"
                       value={editedSettings.user_limits.max_images_per_upload}
                       onChange={(e) => handleSettingChange('user_limits', 'max_images_per_upload', parseInt(e.target.value))}
-                      className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-300 dark:border-zinc-600 rounded-md text-slate-900 dark:text-slate-50"
+                      className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-500 dark:border-zinc-500 rounded-md text-slate-900 dark:text-slate-50"
                     />
                   </div>
                 </div>
@@ -751,9 +751,9 @@ Type DELETE to confirm.`)) {
                       max="95"
                       value={editedSettings.cleanup.warn_at_percentage}
                       onChange={(e) => handleSettingChange('cleanup', 'warn_at_percentage', parseInt(e.target.value))}
-                      className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-300 dark:border-zinc-600 rounded-md text-slate-900 dark:text-slate-50"
+                      className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-500 dark:border-zinc-500 rounded-md text-slate-900 dark:text-slate-50"
                     />
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Warn users when storage reaches this %</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">Warn users when storage reaches this %</p>
                   </div>
                 </div>
               </div>
@@ -931,7 +931,7 @@ Type DELETE to confirm.`)) {
                         </>
                       )}
                     </button>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 text-center">
+                    <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 text-center">
                       This will link guest images to users based on their sessions
                     </p>
                   </div>
@@ -961,7 +961,7 @@ Type DELETE to confirm.`)) {
                       </>
                     )}
                   </button>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 text-center">
+                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 text-center">
                     Permanently deletes all uploaded and processed images
                   </p>
                 </div>
@@ -995,7 +995,7 @@ Type DELETE to confirm.`)) {
                       max="168"
                       value={editedSettings.retention.guest_upload_retention_hours}
                       onChange={(e) => handleSettingChange('retention', 'guest_upload_retention_hours', parseInt(e.target.value))}
-                      className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-300 dark:border-zinc-600 rounded-md text-slate-900 dark:text-slate-50"
+                      className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-500 dark:border-zinc-500 rounded-md text-slate-900 dark:text-slate-50"
                     />
                   </div>
                   <div>
@@ -1009,7 +1009,7 @@ Type DELETE to confirm.`)) {
                       max="365"
                       value={editedSettings.retention.free_user_upload_retention_days}
                       onChange={(e) => handleSettingChange('retention', 'free_user_upload_retention_days', parseInt(e.target.value))}
-                      className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-300 dark:border-zinc-600 rounded-md text-slate-900 dark:text-slate-50"
+                      className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-500 dark:border-zinc-500 rounded-md text-slate-900 dark:text-slate-50"
                     />
                   </div>
                 </div>
@@ -1030,7 +1030,7 @@ Type DELETE to confirm.`)) {
                       max="168"
                       value={editedSettings.retention.guest_processed_retention_hours}
                       onChange={(e) => handleSettingChange('retention', 'guest_processed_retention_hours', parseInt(e.target.value))}
-                      className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-300 dark:border-zinc-600 rounded-md text-slate-900 dark:text-slate-50"
+                      className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-500 dark:border-zinc-500 rounded-md text-slate-900 dark:text-slate-50"
                     />
                   </div>
                   <div>
@@ -1044,7 +1044,7 @@ Type DELETE to confirm.`)) {
                       max="168"
                       value={editedSettings.retention.free_user_processed_retention_hours}
                       onChange={(e) => handleSettingChange('retention', 'free_user_processed_retention_hours', parseInt(e.target.value))}
-                      className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-300 dark:border-zinc-600 rounded-md text-slate-900 dark:text-slate-50"
+                      className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-500 dark:border-zinc-500 rounded-md text-slate-900 dark:text-slate-50"
                     />
                   </div>
                 </div>
@@ -1112,12 +1112,12 @@ Type DELETE to confirm.`)) {
               {showUserData && !loadingDetailedData && databaseData && (!databaseData.detailed_users || databaseData.detailed_users.length === 0) && (
                 <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 border border-slate-300 dark:border-zinc-700">
                   <div className="text-center py-12">
-                    <Database aria-hidden="true" className="w-16 h-16 mx-auto mb-4 text-slate-400 dark:text-slate-600" />
+                    <Database aria-hidden="true" className="w-16 h-16 mx-auto mb-4 text-slate-600 dark:text-slate-600" />
                     <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-2">No User Data Available</h3>
                     <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
                       The database is empty. Create a user account to see data here.
                     </p>
-                    <p className="text-xs text-slate-500 dark:text-slate-500">
+                    <p className="text-xs text-slate-600 dark:text-slate-400">
                       Tip: Register a new account or use OAuth login to populate the database.
                     </p>
                   </div>
@@ -1170,7 +1170,7 @@ Type DELETE to confirm.`)) {
                             </td>
                             <td className="px-3 py-2 text-right">
                               <span className={`font-medium ${
-                                user.image_count > 0 ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-600'
+                                user.image_count > 0 ? 'text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-600 dark:text-slate-400'
                               }`}>
                                 {user.image_count}
                               </span>
@@ -1301,7 +1301,7 @@ Type DELETE to confirm.`)) {
                                     }}
                                   />
                                 ) : (
-                                  <LucideReact.Image aria-hidden="true" className="w-12 h-12 text-slate-400 dark:text-slate-600" />
+                                  <LucideReact.Image aria-hidden="true" className="w-12 h-12 text-slate-600 dark:text-slate-600" />
                                 )}
                               </div>
                               <p className="text-xs text-slate-900 dark:text-slate-50 truncate font-medium mb-1" title={img.filename}>
@@ -1314,7 +1314,7 @@ Type DELETE to confirm.`)) {
                                 <p className="text-xs text-slate-600 dark:text-slate-400">
                                   {img.size_mb}MB • {img.format}
                                 </p>
-                                <p className="text-xs text-slate-500 dark:text-slate-500">
+                                <p className="text-xs text-slate-600 dark:text-slate-400">
                                   {new Date(img.uploaded_at).toLocaleDateString()}
                                 </p>
                               </div>
@@ -1368,7 +1368,7 @@ Type DELETE to confirm.`)) {
                                   {pipeline.description && (
                                     <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">{pipeline.description}</p>
                                   )}
-                                  <div className="flex items-center space-x-4 text-xs text-slate-500 dark:text-slate-500">
+                                  <div className="flex items-center space-x-4 text-xs text-slate-600 dark:text-slate-400">
                                     <span>📅 Created: {new Date(pipeline.created_at).toLocaleDateString()}</span>
                                     <span>🔄 Updated: {new Date(pipeline.updated_at).toLocaleDateString()}</span>
                                     <span>🔧 {pipeline.operation_count || 0} operations</span>
@@ -1411,13 +1411,13 @@ Type DELETE to confirm.`)) {
 
         {/* Footer */}
         <div className="p-4 border-t border-slate-300 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/50 flex items-center justify-between">
-          <div className="text-xs text-slate-500 dark:text-slate-400">
+          <div className="text-xs text-slate-600 dark:text-slate-400">
             {settings?.meta?.updated_at && (
               <span>Last updated: {new Date(settings.meta.updated_at).toLocaleString()}</span>
             )}
           </div>
           {hasChanges && (
-            <p className="text-sm text-orange-600 dark:text-orange-400 font-medium animate-pulse">
+            <p className="text-sm text-orange-700 dark:text-orange-400 font-medium animate-pulse">
               ● Unsaved changes
             </p>
           )}
@@ -1452,7 +1452,7 @@ Type DELETE to confirm.`)) {
               value={pin}
               onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
               placeholder={hasPinSet ? "Enter your PIN" : "Create a PIN (4-6 digits)"}
-              className="w-full px-4 py-3 bg-white dark:bg-zinc-800 border-2 border-slate-300 dark:border-zinc-700 rounded-lg text-center text-2xl tracking-widest mb-6 text-slate-900 dark:text-slate-50"
+              className="w-full px-4 py-3 bg-white dark:bg-zinc-800 border-2 border-slate-500 dark:border-zinc-500 rounded-lg text-center text-2xl tracking-widest mb-6 text-slate-900 dark:text-slate-50"
               autoFocus
               onKeyPress={(e) => {
                 if (e.key === 'Enter' && pin.length >= 4) {

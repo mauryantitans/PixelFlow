@@ -59,15 +59,15 @@ export const LandingPage: React.FC = () => {
           
           <div className="flex items-center justify-center flex-wrap gap-6 mt-6 text-sm text-slate-600 dark:text-slate-400">
             <div className="flex items-center space-x-2">
-              <CheckCircle aria-hidden="true" className="w-4 h-4 text-green-600 dark:text-green-400" />
+              <CheckCircle aria-hidden="true" className="w-4 h-4 text-green-700 dark:text-green-400" />
               <span>100% Free Forever</span>
             </div>
             <div className="flex items-center space-x-2">
-              <CheckCircle aria-hidden="true" className="w-4 h-4 text-green-600 dark:text-green-400" />
+              <CheckCircle aria-hidden="true" className="w-4 h-4 text-green-700 dark:text-green-400" />
               <span>No Sign-Up Required</span>
             </div>
             <div className="flex items-center space-x-2">
-              <CheckCircle aria-hidden="true" className="w-4 h-4 text-green-600 dark:text-green-400" />
+              <CheckCircle aria-hidden="true" className="w-4 h-4 text-green-700 dark:text-green-400" />
               <span>Browser-Based</span>
             </div>
           </div>
@@ -158,7 +158,7 @@ export const LandingPage: React.FC = () => {
           {/* Feature 4 */}
           <div className="bg-white dark:bg-zinc-900 p-8 rounded-xl border-2 border-slate-300 dark:border-zinc-800 hover:shadow-lg dark:hover:shadow-black/40 transition-all">
             <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mb-4">
-              <Lock aria-hidden="true" className="w-6 h-6 text-green-600 dark:text-green-400" />
+              <Lock aria-hidden="true" className="w-6 h-6 text-green-700 dark:text-green-400" />
             </div>
             <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-50 mb-3">Save & Share</h3>
             <p className="text-slate-600 dark:text-slate-300">
@@ -169,7 +169,7 @@ export const LandingPage: React.FC = () => {
           {/* Feature 5 */}
           <div className="bg-white dark:bg-zinc-900 p-8 rounded-xl border-2 border-slate-300 dark:border-zinc-800 hover:shadow-lg dark:hover:shadow-black/40 transition-all">
             <div className="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center mb-4">
-              <ImageIcon aria-hidden="true" className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
+              <ImageIcon aria-hidden="true" className="w-6 h-6 text-amber-700 dark:text-yellow-400" />
             </div>
             <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-50 mb-3">Batch Processing</h3>
             <p className="text-slate-600 dark:text-slate-300">
@@ -336,13 +336,13 @@ export const LandingPage: React.FC = () => {
 
           {/* Bottom bar */}
           <div className="pt-8 border-t-2 border-slate-300 dark:border-zinc-800 flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
-            <p className="text-sm text-slate-500 dark:text-slate-400">
+            <p className="text-sm text-slate-600 dark:text-slate-400">
               © 2025 PixelFlow. Open source image processing.{' '}
               <a 
                 href="https://github.com/Mauryantitans/PixelFlow/blob/React_FastAPI/LICENSE" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-blue-600 dark:text-blue-400 hover:underline"
+                className="text-blue-700 dark:text-blue-400 underline hover:no-underline"
               >
                 Apache-2.0 License
               </a>

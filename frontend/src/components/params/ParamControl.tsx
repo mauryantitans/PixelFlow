@@ -84,9 +84,9 @@ const ParamControl: React.FC<ParamControlProps> = ({ spec, value, stepId, contro
             type="checkbox"
             checked={Boolean(value ?? spec.default)}
             onChange={(e) => onChange(e.target.checked)}
-            className="h-4 w-4 rounded border-gray-300 dark:border-zinc-600 accent-blue-600"
+            className="h-4 w-4 rounded border-gray-500 dark:border-zinc-500 accent-blue-600"
           />
-          <span className="text-xs text-gray-500 dark:text-gray-400">{spec.help || spec.label}</span>
+          <span className="text-xs text-gray-600 dark:text-gray-400">{spec.help || spec.label}</span>
         </label>
       );
 
@@ -99,7 +99,7 @@ const ParamControl: React.FC<ParamControlProps> = ({ spec, value, stepId, contro
             id={controlId}
             value={hex}
             onChange={(e) => onChange(e.target.value)}
-            className="h-7 w-10 rounded border border-gray-300 dark:border-zinc-600 bg-transparent cursor-pointer"
+            className="h-7 w-10 rounded border border-gray-500 dark:border-zinc-500 bg-transparent cursor-pointer"
           />
           <span className="text-xs font-mono text-gray-600 dark:text-gray-300">{hex}</span>
           <button
@@ -148,14 +148,14 @@ const ParamControl: React.FC<ParamControlProps> = ({ spec, value, stepId, contro
               ? 'Re-pick'
               : 'Pick on image'}
           </button>
-          <span className="text-xs font-mono text-gray-500 dark:text-gray-400">
+          <span className="text-xs font-mono text-gray-600 dark:text-gray-400">
             {summarize(spec.type, value)}
           </span>
           {value && (
             <button
               type="button"
               onClick={() => onChange(null)}
-              className="text-gray-400 hover:text-red-500"
+              className="text-gray-600 hover:text-red-500 dark:text-gray-400"
               title="Clear"
               aria-label={`Clear ${spec.label}${stepLabel ? ` for ${stepLabel}` : ''}`}
             >

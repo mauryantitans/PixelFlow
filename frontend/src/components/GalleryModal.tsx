@@ -118,7 +118,7 @@ const GalleryModal: React.FC<GalleryModalProps> = ({
         <div className="flex-1 min-h-0">
           {images.length === 0 ? (
             <div className="flex items-center justify-center h-full">
-              <div className="text-center text-gray-400 dark:text-gray-500">
+              <div className="text-center text-gray-600 dark:text-gray-400">
                 <LucideReact.Image aria-hidden="true" className="w-16 h-16 mx-auto mb-4" />
                 <p className="font-semibold text-lg mb-2">No images uploaded</p>
                 <p className="text-sm">Upload some images to get started</p>
@@ -191,10 +191,10 @@ const GalleryModal: React.FC<GalleryModalProps> = ({
 
                     {/* Image Info */}
                     <div className="p-2">
-                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate" title={image.filename}>
+                        <p className="text-xs text-gray-600 dark:text-gray-400 truncate" title={image.filename}>
                         {image.filename}
                         </p>
-                        <p className="text-xs text-gray-400 dark:text-gray-500">
+                        <p className="text-xs text-gray-600 dark:text-gray-400">
                         {image.width} × {image.height}
                         </p>
                     </div>

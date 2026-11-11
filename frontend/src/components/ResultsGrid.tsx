@@ -103,7 +103,7 @@ const ResultsGridComponent: React.FC<ResultsGridProps> = ({
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <div className="text-center text-gray-400 dark:text-gray-500">
+        <div className="text-center text-gray-600 dark:text-gray-400">
           <LucideReact.Image aria-hidden="true" className="w-16 h-16 mx-auto mb-4" />
           <p className="font-semibold text-lg mb-2">Processing...</p>
           <p className="text-sm">Results will appear when ready</p>
@@ -115,7 +115,7 @@ const ResultsGridComponent: React.FC<ResultsGridProps> = ({
   if (results.length === 0) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <div className="text-center text-gray-400 dark:text-gray-500">
+        <div className="text-center text-gray-600 dark:text-gray-400">
           <LucideReact.Image aria-hidden="true" className="w-16 h-16 mx-auto mb-4" />
           <p className="font-semibold text-lg mb-2">Processed results will appear here</p>
           <p className="text-sm">Apply a pipeline to your selected images</p>
@@ -145,7 +145,7 @@ const ResultsGridComponent: React.FC<ResultsGridProps> = ({
             <button
               onClick={handleDownloadAll}
               disabled={downloading}
-              className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {downloading ? (
                 <>
@@ -219,7 +219,7 @@ const ResultsGridComponent: React.FC<ResultsGridProps> = ({
               </div>
               
               <div className="p-2">
-                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
                   Result {index + 1}
                 </p>
               </div>

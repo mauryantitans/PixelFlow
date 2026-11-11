@@ -321,13 +321,13 @@ const App: React.FC = () => {
   const getStatusTextColor = (type: 'info' | 'processing' | 'success' | 'error' | 'warning') => {
     switch (type) {
       case 'processing':
-        return 'text-blue-600 dark:text-blue-400';
+        return 'text-blue-700 dark:text-blue-400';
       case 'success':
-        return 'text-green-600 dark:text-green-400';
+        return 'text-green-700 dark:text-green-400';
       case 'error':
         return 'text-red-600 dark:text-red-400';
       case 'warning':
-        return 'text-yellow-600 dark:text-yellow-400';
+        return 'text-amber-700 dark:text-yellow-400';
       case 'info':
       default:
         return 'text-slate-700 dark:text-slate-300';
@@ -523,13 +523,13 @@ const App: React.FC = () => {
                 onChange={(e) => setOperationSearch(e.target.value)}
                 className="input-field pr-10"
               />
-              <LucideReact.Search aria-hidden="true" className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <LucideReact.Search aria-hidden="true" className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-600 dark:text-gray-400" />
             </div>
             
             {/* Enhanced Operations List */}
             <div className="flex-grow overflow-y-auto space-y-1 pr-1">
               {(opsLoading || opsError) && (
-                <div className="p-3 text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                <div className="p-3 text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2">
                   {opsLoading ? (
                     <>
                       <LucideReact.Loader2 aria-hidden="true" className="w-4 h-4 animate-spin" />
@@ -537,7 +537,7 @@ const App: React.FC = () => {
                     </>
                   ) : (
                     <>
-                      <LucideReact.AlertTriangle aria-hidden="true" className="w-4 h-4 text-red-500" />
+                      <LucideReact.AlertTriangle aria-hidden="true" className="w-4 h-4 text-red-700 dark:text-red-400" />
                       Couldn't load operations: {opsError}
                     </>
                   )}
@@ -703,7 +703,7 @@ const App: React.FC = () => {
                 <label htmlFor="live-toggle" className="toggle-label" aria-hidden="true"></label>
               </div>
               {selectedCount !== 1 && (
-                <span id="live-toggle-hint" className="text-xs text-slate-500 dark:text-slate-400">
+                <span id="live-toggle-hint" className="text-xs text-slate-600 dark:text-slate-400">
                   (Select 1 image)
                 </span>
               )}
@@ -736,7 +736,7 @@ const App: React.FC = () => {
               <button
               onClick={undo}
               disabled={!canUndo}
-              className="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 transition-colors flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 transition-colors flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
               title="Undo (Ctrl+Z)"
               >
               <LucideReact.Undo2 aria-hidden="true" className="w-3 h-3" />
@@ -745,7 +745,7 @@ const App: React.FC = () => {
               <button
               onClick={redo}
               disabled={!canRedo}
-              className="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 transition-colors flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 transition-colors flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
               title="Redo (Ctrl+Y)"
               >
               <LucideReact.Redo2 aria-hidden="true" className="w-3 h-3" />
@@ -754,7 +754,7 @@ const App: React.FC = () => {
               <div className="w-px h-4 bg-slate-300 dark:bg-zinc-700"></div>
               <button
               onClick={resetPipeline}
-              className="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 transition-colors flex items-center gap-1"
+              className="text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 transition-colors flex items-center gap-1"
               >
               <LucideReact.RotateCcw aria-hidden="true" className="w-3 h-3" />
               Reset
@@ -764,7 +764,7 @@ const App: React.FC = () => {
             
             <div className="space-y-2">
               {pipeline.length === 0 ? (
-                <p className="text-sm text-center py-4 text-slate-500 dark:text-slate-400">
+                <p className="text-sm text-center py-4 text-slate-600 dark:text-slate-400">
                   Add operations from the left panel
                 </p>
               ) : (

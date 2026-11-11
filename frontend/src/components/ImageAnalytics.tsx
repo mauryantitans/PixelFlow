@@ -75,7 +75,7 @@ export const ImageAnalytics: React.FC<ImageAnalyticsProps> = ({
               );
             })}
           </svg>
-          <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+          <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mt-1">
             <span>0</span>
             <span>128</span>
             <span>255</span>
@@ -100,7 +100,7 @@ export const ImageAnalytics: React.FC<ImageAnalyticsProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Close image analytics"
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            className="text-gray-600 hover:text-gray-600 dark:hover:text-gray-300 transition-colors dark:text-gray-400"
           >
             <X aria-hidden="true" className="w-6 h-6" />
           </button>
@@ -123,25 +123,25 @@ export const ImageAnalytics: React.FC<ImageAnalyticsProps> = ({
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Image Information</h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="bg-gray-50 dark:bg-zinc-800 p-4 rounded-lg border border-gray-200 dark:border-zinc-700">
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Dimensions</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Dimensions</p>
                       <p className="text-lg font-semibold text-gray-900 dark:text-white">
                         {stats.width} × {stats.height}
                       </p>
                     </div>
                     <div className="bg-gray-50 dark:bg-zinc-800 p-4 rounded-lg border border-gray-200 dark:border-zinc-700">
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Total Pixels</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Total Pixels</p>
                       <p className="text-lg font-semibold text-gray-900 dark:text-white">
                         {stats.pixels.toLocaleString()}
                       </p>
                     </div>
                     <div className="bg-gray-50 dark:bg-zinc-800 p-4 rounded-lg border border-gray-200 dark:border-zinc-700">
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Aspect Ratio</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Aspect Ratio</p>
                       <p className="text-lg font-semibold text-gray-900 dark:text-white">
                         {(stats.width / stats.height).toFixed(2)}
                       </p>
                     </div>
                     <div className="bg-gray-50 dark:bg-zinc-800 p-4 rounded-lg border border-gray-200 dark:border-zinc-700">
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">File Name</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">File Name</p>
                       <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
                         {imageName}
                       </p>
@@ -221,7 +221,7 @@ export const ImageAnalytics: React.FC<ImageAnalyticsProps> = ({
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center space-x-2">
                     <span>Histograms</span>
                     <div className="group relative">
-                      <Info aria-hidden="true" size={16} className="text-gray-400 cursor-help" />
+                      <Info aria-hidden="true" size={16} className="text-gray-600 cursor-help dark:text-gray-400" />
                       <div className="hidden group-hover:block absolute left-0 top-full mt-1 w-64 p-2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs rounded shadow-lg z-10">
                         Histograms show the distribution of pixel values across different color channels.
                       </div>

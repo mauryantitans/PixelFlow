@@ -34,7 +34,7 @@ const MethodDetailsModal: React.FC<MethodDetailsModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Close method details"
-            className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-500 dark:text-gray-400"
+            className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-600 dark:text-gray-400"
           >
             <LucideReact.X aria-hidden="true" className="w-5 h-5" />
           </button>
@@ -133,7 +133,7 @@ const MethodDetailsModal: React.FC<MethodDetailsModalProps> = ({
             <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-3">Usage Tips</h3>
             <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4 border border-yellow-200 dark:border-yellow-800">
               <div className="flex items-start gap-3">
-                <LucideReact.Zap aria-hidden="true" className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
+                <LucideReact.Zap aria-hidden="true" className="w-5 h-5 text-amber-700 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
                 <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
                   {getUsageTips(operationName)}
                 </div>

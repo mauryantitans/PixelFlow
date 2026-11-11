@@ -67,7 +67,7 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 bg-white dark:bg-zinc-800 border border-slate-300 dark:border-zinc-700 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 bg-white dark:bg-zinc-800 border border-slate-500 dark:border-zinc-500 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="you@example.com"
               disabled={loading}
             />
@@ -84,7 +84,7 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 bg-white dark:bg-zinc-800 border border-slate-300 dark:border-zinc-700 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 bg-white dark:bg-zinc-800 border border-slate-500 dark:border-zinc-500 text-slate-900 dark:text-slate-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="••••••••"
               disabled={loading}
             />
@@ -105,7 +105,7 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
             <div className="w-full border-t border-slate-300 dark:border-zinc-700"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white dark:bg-zinc-900 text-slate-500 dark:text-slate-400">Or continue with</span>
+            <span className="px-2 bg-white dark:bg-zinc-900 text-slate-600 dark:text-slate-400">Or continue with</span>
           </div>
         </div>
 

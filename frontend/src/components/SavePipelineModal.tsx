@@ -85,7 +85,7 @@ export const SavePipelineModal: React.FC<SavePipelineModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Close save pipeline dialog"
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-gray-600 hover:text-gray-600 transition-colors dark:text-gray-400"
           >
             <X aria-hidden="true" className="w-6 h-6" />
           </button>
@@ -117,7 +117,7 @@ export const SavePipelineModal: React.FC<SavePipelineModalProps> = ({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g., Instagram-style filter"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               required
               disabled={loading}
             />
@@ -134,7 +134,7 @@ export const SavePipelineModal: React.FC<SavePipelineModalProps> = ({
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Describe what this pipeline does..."
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              className="w-full px-3 py-2 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
               disabled={loading}
             />
           </div>
@@ -148,7 +148,7 @@ export const SavePipelineModal: React.FC<SavePipelineModalProps> = ({
               id="category"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               disabled={loading}
             >
               <option value="">Select a category</option>
@@ -172,7 +172,7 @@ export const SavePipelineModal: React.FC<SavePipelineModalProps> = ({
               value={tags}
               onChange={(e) => setTags(e.target.value)}
               placeholder="e.g., vintage, blur, black-white"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               disabled={loading}
             />
           </div>
@@ -184,12 +184,12 @@ export const SavePipelineModal: React.FC<SavePipelineModalProps> = ({
               type="checkbox"
               checked={isPublic}
               onChange={(e) => setIsPublic(e.target.checked)}
-              className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-500 rounded"
               disabled={loading}
             />
             <label htmlFor="is_public" className="ml-2 block text-sm text-gray-700">
               <span className="font-medium">Make this pipeline public</span>
-              <p className="text-gray-500 text-xs mt-1">
+              <p className="text-gray-600 text-xs mt-1 dark:text-gray-400">
                 Other users will be able to view and use this pipeline
               </p>
             </label>

@@ -90,7 +90,7 @@ export const Header: React.FC = () => {
               />
               <div className="flex flex-col">
                 <span className="text-xl font-bold text-slate-900 dark:text-slate-50 leading-tight">PixelFlow</span>
-                <span className="text-xs text-slate-500 dark:text-slate-400 leading-tight">Image Processing Pipeline Builder</span>
+                <span className="text-xs text-slate-600 dark:text-slate-400 leading-tight">Image Processing Pipeline Builder</span>
               </div>
             </Link>
 
@@ -233,7 +233,7 @@ export const Header: React.FC = () => {
                           <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">
                             {user.full_name || user.username}
                           </p>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                          <p className="text-xs text-slate-600 dark:text-slate-400 truncate mt-0.5">
                             {user.email}
                           </p>
                           {user.is_admin && (
@@ -301,8 +301,8 @@ export const Header: React.FC = () => {
         {notification && (
           <div className={`absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-4 py-2 rounded-lg shadow-lg z-50 animate-fade-in ${
             notification.type === 'success' 
-              ? 'bg-green-500 dark:bg-green-600' 
-              : 'bg-red-500 dark:bg-red-600'
+              ? 'bg-green-700 dark:bg-green-700' 
+              : 'bg-red-700 dark:bg-red-700'
           } text-white text-sm font-medium`}>
             {notification.message}
           </div>

@@ -53,7 +53,7 @@ const PipelineStepComponent: React.FC<PipelineStepProps> = ({
           disabled={index === 0}
           aria-label={`Move ${stepLabel} up`}
           title="Move up"
-          className="reorder-btn text-gray-400 hover:text-zinc-800 dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+          className="reorder-btn text-gray-600 hover:text-zinc-800 dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed dark:text-gray-400"
         >
           <LucideReact.ArrowUp aria-hidden="true" className="w-4 h-4" />
         </button>
@@ -63,7 +63,7 @@ const PipelineStepComponent: React.FC<PipelineStepProps> = ({
           disabled={index === totalSteps - 1}
           aria-label={`Move ${stepLabel} down`}
           title="Move down"
-          className="reorder-btn text-gray-400 hover:text-zinc-800 dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+          className="reorder-btn text-gray-600 hover:text-zinc-800 dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed dark:text-gray-400"
         >
           <LucideReact.ArrowDown aria-hidden="true" className="w-4 h-4" />
         </button>
@@ -81,7 +81,7 @@ const PipelineStepComponent: React.FC<PipelineStepProps> = ({
                 <button
                   type="button"
                   onClick={onShowDetails}
-                  className="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  className="text-gray-600 hover:text-blue-600 dark:hover:text-blue-400 transition-colors dark:text-gray-400"
                   title="Method details"
                   aria-label={`Method details for ${stepLabel}`}
                 >
@@ -111,11 +111,11 @@ const PipelineStepComponent: React.FC<PipelineStepProps> = ({
               return (
                 <div key={param.name}>
                   {hasSingleInput ? (
-                    <label htmlFor={controlId} className="text-xs text-gray-500 dark:text-gray-400 block mb-1">
+                    <label htmlFor={controlId} className="text-xs text-gray-600 dark:text-gray-400 block mb-1">
                       {param.label}
                     </label>
                   ) : (
-                    <span id={`${controlId}-label`} className="text-xs text-gray-500 dark:text-gray-400 block mb-1">
+                    <span id={`${controlId}-label`} className="text-xs text-gray-600 dark:text-gray-400 block mb-1">
                       {param.label}
                     </span>
                   )}
@@ -147,7 +147,7 @@ const PipelineStepComponent: React.FC<PipelineStepProps> = ({
           <button
             type="button"
             onClick={onRemove}
-            className="text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+            className="text-gray-600 hover:text-red-600 dark:hover:text-red-400 transition-colors dark:text-gray-400"
             title="Remove step"
             aria-label={`Remove ${stepLabel} step`}
           >
@@ -161,7 +161,7 @@ const PipelineStepComponent: React.FC<PipelineStepProps> = ({
             className={`transition-colors ${
               isViewing
                 ? 'text-blue-600 dark:text-blue-400'
-                : 'text-gray-400 hover:text-zinc-800 dark:hover:text-white'
+                : 'text-gray-600 hover:text-zinc-800 dark:hover:text-white dark:text-gray-400'
             }`}
             title="Preview this step"
           >
