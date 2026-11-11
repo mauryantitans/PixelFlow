@@ -13,6 +13,29 @@ from ...utils.auth import get_current_user
 
 router = APIRouter()
 
+def _enforce_pipeline_limit(db: Session, user: User) -> None:
+    """Free accounts may keep at most `free_user_max_pipelines` (admins: no limit).
+
+    Used by both create and duplicate (duplicating used to skip the check).
+    """
+    if user.is_admin:
+        return
+    from ...utils.settings_manager import get_settings
+
+    max_pipelines = get_settings(db).free_user_max_pipelines
+    current_count = db.query(func.count(SavedPipeline.id)).filter(
+        SavedPipeline.user_id == user.id
+    ).scalar()
+    if max_pipelines is not None and current_count >= max_pipelines:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"Pipeline limit reached. Free users can save up to {max_pipelines} pipelines. Please delete an existing pipeline or upgrade your account."
+        )
+
+
+# Both "/api/pipelines" and "/api/pipelines/" are served directly: a redirect
+# between them would go through the Vercel/Render proxy as an http:// URL.
+@router.post("", response_model=PipelineResponse, status_code=status.HTTP_201_CREATED, include_in_schema=False)
 @router.post("/", response_model=PipelineResponse, status_code=status.HTTP_201_CREATED)
 async def create_pipeline(
     pipeline: PipelineCreate,
@@ -20,28 +43,7 @@ async def create_pipeline(
     db: Session = Depends(get_db)
 ):
     """Create a new saved pipeline"""
-    from ...utils.settings_manager import get_settings
-    
-    # Get settings from database
-    settings = get_settings(db)
-    
-    # Check pipeline limit based on user type
-    current_count = db.query(func.count(SavedPipeline.id)).filter(
-        SavedPipeline.user_id == current_user.id
-    ).scalar()
-    
-    # Determine max pipelines for this user
-    if current_user.is_admin:
-        max_pipelines = None  # Unlimited
-    else:
-        max_pipelines = settings.free_user_max_pipelines
-    
-    # Check if limit reached (None means unlimited)
-    if max_pipelines is not None and current_count >= max_pipelines:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"Pipeline limit reached. Free users can save up to {max_pipelines} pipelines. Please delete an existing pipeline or upgrade your account."
-        )
+    _enforce_pipeline_limit(db, current_user)
     
     db_pipeline = SavedPipeline(
         user_id=current_user.id,
@@ -60,6 +62,7 @@ async def create_pipeline(
     
     return db_pipeline
 
+@router.get("", response_model=List[PipelineResponse], include_in_schema=False)
 @router.get("/", response_model=List[PipelineResponse])
 async def get_user_pipelines(
     current_user: User = Depends(get_current_user),
@@ -216,6 +219,8 @@ async def duplicate_pipeline(
             detail="Not authorized to access this pipeline"
         )
     
+    _enforce_pipeline_limit(db, current_user)
+
     # Create duplicate
     new_pipeline = SavedPipeline(
         user_id=current_user.id,
