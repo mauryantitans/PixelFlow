@@ -519,7 +519,7 @@ Type DELETE to confirm.`)) {
         <div className="flex-shrink-0 flex items-center justify-between p-6 border-b border-slate-300 dark:border-zinc-800">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
-              <Settings className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+              <Settings aria-hidden="true" className="w-6 h-6 text-purple-600 dark:text-purple-400" />
             </div>
             <div>
               <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">Admin Tools</h2>
@@ -544,7 +544,7 @@ Type DELETE to confirm.`)) {
               className="flex items-center space-x-2 px-3 py-2 bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-700 dark:text-slate-300 rounded-lg transition-colors disabled:opacity-50 text-sm"
               title="Refresh data"
             >
-              <RefreshCw className={`w-4 h-4 ${(refreshing || loadingDetailedData || loadingUserImages) ? 'animate-spin' : ''}`} />
+              <RefreshCw aria-hidden="true" className={`w-4 h-4 ${(refreshing || loadingDetailedData || loadingUserImages) ? 'animate-spin' : ''}`} />
               <span>Refresh</span>
             </button>
             {hasChanges && (
@@ -555,24 +555,24 @@ Type DELETE to confirm.`)) {
               >
                 {saving ? (
                   <>
-                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    <RefreshCw aria-hidden="true" className="w-4 h-4 animate-spin" />
                     <span>Saving...</span>
                   </>
                 ) : saved ? (
                   <>
-                    <Check className="w-4 h-4" />
+                    <Check aria-hidden="true" className="w-4 h-4" />
                     <span>Saved!</span>
                   </>
                 ) : (
                   <>
-                    <Save className="w-4 h-4" />
+                    <Save aria-hidden="true" className="w-4 h-4" />
                     <span>Save Changes</span>
                   </>
                 )}
               </button>
             )}
-            <button onClick={onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-lg text-slate-700 dark:text-slate-300">
-              <X className="w-5 h-5" />
+            <button type="button" onClick={onClose} aria-label="Close admin tools" className="p-2 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-lg text-slate-700 dark:text-slate-300">
+              <X aria-hidden="true" className="w-5 h-5" />
             </button>
           </div>
         </div>
@@ -595,9 +595,9 @@ Type DELETE to confirm.`)) {
                   : 'text-slate-600 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-zinc-800/50'
               }`}
             >
-              <tab.icon className="w-4 h-4 inline mr-2" />
+              <tab.icon aria-hidden="true" className="w-4 h-4 inline mr-2" />
               {tab.label}
-              {tab.protected && <Lock className="w-3 h-3 inline ml-1" />}
+              {tab.protected && <><Lock aria-hidden="true" className="w-3 h-3 inline ml-1" /><span className="sr-only"> (PIN protected)</span></>}
             </button>
           ))}
         </div>
@@ -618,10 +618,11 @@ Type DELETE to confirm.`)) {
                 <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Pipeline Limits</h3>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    <label htmlFor="admin-field-1" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                       Free Users - Max Saved Pipelines
                     </label>
                     <input
+                      id="admin-field-1"
                       type="number"
                       min="1"
                       max="100"
@@ -641,10 +642,11 @@ Type DELETE to confirm.`)) {
                 <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Storage Quotas</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    <label htmlFor="admin-field-2" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                       Guest Users (MB)
                     </label>
                     <input
+                      id="admin-field-2"
                       type="number"
                       min="10"
                       max="1000"
@@ -655,10 +657,11 @@ Type DELETE to confirm.`)) {
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Current: {editedSettings.user_limits.guest_storage_quota_mb}MB</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    <label htmlFor="admin-field-3" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                       Registered Users (MB)
                     </label>
                     <input
+                      id="admin-field-3"
                       type="number"
                       min="100"
                       max="10000"
@@ -676,10 +679,11 @@ Type DELETE to confirm.`)) {
                 <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Image Upload Limits</h3>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    <label htmlFor="admin-field-4" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                       Guest Max Images/Session
                     </label>
                     <input
+                      id="admin-field-4"
                       type="number"
                       min="10"
                       max="500"
@@ -689,10 +693,11 @@ Type DELETE to confirm.`)) {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    <label htmlFor="admin-field-5" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                       User Max Images/Session
                     </label>
                     <input
+                      id="admin-field-5"
                       type="number"
                       min="50"
                       max="1000"
@@ -702,10 +707,11 @@ Type DELETE to confirm.`)) {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    <label htmlFor="admin-field-6" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                       Max Per Upload
                     </label>
                     <input
+                      id="admin-field-6"
                       type="number"
                       min="5"
                       max="100"
@@ -735,10 +741,11 @@ Type DELETE to confirm.`)) {
                   </label>
                   
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    <label htmlFor="admin-field-7" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                       Warn at Percentage (%)
                     </label>
                     <input
+                      id="admin-field-7"
                       type="number"
                       min="50"
                       max="95"
@@ -811,12 +818,12 @@ Type DELETE to confirm.`)) {
                   >
                     {loading ? (
                       <>
-                        <RefreshCw className="w-5 h-5 animate-spin" />
+                        <RefreshCw aria-hidden="true" className="w-5 h-5 animate-spin" />
                         <span>Running...</span>
                       </>
                     ) : (
                       <>
-                        <Trash2 className="w-5 h-5" />
+                        <Trash2 aria-hidden="true" className="w-5 h-5" />
                         <span>Run Cleanup Now</span>
                       </>
                     )}
@@ -831,7 +838,7 @@ Type DELETE to confirm.`)) {
             <div className="space-y-6">
               <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                 <div className="flex items-start space-x-2">
-                  <LucideReact.Activity className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+                  <LucideReact.Activity aria-hidden="true" className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
                   <div>
                     <p className="text-sm text-blue-800 dark:text-blue-300">
                       <strong>Active Sessions</strong> = Tabs with heartbeat in last 5 minutes<br />
@@ -876,7 +883,7 @@ Type DELETE to confirm.`)) {
                     disabled={refreshing}
                     className="px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/50 rounded transition-colors disabled:opacity-50"
                   >
-                    <RefreshCw className={`w-3 h-3 inline mr-1 ${refreshing ? 'animate-spin' : ''}`} />
+                    <RefreshCw aria-hidden="true" className={`w-3 h-3 inline mr-1 ${refreshing ? 'animate-spin' : ''}`} />
                     Refresh
                   </button>
                 </div>
@@ -914,12 +921,12 @@ Type DELETE to confirm.`)) {
                     >
                       {fixingOrphans ? (
                         <>
-                          <RefreshCw className="w-4 h-4 animate-spin" />
+                          <RefreshCw aria-hidden="true" className="w-4 h-4 animate-spin" />
                           <span>Fixing...</span>
                         </>
                       ) : (
                         <>
-                          <LucideReact.Link className="w-4 h-4" />
+                          <LucideReact.Link aria-hidden="true" className="w-4 h-4" />
                           <span>Fix Orphaned Images</span>
                         </>
                       )}
@@ -944,12 +951,12 @@ Type DELETE to confirm.`)) {
                   >
                     {deletingAllImages ? (
                       <>
-                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        <RefreshCw aria-hidden="true" className="w-4 h-4 animate-spin" />
                         <span>Deleting...</span>
                       </>
                     ) : (
                       <>
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 aria-hidden="true" className="w-4 h-4" />
                         <span>Delete ALL Images</span>
                       </>
                     )}
@@ -978,10 +985,11 @@ Type DELETE to confirm.`)) {
                 <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">How long to keep uploaded images before automatic cleanup</p>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    <label htmlFor="admin-field-8" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                       Guest (hours)
                     </label>
                     <input
+                      id="admin-field-8"
                       type="number"
                       min="1"
                       max="168"
@@ -991,10 +999,11 @@ Type DELETE to confirm.`)) {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    <label htmlFor="admin-field-9" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                       Users (days)
                     </label>
                     <input
+                      id="admin-field-9"
                       type="number"
                       min="1"
                       max="365"
@@ -1011,10 +1020,11 @@ Type DELETE to confirm.`)) {
                 <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">Processed results can be regenerated, so shorter retention periods</p>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    <label htmlFor="admin-field-10" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                       Guest (hours)
                     </label>
                     <input
+                      id="admin-field-10"
                       type="number"
                       min="1"
                       max="168"
@@ -1024,10 +1034,11 @@ Type DELETE to confirm.`)) {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    <label htmlFor="admin-field-11" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                       Users (hours)
                     </label>
                     <input
+                      id="admin-field-11"
                       type="number"
                       min="1"
                       max="168"
@@ -1046,7 +1057,7 @@ Type DELETE to confirm.`)) {
             <div className="space-y-6">
               <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
                 <div className="flex items-start space-x-3">
-                  <Shield className="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5" />
+                  <Shield aria-hidden="true" className="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5" />
                   <div>
                     <p className="font-medium text-red-800 dark:text-red-300 mb-1">Sensitive Data Area - PIN Protected</p>
                     <p className="text-sm text-red-700 dark:text-red-400">
@@ -1060,12 +1071,15 @@ Type DELETE to confirm.`)) {
               <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 border border-slate-300 dark:border-zinc-700">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50">View User Data</h3>
+                    <h3 id="admin-user-data-label" className="text-lg font-semibold text-slate-900 dark:text-slate-50">View User Data</h3>
                     <p className="text-sm text-slate-600 dark:text-slate-400">Show emails, sessions, and uploaded images</p>
                   </div>
                   <label className="relative inline-block w-12 h-6">
                     <input
                       type="checkbox"
+                      id="admin-user-data-toggle"
+                      role="switch"
+                      aria-labelledby="admin-user-data-label"
                       checked={showUserData}
                       onChange={handleToggleUserData}
                       className="sr-only peer"
@@ -1098,7 +1112,7 @@ Type DELETE to confirm.`)) {
               {showUserData && !loadingDetailedData && databaseData && (!databaseData.detailed_users || databaseData.detailed_users.length === 0) && (
                 <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 border border-slate-300 dark:border-zinc-700">
                   <div className="text-center py-12">
-                    <Database className="w-16 h-16 mx-auto mb-4 text-slate-400 dark:text-slate-600" />
+                    <Database aria-hidden="true" className="w-16 h-16 mx-auto mb-4 text-slate-400 dark:text-slate-600" />
                     <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-2">No User Data Available</h3>
                     <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
                       The database is empty. Create a user account to see data here.
@@ -1114,7 +1128,7 @@ Type DELETE to confirm.`)) {
               {showUserData && loadingDetailedData && (
                 <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 border border-slate-300 dark:border-zinc-700">
                   <div className="text-center py-12">
-                    <RefreshCw className="w-16 h-16 mx-auto mb-4 text-blue-600 dark:text-blue-400 animate-spin" />
+                    <RefreshCw aria-hidden="true" className="w-16 h-16 mx-auto mb-4 text-blue-600 dark:text-blue-400 animate-spin" />
                     <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-2">Loading Database Details...</h3>
                     <p className="text-sm text-slate-600 dark:text-slate-400">
                       Fetching user data from the database
@@ -1188,7 +1202,7 @@ Type DELETE to confirm.`)) {
                         onClick={backToUsersList}
                         className="p-2 hover:bg-slate-100 dark:hover:bg-zinc-700 rounded-lg text-slate-600 dark:text-slate-400 transition-colors"
                       >
-                        <LucideReact.ArrowLeft className="w-5 h-5" />
+                        <LucideReact.ArrowLeft aria-hidden="true" className="w-5 h-5" />
                       </button>
                       <div>
                         <h3 className="text-xl font-bold text-slate-900 dark:text-slate-50">{selectedUser.email}</h3>
@@ -1221,12 +1235,12 @@ Type DELETE to confirm.`)) {
                       >
                         {deletingUser ? (
                           <>
-                            <RefreshCw className="w-4 h-4 animate-spin" />
+                            <RefreshCw aria-hidden="true" className="w-4 h-4 animate-spin" />
                             <span>Deleting...</span>
                           </>
                         ) : (
                           <>
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 aria-hidden="true" className="w-4 h-4" />
                             <span>Delete User</span>
                           </>
                         )}
@@ -1244,7 +1258,7 @@ Type DELETE to confirm.`)) {
                           : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                       }`}
                     >
-                      <LucideReact.Image className="w-4 h-4 inline mr-2" />
+                      <LucideReact.Image aria-hidden="true" className="w-4 h-4 inline mr-2" />
                       Images ({selectedUser.image_count})
                     </button>
                     <button
@@ -1255,7 +1269,7 @@ Type DELETE to confirm.`)) {
                           : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                       }`}
                     >
-                      <LucideReact.Workflow className="w-4 h-4 inline mr-2" />
+                      <LucideReact.Workflow aria-hidden="true" className="w-4 h-4 inline mr-2" />
                       Pipelines ({selectedUser.pipeline_count})
                     </button>
                   </div>
@@ -1264,7 +1278,7 @@ Type DELETE to confirm.`)) {
                   {activeUserTab === 'images' && (
                     loadingUserImages ? (
                       <div className="text-center py-12">
-                        <RefreshCw className="w-12 h-12 mx-auto mb-4 text-blue-600 dark:text-blue-400 animate-spin" />
+                        <RefreshCw aria-hidden="true" className="w-12 h-12 mx-auto mb-4 text-blue-600 dark:text-blue-400 animate-spin" />
                         <p className="text-sm text-slate-600 dark:text-slate-400">Loading user images...</p>
                       </div>
                     ) : userImages.length > 0 ? (
@@ -1287,7 +1301,7 @@ Type DELETE to confirm.`)) {
                                     }}
                                   />
                                 ) : (
-                                  <LucideReact.Image className="w-12 h-12 text-slate-400 dark:text-slate-600" />
+                                  <LucideReact.Image aria-hidden="true" className="w-12 h-12 text-slate-400 dark:text-slate-600" />
                                 )}
                               </div>
                               <p className="text-xs text-slate-900 dark:text-slate-50 truncate font-medium mb-1" title={img.filename}>
@@ -1311,12 +1325,12 @@ Type DELETE to confirm.`)) {
                               >
                                 {deletingImage === img.id ? (
                                   <>
-                                    <RefreshCw className="w-3 h-3 animate-spin" />
+                                    <RefreshCw aria-hidden="true" className="w-3 h-3 animate-spin" />
                                     <span>Deleting...</span>
                                   </>
                                 ) : (
                                   <>
-                                    <Trash2 className="w-3 h-3" />
+                                    <Trash2 aria-hidden="true" className="w-3 h-3" />
                                     <span>Delete</span>
                                   </>
                                 )}
@@ -1327,7 +1341,7 @@ Type DELETE to confirm.`)) {
                       </div>
                     ) : (
                       <div className="text-center py-12">
-                        <LucideReact.Image className="w-16 h-16 mx-auto mb-4 text-slate-300 dark:text-slate-700" />
+                        <LucideReact.Image aria-hidden="true" className="w-16 h-16 mx-auto mb-4 text-slate-300 dark:text-slate-700" />
                         <p className="text-sm text-slate-600 dark:text-slate-400">This user hasn't uploaded any images yet</p>
                       </div>
                     )
@@ -1337,7 +1351,7 @@ Type DELETE to confirm.`)) {
                   {activeUserTab === 'pipelines' && (
                     loadingUserPipelines ? (
                       <div className="text-center py-12">
-                        <RefreshCw className="w-12 h-12 mx-auto mb-4 text-purple-600 dark:text-purple-400 animate-spin" />
+                        <RefreshCw aria-hidden="true" className="w-12 h-12 mx-auto mb-4 text-purple-600 dark:text-purple-400 animate-spin" />
                         <p className="text-sm text-slate-600 dark:text-slate-400">Loading user pipelines...</p>
                       </div>
                     ) : userPipelines.length > 0 ? (
@@ -1367,12 +1381,12 @@ Type DELETE to confirm.`)) {
                                 >
                                   {deletingPipeline === pipeline.id ? (
                                     <>
-                                      <RefreshCw className="w-3 h-3 animate-spin" />
+                                      <RefreshCw aria-hidden="true" className="w-3 h-3 animate-spin" />
                                       <span>Deleting...</span>
                                     </>
                                   ) : (
                                     <>
-                                      <Trash2 className="w-3 h-3" />
+                                      <Trash2 aria-hidden="true" className="w-3 h-3" />
                                       <span>Delete</span>
                                     </>
                                   )}
@@ -1384,7 +1398,7 @@ Type DELETE to confirm.`)) {
                       </div>
                     ) : (
                       <div className="text-center py-12">
-                        <LucideReact.Workflow className="w-16 h-16 mx-auto mb-4 text-slate-300 dark:text-slate-700" />
+                        <LucideReact.Workflow aria-hidden="true" className="w-16 h-16 mx-auto mb-4 text-slate-300 dark:text-slate-700" />
                         <p className="text-sm text-slate-600 dark:text-slate-400">This user hasn't saved any pipelines yet</p>
                       </div>
                     )
@@ -1416,12 +1430,12 @@ Type DELETE to confirm.`)) {
           <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-2xl max-w-md w-full p-6">
             <div className="text-center mb-6">
               <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Lock className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+                <Lock aria-hidden="true" className="w-8 h-8 text-purple-600 dark:text-purple-400" />
               </div>
               <h2 id="admin-pin-title" className="text-xl font-bold text-slate-900 dark:text-slate-50 mb-2">
                 {hasPinSet ? 'Enter Your Admin PIN' : 'Create Your Admin PIN'}
               </h2>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
+              <p id="admin-pin-help" className="text-sm text-slate-600 dark:text-slate-400">
                 {hasPinSet 
                   ? 'Enter the 4-6 digit PIN you created earlier to access sensitive user data'
                   : 'Create a 4-6 digit PIN to protect access to sensitive user data. You\'ll need this PIN every time you want to view the database.'}
@@ -1431,6 +1445,9 @@ Type DELETE to confirm.`)) {
             <input
               type="password"
               inputMode="numeric"
+              aria-labelledby="admin-pin-title"
+              aria-describedby="admin-pin-help"
+              autoComplete="off"
               maxLength={6}
               value={pin}
               onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}

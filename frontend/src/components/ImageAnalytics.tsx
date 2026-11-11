@@ -93,14 +93,16 @@ export const ImageAnalytics: React.FC<ImageAnalyticsProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-zinc-700 sticky top-0 bg-white dark:bg-zinc-900 z-10">
           <div className="flex items-center space-x-2">
-            <BarChart3 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <BarChart3 aria-hidden="true" className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">Image Analytics</h2>
           </div>
           <button
+            type="button"
             onClick={onClose}
+            aria-label="Close image analytics"
             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
           >
-            <X className="w-6 h-6" />
+            <X aria-hidden="true" className="w-6 h-6" />
           </button>
         </div>
 
@@ -219,7 +221,7 @@ export const ImageAnalytics: React.FC<ImageAnalyticsProps> = ({
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center space-x-2">
                     <span>Histograms</span>
                     <div className="group relative">
-                      <Info size={16} className="text-gray-400 cursor-help" />
+                      <Info aria-hidden="true" size={16} className="text-gray-400 cursor-help" />
                       <div className="hidden group-hover:block absolute left-0 top-full mt-1 w-64 p-2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs rounded shadow-lg z-10">
                         Histograms show the distribution of pixel values across different color channels.
                       </div>

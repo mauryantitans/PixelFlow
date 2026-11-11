@@ -78,14 +78,16 @@ export const SavePipelineModal: React.FC<SavePipelineModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center space-x-2">
-            <Save className="w-5 h-5 text-blue-600" />
+            <Save aria-hidden="true" className="w-5 h-5 text-blue-600" />
             <h2 className="text-xl font-bold text-gray-900">Save Pipeline</h2>
           </div>
           <button
+            type="button"
             onClick={onClose}
+            aria-label="Close save pipeline dialog"
             className="text-gray-400 hover:text-gray-600 transition-colors"
           >
-            <X className="w-6 h-6" />
+            <X aria-hidden="true" className="w-6 h-6" />
           </button>
         </div>
 

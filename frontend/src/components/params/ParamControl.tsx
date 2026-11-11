@@ -7,6 +7,10 @@ interface ParamControlProps {
   spec: ParamSpecDTO;
   value: any;
   stepId: string;
+  /** id for the primary input so the visible caption can label it */
+  controlId?: string;
+  /** human label of the owning step, used in accessible names */
+  stepLabel?: string;
   onChange: (value: any) => void;
 }
 
@@ -23,7 +27,7 @@ function summarize(type: string, value: any): string {
  * Renders the right input control for a single operation parameter, driven by
  * the param's declared `type` from the backend schema.
  */
-const ParamControl: React.FC<ParamControlProps> = ({ spec, value, stepId, onChange }) => {
+const ParamControl: React.FC<ParamControlProps> = ({ spec, value, stepId, controlId, stepLabel, onChange }) => {
   const { arm, isArmed } = usePicker();
   const armed = isArmed(stepId, spec.name);
 
@@ -39,6 +43,8 @@ const ParamControl: React.FC<ParamControlProps> = ({ spec, value, stepId, onChan
         <div className="flex items-center gap-2">
           <input
             type="range"
+            id={controlId}
+            aria-valuetext={String(value ?? spec.default ?? '')}
             min={spec.min}
             max={spec.max}
             step={step}
@@ -48,7 +54,7 @@ const ParamControl: React.FC<ParamControlProps> = ({ spec, value, stepId, onChan
             }
             className="param-slider flex-1"
           />
-          <span className="text-sm font-mono text-gray-600 dark:text-gray-300 w-12 text-right">
+          <span className="text-sm font-mono text-gray-600 dark:text-gray-300 w-12 text-right" aria-hidden="true">
             {String(value ?? spec.default ?? '')}
           </span>
         </div>
@@ -58,6 +64,7 @@ const ParamControl: React.FC<ParamControlProps> = ({ spec, value, stepId, onChan
     case 'enum':
       return (
         <select
+          id={controlId}
           value={String(value ?? spec.default ?? '')}
           onChange={(e) => onChange(e.target.value)}
           className="param-select"
@@ -89,6 +96,7 @@ const ParamControl: React.FC<ParamControlProps> = ({ spec, value, stepId, onChan
         <div className="flex items-center gap-2">
           <input
             type="color"
+            id={controlId}
             value={hex}
             onChange={(e) => onChange(e.target.value)}
             className="h-7 w-10 rounded border border-gray-300 dark:border-zinc-600 bg-transparent cursor-pointer"
@@ -103,8 +111,10 @@ const ParamControl: React.FC<ParamControlProps> = ({ spec, value, stepId, onChan
                 : 'border-gray-300 dark:border-zinc-600 text-gray-600 dark:text-gray-300'
             }`}
             title="Pick a color from the image"
+            aria-label={armed ? `Click image… to pick ${spec.label}` : `Eyedropper: pick ${spec.label} from the image`}
+            aria-pressed={armed}
           >
-            <LucideReact.Pipette className="w-3.5 h-3.5" />
+            <LucideReact.Pipette aria-hidden="true" className="w-3.5 h-3.5" />
             {armed ? 'Click image…' : 'Eyedropper'}
           </button>
         </div>
@@ -120,13 +130,16 @@ const ParamControl: React.FC<ParamControlProps> = ({ spec, value, stepId, onChan
           <button
             type="button"
             onClick={() => arm({ stepId, paramName: spec.name, type: spec.type })}
+            aria-labelledby={controlId ? `${controlId}-label ${controlId}-pick` : undefined}
+            id={controlId ? `${controlId}-pick` : undefined}
+            aria-pressed={armed}
             className={`flex items-center gap-1 text-xs px-2 py-1 rounded border ${
               armed
                 ? 'border-blue-500 text-blue-600 dark:text-blue-400 animate-pulse'
                 : 'border-gray-300 dark:border-zinc-600 text-gray-600 dark:text-gray-300'
             }`}
           >
-            <LucideReact.Crosshair className="w-3.5 h-3.5" />
+            <LucideReact.Crosshair aria-hidden="true" className="w-3.5 h-3.5" />
             {armed
               ? spec.type === 'rect'
                 ? 'Drag on image…'
@@ -144,8 +157,9 @@ const ParamControl: React.FC<ParamControlProps> = ({ spec, value, stepId, onChan
               onClick={() => onChange(null)}
               className="text-gray-400 hover:text-red-500"
               title="Clear"
+              aria-label={`Clear ${spec.label}${stepLabel ? ` for ${stepLabel}` : ''}`}
             >
-              <LucideReact.X className="w-3.5 h-3.5" />
+              <LucideReact.X aria-hidden="true" className="w-3.5 h-3.5" />
             </button>
           )}
         </div>

@@ -68,7 +68,7 @@ const DiffView: React.FC<DiffViewProps> = ({ aSrc, bSrc }) => {
   if (error) {
     return <div className="text-sm text-gray-500 dark:text-gray-400">{error}</div>;
   }
-  return <canvas ref={canvasRef} className="max-w-full max-h-full object-contain rounded-lg shadow-lg bg-black" />;
+  return <canvas ref={canvasRef} role="img" aria-label="Difference heatmap: brighter red means a bigger change between image A and image B" className="max-w-full max-h-full object-contain rounded-lg shadow-lg bg-black" />;
 };
 
 export default DiffView;

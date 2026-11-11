@@ -25,16 +25,18 @@ const MethodDetailsModal: React.FC<MethodDetailsModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-zinc-700">
           <div className="flex items-center gap-2">
-            <LucideReact.Info className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <LucideReact.Info aria-hidden="true" className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             <h2 className="text-xl font-bold text-zinc-900 dark:text-white">
               {operationName}
             </h2>
           </div>
           <button
+            type="button"
             onClick={onClose}
+            aria-label="Close method details"
             className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-500 dark:text-gray-400"
           >
-            <LucideReact.X className="w-5 h-5" />
+            <LucideReact.X aria-hidden="true" className="w-5 h-5" />
           </button>
         </div>
 
@@ -118,7 +120,7 @@ const MethodDetailsModal: React.FC<MethodDetailsModalProps> = ({
             <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-3">Technical Information</h3>
             <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
               <div className="flex items-start gap-3">
-                <LucideReact.Lightbulb className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                <LucideReact.Lightbulb aria-hidden="true" className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
                 <div className="space-y-2 text-sm">
                   {getAdditionalInfo(operationName)}
                 </div>
@@ -131,7 +133,7 @@ const MethodDetailsModal: React.FC<MethodDetailsModalProps> = ({
             <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-3">Usage Tips</h3>
             <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4 border border-yellow-200 dark:border-yellow-800">
               <div className="flex items-start gap-3">
-                <LucideReact.Zap className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
+                <LucideReact.Zap aria-hidden="true" className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
                 <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
                   {getUsageTips(operationName)}
                 </div>

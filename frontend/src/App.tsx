@@ -500,25 +500,30 @@ const App: React.FC = () => {
           )}
           <button
             onClick={toggleSidebar}
+            aria-label={ui.sidebarCollapsed ? 'Expand operations panel' : 'Collapse operations panel'}
+            aria-expanded={!ui.sidebarCollapsed}
+            aria-controls="operations-panel"
+            title={ui.sidebarCollapsed ? 'Expand operations panel' : 'Collapse operations panel'}
             className="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-zinc-800 text-slate-600 dark:text-slate-300"
           >
-            <LucideReact.PanelLeftClose className="w-5 h-5" />
+            <LucideReact.PanelLeftClose aria-hidden="true" className="w-5 h-5" />
           </button>
         </div>
         
         {!ui.sidebarCollapsed && (
-          <div className="flex-grow flex flex-col min-h-0">
+          <div id="operations-panel" className="flex-grow flex flex-col min-h-0">
             {/* Search Bar */}
             <div className="relative mb-4">
+              <label htmlFor="operationSearch" className="sr-only">Search operations</label>
               <input
-                type="text"
+                type="search"
                 id="operationSearch"
                 placeholder="Search operations... (Ctrl+K)"
                 value={operationSearch}
                 onChange={(e) => setOperationSearch(e.target.value)}
                 className="input-field pr-10"
               />
-              <LucideReact.Search className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <LucideReact.Search aria-hidden="true" className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
             </div>
             
             {/* Enhanced Operations List */}
@@ -527,12 +532,12 @@ const App: React.FC = () => {
                 <div className="p-3 text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
                   {opsLoading ? (
                     <>
-                      <LucideReact.Loader2 className="w-4 h-4 animate-spin" />
+                      <LucideReact.Loader2 aria-hidden="true" className="w-4 h-4 animate-spin" />
                       Loading operations…
                     </>
                   ) : (
                     <>
-                      <LucideReact.AlertTriangle className="w-4 h-4 text-red-500" />
+                      <LucideReact.AlertTriangle aria-hidden="true" className="w-4 h-4 text-red-500" />
                       Couldn't load operations: {opsError}
                     </>
                   )}
@@ -547,13 +552,13 @@ const App: React.FC = () => {
                   <details open={libraryIndex < 1} className="operation-group">
                     <summary className="library-header">
                       <div className="flex items-center">
-                        {libraryName === 'OpenCV' && <LucideReact.Camera className="library-icon" />}
-                        {libraryName === 'Scikit-Image' && <LucideReact.Microscope className="library-icon" />}
-                        {libraryName === 'Basic Operations' && <LucideReact.Sliders className="library-icon" />}
-                        {libraryName === 'Search Results' && <LucideReact.Search className="library-icon" />}
+                        {libraryName === 'OpenCV' && <LucideReact.Camera aria-hidden="true" className="library-icon" />}
+                        {libraryName === 'Scikit-Image' && <LucideReact.Microscope aria-hidden="true" className="library-icon" />}
+                        {libraryName === 'Basic Operations' && <LucideReact.Sliders aria-hidden="true" className="library-icon" />}
+                        {libraryName === 'Search Results' && <LucideReact.Search aria-hidden="true" className="library-icon" />}
                         {libraryName}
                       </div>
-                      <LucideReact.ChevronDown className="chevron-icon" />
+                      <LucideReact.ChevronDown aria-hidden="true" className="chevron-icon" />
                     </summary>
                     
                     <div className="space-y-2 mt-2">
@@ -562,20 +567,20 @@ const App: React.FC = () => {
                           <details open={categoryIndex < 2} className="operation-group">
                             <summary className="category-header">
                               <div className="flex items-center">
-                                {categoryName === 'Adjustments' && <LucideReact.SlidersHorizontal className="w-3 h-3 mr-1" />}
-                                {categoryName === 'Filters' && <LucideReact.Filter className="w-3 h-3 mr-1" />}
-                                {categoryName === 'Blur & Sharpen' && <LucideReact.Focus className="w-3 h-3 mr-1" />}
-                                {categoryName === 'Effects' && <LucideReact.Sparkles className="w-3 h-3 mr-1" />}
-                                {categoryName === 'Filtering' && <LucideReact.Grid className="w-3 h-3 mr-1" />}
-                                {categoryName === 'Edge Detection' && <LucideReact.Scan className="w-3 h-3 mr-1" />}
-                                {categoryName === 'Enhancement' && <LucideReact.Sun className="w-3 h-3 mr-1" />}
-                                {categoryName === 'Restoration' && <LucideReact.Wrench className="w-3 h-3 mr-1" />}
-                                {categoryName === 'Found Operations' && <LucideReact.Search className="w-3 h-3 mr-1" />}
+                                {categoryName === 'Adjustments' && <LucideReact.SlidersHorizontal aria-hidden="true" className="w-3 h-3 mr-1" />}
+                                {categoryName === 'Filters' && <LucideReact.Filter aria-hidden="true" className="w-3 h-3 mr-1" />}
+                                {categoryName === 'Blur & Sharpen' && <LucideReact.Focus aria-hidden="true" className="w-3 h-3 mr-1" />}
+                                {categoryName === 'Effects' && <LucideReact.Sparkles aria-hidden="true" className="w-3 h-3 mr-1" />}
+                                {categoryName === 'Filtering' && <LucideReact.Grid aria-hidden="true" className="w-3 h-3 mr-1" />}
+                                {categoryName === 'Edge Detection' && <LucideReact.Scan aria-hidden="true" className="w-3 h-3 mr-1" />}
+                                {categoryName === 'Enhancement' && <LucideReact.Sun aria-hidden="true" className="w-3 h-3 mr-1" />}
+                                {categoryName === 'Restoration' && <LucideReact.Wrench aria-hidden="true" className="w-3 h-3 mr-1" />}
+                                {categoryName === 'Found Operations' && <LucideReact.Search aria-hidden="true" className="w-3 h-3 mr-1" />}
                                 {!['Adjustments', 'Filters', 'Blur & Sharpen', 'Effects', 'Filtering', 'Edge Detection', 'Enhancement', 'Restoration', 'Found Operations'].includes(categoryName) && 
-                                <LucideReact.Folder className="w-3 h-3 mr-1" />}
+                                <LucideReact.Folder aria-hidden="true" className="w-3 h-3 mr-1" />}
                                 <span className="text-slate-700 dark:text-slate-300">{categoryName}</span>
                               </div>
-                              <LucideReact.ChevronDown className="w-3 h-3 chevron-icon" />
+                              <LucideReact.ChevronDown aria-hidden="true" className="w-3 h-3 chevron-icon" />
                             </summary>
                             
                             <div className="grid grid-cols-2 gap-1.5 mt-2">
@@ -585,12 +590,20 @@ const App: React.FC = () => {
                               ).map((op: string) => (
                                 <button
                                   key={op}
+                                  type="button"
+                                  data-op={op}
                                   onClick={() => handleAddOperation(op)}
+                                  aria-label={`Add ${op}`}
+                                  aria-describedby={getOp(op)?.description ? `op-desc-${op.replace(/[^a-zA-Z0-9]/g, '-')}` : undefined}
                                   className="operation-btn-enhanced group"
                                 >
                                   {op}
                                   {getOp(op)?.description && (
-                                    <div className="operation-tooltip">
+                                    <div
+                                      id={`op-desc-${op.replace(/[^a-zA-Z0-9]/g, '-')}`}
+                                      aria-hidden="true"
+                                      className="operation-tooltip"
+                                    >
                                       {getOp(op)?.description}
                                     </div>
                                   )}
@@ -642,7 +655,7 @@ const App: React.FC = () => {
             >
               {batchLoading ? (
                 <>
-                  <div className="relative w-5 h-5 flex items-center justify-center">
+                  <div className="relative w-5 h-5 flex items-center justify-center" aria-hidden="true">
                     {/* Outer static circle */}
                     <div className="absolute inset-0 border-2 border-black/40 rounded-full"></div>
                     {/* Rotating circle - animated spinner */}
@@ -662,11 +675,11 @@ const App: React.FC = () => {
           <div className="flex-1 text-center px-4">
             {status.text && (
               <span className={`text-sm flex items-center justify-center gap-2 transition-colors duration-200 font-medium ${getStatusTextColor(status.type)}`}>
-                {status.type === 'processing' && <LucideReact.Loader2 className="w-4 h-4 animate-spin" />}
-                {status.type === 'success' && <LucideReact.CheckCircle className="w-4 h-4" />}
-                {status.type === 'error' && <LucideReact.AlertTriangle className="w-4 h-4" />}
-                {status.type === 'warning' && <LucideReact.AlertCircle className="w-4 h-4" />}
-                {status.type === 'info' && status.text.includes('Live mode') && <LucideReact.Zap className="w-4 h-4" />}
+                {status.type === 'processing' && <LucideReact.Loader2 aria-hidden="true" className="w-4 h-4 animate-spin" />}
+                {status.type === 'success' && <LucideReact.CheckCircle aria-hidden="true" className="w-4 h-4" />}
+                {status.type === 'error' && <LucideReact.AlertTriangle aria-hidden="true" className="w-4 h-4" />}
+                {status.type === 'warning' && <LucideReact.AlertCircle aria-hidden="true" className="w-4 h-4" />}
+                {status.type === 'info' && status.text.includes('Live mode') && <LucideReact.Zap aria-hidden="true" className="w-4 h-4" />}
                 {status.text}
               </span>
             )}
@@ -675,19 +688,22 @@ const App: React.FC = () => {
           <div className="flex items-center gap-4">
             {/* Live Processing Toggle - FIXED */}
             <div className="flex items-center gap-3">
-              <span className="text-sm font-medium text-slate-900 dark:text-slate-50">Live Processing</span>
+              <label htmlFor="live-toggle" className="text-sm font-medium text-slate-900 dark:text-slate-50">Live Processing</label>
               <div className="relative inline-block w-10 align-middle select-none">
                 <input
                   type="checkbox"
+                  id="live-toggle"
+                  role="switch"
+                  aria-describedby={selectedCount !== 1 ? 'live-toggle-hint' : undefined}
                   checked={liveProcessingEnabled}
                   onChange={(e) => handleLiveToggle(e.target.checked)}
                   disabled={selectedCount !== 1}
                   className="toggle-checkbox"
                 />
-                <label className="toggle-label"></label>
+                <label htmlFor="live-toggle" className="toggle-label" aria-hidden="true"></label>
               </div>
               {selectedCount !== 1 && (
-                <span className="text-xs text-slate-500 dark:text-slate-400">
+                <span id="live-toggle-hint" className="text-xs text-slate-500 dark:text-slate-400">
                   (Select 1 image)
                 </span>
               )}
@@ -707,7 +723,7 @@ const App: React.FC = () => {
                 {/* Timing Display */}
                 {((liveProcessingEnabled && liveTimingData.total_time > 0) || (!liveProcessingEnabled && batchTimingData.total_time > 0)) && (
                   <div className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
-                    <LucideReact.Clock className="w-3 h-3" />
+                    <LucideReact.Clock aria-hidden="true" className="w-3 h-3" />
                     {liveProcessingEnabled 
                       ? `${(liveTimingData.total_time * 1000).toFixed(0)}ms`
                       : `${(batchTimingData.total_time).toFixed(2)}s total`
@@ -723,7 +739,7 @@ const App: React.FC = () => {
               className="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 transition-colors flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
               title="Undo (Ctrl+Z)"
               >
-              <LucideReact.Undo2 className="w-3 h-3" />
+              <LucideReact.Undo2 aria-hidden="true" className="w-3 h-3" />
               Undo
               </button>
               <button
@@ -732,7 +748,7 @@ const App: React.FC = () => {
               className="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 transition-colors flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
               title="Redo (Ctrl+Y)"
               >
-              <LucideReact.Redo2 className="w-3 h-3" />
+              <LucideReact.Redo2 aria-hidden="true" className="w-3 h-3" />
               Redo
               </button>
               <div className="w-px h-4 bg-slate-300 dark:bg-zinc-700"></div>
@@ -740,7 +756,7 @@ const App: React.FC = () => {
               onClick={resetPipeline}
               className="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-50 transition-colors flex items-center gap-1"
               >
-              <LucideReact.RotateCcw className="w-3 h-3" />
+              <LucideReact.RotateCcw aria-hidden="true" className="w-3 h-3" />
               Reset
               </button>
               </div>
@@ -883,6 +899,8 @@ const App: React.FC = () => {
             {/* Zoom Controls */}
             <div className="absolute bottom-4 right-4 bg-gray-900/50 backdrop-blur-sm rounded-lg text-white flex items-center text-xs">
               <button 
+                type="button"
+                aria-label="Zoom out"
                 className="p-3 hover:bg-white/20 rounded-l-lg"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -898,10 +916,12 @@ const App: React.FC = () => {
                   }
                 }}
               >
-                <LucideReact.ZoomOut className="w-4 h-4" />
+                <LucideReact.ZoomOut aria-hidden="true" className="w-4 h-4" />
               </button>
-              <span className="px-3 font-mono">Zoom</span>
+              <span className="px-3 font-mono" aria-hidden="true">Zoom</span>
               <button 
+                type="button"
+                aria-label="Zoom in"
                 className="p-3 hover:bg-white/20 rounded-r-lg"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -918,15 +938,17 @@ const App: React.FC = () => {
                   }
                 }}
               >
-                <LucideReact.ZoomIn className="w-4 h-4" />
+                <LucideReact.ZoomIn aria-hidden="true" className="w-4 h-4" />
               </button>
             </div>
             
             <button
+              type="button"
               onClick={closeLightbox}
+              aria-label="Close image viewer"
               className="absolute top-4 right-4 p-2 bg-black/50 text-white rounded-full hover:bg-black/70"
             >
-              <LucideReact.X className="w-6 h-6" />
+              <LucideReact.X aria-hidden="true" className="w-6 h-6" />
             </button>
           </div>
         </div>
@@ -947,7 +969,7 @@ const App: React.FC = () => {
             <div className="flex items-start space-x-4">
               <div className="flex-shrink-0">
                 <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
-                  <LucideReact.AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
+                  <LucideReact.AlertTriangle aria-hidden="true" className="w-6 h-6 text-red-600 dark:text-red-400" />
                 </div>
               </div>
               <div className="flex-1">

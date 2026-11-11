@@ -85,7 +85,7 @@ export const Header: React.FC = () => {
             >
               <img 
                 src="/PixelFlow_Icon.png" 
-                alt="PixelFlow" 
+                alt="" 
                 className="w-10 h-10 rounded-lg"
               />
               <div className="flex flex-col">
@@ -105,7 +105,7 @@ export const Header: React.FC = () => {
                     : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-zinc-800'
                 }`}
               >
-                <Home size={16} />
+                <Home aria-hidden="true" size={16} />
                 <span>Home</span>
               </Link>
 
@@ -118,7 +118,7 @@ export const Header: React.FC = () => {
                     : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-zinc-800'
                 }`}
               >
-                <Zap size={16} />
+                <Zap aria-hidden="true" size={16} />
                 <span>App</span>
               </Link>
 
@@ -128,7 +128,7 @@ export const Header: React.FC = () => {
                 rel="noopener noreferrer"
                 className="flex items-center space-x-1.5 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-md transition-colors"
               >
-                <BookOpen size={16} />
+                <BookOpen aria-hidden="true" size={16} />
                 <span>Docs</span>
               </a>
 
@@ -138,7 +138,7 @@ export const Header: React.FC = () => {
                 rel="noopener noreferrer"
                 className="flex items-center space-x-1.5 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-md transition-colors"
               >
-                <Github size={16} />
+                <Github aria-hidden="true" size={16} />
                 <span>Source</span>
               </a>
             </nav>
@@ -161,8 +161,9 @@ export const Header: React.FC = () => {
               onClick={toggleTheme}
               className="p-2 rounded-md hover:bg-slate-100 dark:hover:bg-zinc-800 text-slate-600 dark:text-slate-300 transition-colors"
               title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
             >
-              {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              {theme === 'dark' ? <Sun aria-hidden="true" className="w-5 h-5" /> : <Moon aria-hidden="true" className="w-5 h-5" />}
             </button>
 
             {/* Vertical Divider */}
@@ -178,7 +179,7 @@ export const Header: React.FC = () => {
                   className="flex items-center space-x-1.5 px-3 py-1.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-md transition-colors"
                   title="Load Pipeline"
                 >
-                  <FolderOpen size={16} />
+                  <FolderOpen aria-hidden="true" size={16} />
                   <span className="hidden sm:inline">Load</span>
                 </button>
 
@@ -187,7 +188,7 @@ export const Header: React.FC = () => {
                   className="flex items-center space-x-1.5 px-3 py-1.5 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors shadow-sm"
                   title="Save Pipeline"
                 >
-                  <Save size={16} />
+                  <Save aria-hidden="true" size={16} />
                   <span className="hidden sm:inline">Save</span>
                 </button>
               </>
@@ -198,17 +199,19 @@ export const Header: React.FC = () => {
                 {/* User Menu */}
                 <div className="relative">
                   <button
+                    type="button"
                     onClick={() => setShowMenu(!showMenu)}
+                    aria-label={`Account menu for ${user.username}`}
                     className="flex items-center space-x-2 px-3 py-1.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-md transition-colors"
                   >
                     {user.profile_picture ? (
                       <img 
                         src={user.profile_picture} 
-                        alt={user.username}
+                        alt=""
                         className="w-7 h-7 rounded-full object-cover"
                       />
                     ) : (
-                      <div className="w-7 h-7 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
+                      <div aria-hidden="true" className="w-7 h-7 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
                         <span className="text-white text-xs font-semibold">
                           {user.username.charAt(0).toUpperCase()}
                         </span>
@@ -249,7 +252,7 @@ export const Header: React.FC = () => {
                               }}
                               className="w-full flex items-center space-x-2 px-4 py-2 text-sm text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors"
                             >
-                              <Settings size={16} />
+                              <Settings aria-hidden="true" size={16} />
                               <span>Admin Tools</span>
                             </button>
                             <div className="border-t border-slate-300 dark:border-zinc-700 my-1"></div>
@@ -264,7 +267,7 @@ export const Header: React.FC = () => {
                           }}
                           className="w-full flex items-center space-x-2 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                         >
-                          <LogOut size={16} />
+                          <LogOut aria-hidden="true" size={16} />
                           <span>Logout</span>
                         </button>
                       </div>
@@ -278,7 +281,7 @@ export const Header: React.FC = () => {
                 {isOnApp && (
                   <div className="flex items-center space-x-2 px-3 py-1.5 bg-blue-50 dark:bg-blue-900/20 rounded-md border border-blue-200 dark:border-blue-800">
                     <span className="text-xs text-blue-700 dark:text-blue-400 font-medium">
-                      👋 Guest Mode
+                      <span aria-hidden="true">👋 </span>Guest Mode
                     </span>
                   </div>
                 )}
@@ -286,7 +289,7 @@ export const Header: React.FC = () => {
                   onClick={() => navigate('/auth')}
                   className="flex items-center space-x-1.5 px-4 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors shadow-sm"
                 >
-                  <LogIn size={16} />
+                  <LogIn aria-hidden="true" size={16} />
                   <span>Sign In</span>
                 </button>
               </>

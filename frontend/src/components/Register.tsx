@@ -68,7 +68,7 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
           <div className="flex justify-center mb-4">
             <img 
               src="/PixelFlow_Icon.png" 
-              alt="PixelFlow" 
+              alt="" 
               className="w-16 h-16 rounded-lg"
             />
           </div>
@@ -90,6 +90,7 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
             </label>
             <input
               id="email"
+              autoComplete="email"
               name="email"
               type="email"
               required
@@ -107,6 +108,7 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
             </label>
             <input
               id="username"
+              autoComplete="username"
               name="username"
               type="text"
               required
@@ -124,6 +126,7 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
             </label>
             <input
               id="full_name"
+              autoComplete="name"
               name="full_name"
               type="text"
               value={formData.full_name}
@@ -140,6 +143,7 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
             </label>
             <input
               id="password"
+              autoComplete="new-password"
               name="password"
               type="password"
               required
@@ -158,6 +162,7 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
             </label>
             <input
               id="confirmPassword"
+              autoComplete="new-password"
               name="confirmPassword"
               type="password"
               required

@@ -138,8 +138,8 @@ const Inspector: React.FC<InspectorProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-zinc-700">
           <div className="flex items-center gap-2">
-            <button onClick={onBack} className="btn-sm" title="Back to results grid">
-              <LucideReact.ArrowLeft className="w-5 h-5" />
+            <button type="button" onClick={onBack} className="btn-sm" title="Back to results grid" aria-label="Back to results grid">
+              <LucideReact.ArrowLeft aria-hidden="true" className="w-5 h-5" />
             </button>
             <h2 className="text-lg font-bold text-zinc-900 dark:text-white">Inspector</h2>
           </div>
@@ -152,11 +152,12 @@ const Inspector: React.FC<InspectorProps> = ({
                 disabled={currentStepIndex <= -1}
                 className="p-1 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                 title="Previous step"
+                aria-label="Previous step"
               >
-                <LucideReact.ChevronLeft className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                <LucideReact.ChevronLeft aria-hidden="true" className="w-5 h-5 text-gray-700 dark:text-gray-300" />
               </button>
               
-              <span className="text-sm font-semibold text-gray-900 dark:text-white min-w-[120px] text-center">
+              <span className="text-sm font-semibold text-gray-900 dark:text-white min-w-[120px] text-center" aria-live="polite">
                 {getStepLabel()}
               </span>
               
@@ -165,8 +166,9 @@ const Inspector: React.FC<InspectorProps> = ({
                 disabled={currentStepIndex >= maxStepIndex}
                 className="p-1 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                 title="Next step"
+                aria-label="Next step"
               >
-                <LucideReact.ChevronRight className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                <LucideReact.ChevronRight aria-hidden="true" className="w-5 h-5 text-gray-700 dark:text-gray-300" />
               </button>
             </div>
           )}
@@ -177,29 +179,37 @@ const Inspector: React.FC<InspectorProps> = ({
               onClick={() => onViewChange('normal')}
               className={`btn-sm ${view === 'normal' ? 'active' : ''}`}
               title="Normal View"
+              aria-label="Normal View"
+              aria-pressed={view === 'normal'}
             >
-              <LucideReact.Image className="w-5 h-5" />
+              <LucideReact.Image aria-hidden="true" className="w-5 h-5" />
             </button>
             <button
               onClick={() => onViewChange('side-by-side')}
               className={`btn-sm ${view === 'side-by-side' ? 'active' : ''}`}
               title="Side-by-side View"
+              aria-label="Side-by-side View"
+              aria-pressed={view === 'side-by-side'}
             >
-              <LucideReact.Columns className="w-5 h-5" />
+              <LucideReact.Columns aria-hidden="true" className="w-5 h-5" />
             </button>
             <button
               onClick={() => onViewChange('slider')}
               className={`btn-sm ${view === 'slider' ? 'active' : ''}`}
               title="Before/After slider"
+              aria-label="Before/After slider"
+              aria-pressed={view === 'slider'}
             >
-              <LucideReact.SlidersHorizontal className="w-5 h-5" />
+              <LucideReact.SlidersHorizontal aria-hidden="true" className="w-5 h-5" />
             </button>
             <button
               onClick={() => onViewChange('diff')}
               className={`btn-sm ${view === 'diff' ? 'active' : ''}`}
               title="Difference / overlay"
+              aria-label="Difference / overlay"
+              aria-pressed={view === 'diff'}
             >
-              <LucideReact.Layers className="w-5 h-5" />
+              <LucideReact.Layers aria-hidden="true" className="w-5 h-5" />
             </button>
 
             <div className="w-px h-6 bg-gray-300 dark:bg-zinc-700"></div>
@@ -209,8 +219,9 @@ const Inspector: React.FC<InspectorProps> = ({
               onClick={handleShowAnalytics} 
               className="btn-sm" 
               title="View Analytics"
+              aria-label="View Analytics"
             >
-              <LucideReact.BarChart3 className="w-5 h-5" />
+              <LucideReact.BarChart3 aria-hidden="true" className="w-5 h-5" />
             </button>
 
             {hasIntermediates && (
@@ -218,8 +229,9 @@ const Inspector: React.FC<InspectorProps> = ({
                 onClick={handleDownloadAllSteps} 
                 className="btn-sm" 
                 title="Download All Steps"
+                aria-label="Download All Steps"
               >
-                <LucideReact.FolderDown className="w-5 h-5" />
+                <LucideReact.FolderDown aria-hidden="true" className="w-5 h-5" />
               </button>
             )}
             
@@ -227,8 +239,9 @@ const Inspector: React.FC<InspectorProps> = ({
               onClick={handleDownload} 
               className="btn-sm" 
               title={`Download ${getStepLabel()}`}
+              aria-label={`Download ${getStepLabel()}`}
             >
-              <LucideReact.Download className="w-5 h-5" />
+              <LucideReact.Download aria-hidden="true" className="w-5 h-5" />
             </button>
           </div>
         </div>
@@ -239,7 +252,7 @@ const Inspector: React.FC<InspectorProps> = ({
           {view !== 'normal' && (
             <div className="flex items-center justify-center gap-4 mb-3 text-sm">
               <label className="flex items-center gap-1 text-gray-700 dark:text-gray-300">
-                A:
+                A:<span className="sr-only"> first image to compare</span>
                 <select
                   value={stageA}
                   onChange={(e) => setStageA(Number(e.target.value))}
@@ -251,7 +264,7 @@ const Inspector: React.FC<InspectorProps> = ({
                 </select>
               </label>
               <label className="flex items-center gap-1 text-gray-700 dark:text-gray-300">
-                B:
+                B:<span className="sr-only"> second image to compare</span>
                 <select
                   value={stageB}
                   onChange={(e) => setStageB(Number(e.target.value))}

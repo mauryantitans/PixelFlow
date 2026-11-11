@@ -101,15 +101,15 @@ const GalleryModal: React.FC<GalleryModalProps> = ({
                 onClick={onDeleteSelected}
                 className="btn-sm bg-red-600 hover:bg-red-700 text-white flex items-center gap-1"
               >
-                <LucideReact.Trash2 className="w-4 h-4" />
+                <LucideReact.Trash2 aria-hidden="true" className="w-4 h-4" />
                 Delete Selected ({selectedCount})
               </button>
             )}
             <div className="text-sm text-gray-600 dark:text-gray-400 px-2">
               {selectedCount} selected
             </div>
-            <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700">
-              <LucideReact.X className="w-6 h-6 text-zinc-800 dark:text-white" />
+            <button type="button" onClick={onClose} aria-label="Close gallery" className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700">
+              <LucideReact.X aria-hidden="true" className="w-6 h-6 text-zinc-800 dark:text-white" />
             </button>
           </div>
         </div>
@@ -119,7 +119,7 @@ const GalleryModal: React.FC<GalleryModalProps> = ({
           {images.length === 0 ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center text-gray-400 dark:text-gray-500">
-                <LucideReact.Image className="w-16 h-16 mx-auto mb-4" />
+                <LucideReact.Image aria-hidden="true" className="w-16 h-16 mx-auto mb-4" />
                 <p className="font-semibold text-lg mb-2">No images uploaded</p>
                 <p className="text-sm">Upload some images to get started</p>
               </div>
@@ -159,8 +159,9 @@ const GalleryModal: React.FC<GalleryModalProps> = ({
                             }}
                             className="p-1 bg-blue-600/90 text-white rounded hover:bg-blue-700 shadow-lg backdrop-blur-sm"
                             title="View full size"
+                            aria-label={`View full size: ${image.filename}`}
                         >
-                            <LucideReact.ZoomIn className="w-3 h-3" />
+                            <LucideReact.ZoomIn aria-hidden="true" className="w-3 h-3" />
                         </button>
                         <button
                             onClick={(e) => {
@@ -169,8 +170,9 @@ const GalleryModal: React.FC<GalleryModalProps> = ({
                             }}
                             className="p-1 bg-red-600/90 text-white rounded hover:bg-red-700 shadow-lg backdrop-blur-sm"
                             title="Delete image"
+                            aria-label={`Delete image: ${image.filename}`}
                         >
-                            <LucideReact.Trash2 className="w-3 h-3" />
+                            <LucideReact.Trash2 aria-hidden="true" className="w-3 h-3" />
                         </button>
                         </div>
 
@@ -183,7 +185,7 @@ const GalleryModal: React.FC<GalleryModalProps> = ({
                         <div className={`absolute top-1 right-1 bg-blue-600 rounded-full p-1 transition-opacity z-10 ${
                         image.selected ? 'opacity-100' : 'opacity-0'
                         }`}>
-                        <LucideReact.Check className="w-3 h-3 text-white" />
+                        <LucideReact.Check aria-hidden="true" className="w-3 h-3 text-white" />
                         </div>
                     </div>
 

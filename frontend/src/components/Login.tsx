@@ -40,7 +40,7 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
           <div className="flex justify-center mb-4">
             <img 
               src="/PixelFlow_Icon.png" 
-              alt="PixelFlow" 
+              alt="" 
               className="w-16 h-16 rounded-lg"
             />
           </div>
@@ -62,6 +62,7 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
             </label>
             <input
               id="email"
+              autoComplete="email"
               type="email"
               required
               value={email}
@@ -78,6 +79,7 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
             </label>
             <input
               id="password"
+              autoComplete="current-password"
               type="password"
               required
               value={password}

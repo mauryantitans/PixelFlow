@@ -104,7 +104,7 @@ const ResultsGridComponent: React.FC<ResultsGridProps> = ({
     return (
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center text-gray-400 dark:text-gray-500">
-          <LucideReact.Image className="w-16 h-16 mx-auto mb-4" />
+          <LucideReact.Image aria-hidden="true" className="w-16 h-16 mx-auto mb-4" />
           <p className="font-semibold text-lg mb-2">Processing...</p>
           <p className="text-sm">Results will appear when ready</p>
         </div>
@@ -116,7 +116,7 @@ const ResultsGridComponent: React.FC<ResultsGridProps> = ({
     return (
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center text-gray-400 dark:text-gray-500">
-          <LucideReact.Image className="w-16 h-16 mx-auto mb-4" />
+          <LucideReact.Image aria-hidden="true" className="w-16 h-16 mx-auto mb-4" />
           <p className="font-semibold text-lg mb-2">Processed results will appear here</p>
           <p className="text-sm">Apply a pipeline to your selected images</p>
         </div>
@@ -138,7 +138,7 @@ const ResultsGridComponent: React.FC<ResultsGridProps> = ({
               className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
               title="Reset results"
             >
-              <LucideReact.RotateCcw className="w-4 h-4" />
+              <LucideReact.RotateCcw aria-hidden="true" className="w-4 h-4" />
               <span>Reset</span>
             </button>
             
@@ -149,12 +149,12 @@ const ResultsGridComponent: React.FC<ResultsGridProps> = ({
             >
               {downloading ? (
                 <>
-                  <LucideReact.Loader2 className="w-4 h-4 animate-spin" />
+                  <LucideReact.Loader2 aria-hidden="true" className="w-4 h-4 animate-spin" />
                   <span>Creating ZIP...</span>
                 </>
               ) : (
                 <>
-                  <LucideReact.Download className="w-4 h-4" />
+                  <LucideReact.Download aria-hidden="true" className="w-4 h-4" />
                   <span>Download All</span>
                 </>
               )}
@@ -190,16 +190,18 @@ const ResultsGridComponent: React.FC<ResultsGridProps> = ({
                     onClick={(e) => handleDownloadSingle(result, index, e)}
                     className="p-2 bg-white/90 dark:bg-zinc-800/90 rounded-full hover:bg-white dark:hover:bg-zinc-700 transition-colors"
                     title="Download"
+                    aria-label={`Download result ${index + 1}`}
                   >
-                    <LucideReact.Download className="w-4 h-4 text-gray-900 dark:text-white" />
+                    <LucideReact.Download aria-hidden="true" className="w-4 h-4 text-gray-900 dark:text-white" />
                   </button>
                   
                   <button
                     onClick={(e) => handleShowAnalytics(result, index, e)}
                     className="p-2 bg-white/90 dark:bg-zinc-800/90 rounded-full hover:bg-white dark:hover:bg-zinc-700 transition-colors"
                     title="Analytics"
+                    aria-label={`Analytics for result ${index + 1}`}
                   >
-                    <LucideReact.BarChart3 className="w-4 h-4 text-gray-900 dark:text-white" />
+                    <LucideReact.BarChart3 aria-hidden="true" className="w-4 h-4 text-gray-900 dark:text-white" />
                   </button>
                   
                   <button
@@ -209,8 +211,9 @@ const ResultsGridComponent: React.FC<ResultsGridProps> = ({
                     }}
                     className="p-2 bg-white/90 dark:bg-zinc-800/90 rounded-full hover:bg-white dark:hover:bg-zinc-700 transition-colors"
                     title="Inspect"
+                    aria-label={`Inspect result ${index + 1}`}
                   >
-                    <LucideReact.Eye className="w-4 h-4 text-gray-900 dark:text-white" />
+                    <LucideReact.Eye aria-hidden="true" className="w-4 h-4 text-gray-900 dark:text-white" />
                   </button>
                 </div>
               </div>
