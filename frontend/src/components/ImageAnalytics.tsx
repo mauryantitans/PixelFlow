@@ -94,7 +94,7 @@ export const ImageAnalytics: React.FC<ImageAnalyticsProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-2 sm:p-4">
       <div
         ref={dialogRef}
         role="dialog"
@@ -103,7 +103,7 @@ export const ImageAnalytics: React.FC<ImageAnalyticsProps> = ({
         tabIndex={-1}
         className="bg-white dark:bg-zinc-900 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-zinc-700 sticky top-0 bg-white dark:bg-zinc-900 z-10">
+        <div className="flex items-center justify-between gap-2 p-4 sm:p-6 border-b border-gray-200 dark:border-zinc-700 sticky top-0 bg-white dark:bg-zinc-900 z-10">
           <div className="flex items-center space-x-2">
             <BarChart3 aria-hidden="true" className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             <h2 id="image-analytics-title" className="text-xl font-bold text-gray-900 dark:text-white">Image Analytics</h2>

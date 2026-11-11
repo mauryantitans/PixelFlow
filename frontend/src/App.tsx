@@ -516,11 +516,12 @@ const App: React.FC = () => {
   }, [lightboxState.isOpen]);
 
   return (
-    <main id="main-content" tabIndex={-1} className="flex bg-slate-50 dark:bg-zinc-950 min-h-screen focus:outline-none">
+    <main id="main-content" tabIndex={-1} className="flex flex-col md:flex-row bg-slate-50 dark:bg-zinc-950 min-h-screen focus:outline-none">
+      {/* Single column below md (operations, toolbar, pipeline, results stacked); side by side from md up (WCAG 1.4.10 Reflow). */}
       <h1 className="sr-only">PixelFlow image processing workspace</h1>
       {/* Operations Sidebar */}
-      <section aria-label="Operations" className={`h-screen sticky top-0 bg-white dark:bg-zinc-900 p-4 flex flex-col border-r-2 border-slate-300 dark:border-zinc-800 flex-shrink-0 transition-all duration-300 relative ${
-        ui.sidebarCollapsed ? 'w-16' : 'w-80'
+      <section aria-label="Operations" className={`md:h-screen md:sticky md:top-0 bg-white dark:bg-zinc-900 p-4 flex flex-col border-b-2 md:border-b-0 md:border-r-2 border-slate-300 dark:border-zinc-800 flex-shrink-0 transition-all duration-300 relative ${
+        ui.sidebarCollapsed ? 'w-full md:w-16' : 'w-full md:w-80'
       }`}>
         
         <div className="flex items-center justify-between mb-4">
@@ -554,9 +555,10 @@ const App: React.FC = () => {
               />
               <LucideReact.Search aria-hidden="true" className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-600 dark:text-gray-400" />
             </div>
+
             
             {/* Enhanced Operations List */}
-            <div className="flex-grow overflow-y-auto space-y-1 pr-1">
+            <div className="flex-grow overflow-y-auto space-y-1 pr-1 max-h-[60vh] md:max-h-none">
               {(opsLoading || opsError) && (
                 <div role={opsError ? 'alert' : 'status'} className="p-3 text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2">
                   {opsLoading ? (
@@ -652,10 +654,10 @@ const App: React.FC = () => {
       </section>
       
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-h-screen">
+      <div className="flex-1 min-w-0 flex flex-col md:min-h-screen">
         {/* Toolbar */}
-        <div className="flex items-center justify-between p-4 border-b-2 border-slate-300 dark:border-zinc-800 bg-white dark:bg-zinc-900 sticky top-0 z-40">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 p-3 sm:p-4 border-b-2 border-slate-300 dark:border-zinc-800 bg-white dark:bg-zinc-900 md:sticky md:top-0 z-40">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4">
             {/* The real file input stays in the tab order (it used to be
                 display:none, so keyboard users could not upload). It is
                 visually hidden and the label is styled as the button. */}
@@ -708,7 +710,7 @@ const App: React.FC = () => {
 
           {/* Status Display — a polite live region, so upload/processing/
               error messages are read out without moving focus (WCAG 4.1.3). */}
-          <div className="flex-1 text-center px-4" role="status" aria-live="polite" aria-atomic="true">
+          <div className="order-last basis-full xl:order-none xl:basis-auto flex-1 text-center px-2" role="status" aria-live="polite" aria-atomic="true">
             {status.text && (
               <span className={`text-sm flex items-center justify-center gap-2 transition-colors duration-200 font-medium ${getStatusTextColor(status.type)}`}>
                 {status.type === 'processing' && <LucideReact.Loader2 aria-hidden="true" className="w-4 h-4 animate-spin" />}
@@ -721,9 +723,9 @@ const App: React.FC = () => {
             )}
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-4">
             {/* Live Processing Toggle - FIXED */}
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               <label htmlFor="live-toggle" className="text-sm font-medium text-slate-900 dark:text-slate-50">Live Processing</label>
               <div className="relative inline-block w-10 align-middle select-none">
                 <input
@@ -748,11 +750,11 @@ const App: React.FC = () => {
         </div>
         
         {/* Content Area */}
-        <div className="flex-1 p-6 flex flex-col gap-6">
+        <div className="flex-1 min-w-0 p-3 sm:p-6 flex flex-col gap-4 sm:gap-6">
           {/* Pipeline Section */}
           <section aria-labelledby="pipeline-heading" className="bg-white dark:bg-zinc-900 rounded-lg p-4 border-2 border-slate-300 dark:border-zinc-800">
-            <div className="flex justify-between items-center mb-4">
-              <div className="flex items-center gap-4">
+            <div className="flex flex-wrap justify-between items-center gap-2 mb-4">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-4">
                 <h2 id="pipeline-heading" tabIndex={-1} className="focus:outline-none text-lg font-bold text-slate-900 dark:text-slate-50">
                   Pipeline ({pipeline.length} steps)
                 </h2>

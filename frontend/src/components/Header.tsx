@@ -105,10 +105,11 @@ export const Header: React.FC = () => {
 
   return (
     <>
-      <header className="bg-white dark:bg-zinc-900 border-b border-slate-300 dark:border-zinc-800 px-6 py-3 relative z-50">
-        <div className="flex items-center justify-between">
+      <header className="bg-white dark:bg-zinc-900 border-b border-slate-300 dark:border-zinc-800 px-3 sm:px-6 py-3 relative z-50">
+        {/* Wraps instead of overflowing on narrow screens / high zoom (WCAG 1.4.10 Reflow). */}
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
           {/* Logo and Title */}
-          <div className="flex items-center space-x-6">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
             <Link
               to="/"
               className="flex items-center space-x-3 hover:opacity-80 transition-opacity rounded-md"
@@ -125,7 +126,7 @@ export const Header: React.FC = () => {
             </Link>
 
             {/* Navigation Links */}
-            <nav aria-label="Main" className="hidden md:flex items-center space-x-1">
+            <nav aria-label="Main" className="flex flex-wrap items-center gap-1">
               <Link
                 to="/"
                 aria-current={!isOnApp ? 'page' : undefined}
@@ -185,7 +186,7 @@ export const Header: React.FC = () => {
           </div>
 
           {/* Right Side Actions */}
-          <div className="flex items-center space-x-2">
+          <div className="flex flex-wrap items-center gap-2">
             {/* Theme Toggle - Always visible, positioned first */}
             <button
               onClick={toggleTheme}
@@ -210,7 +211,7 @@ export const Header: React.FC = () => {
                   title="Load Pipeline"
                 >
                   <FolderOpen aria-hidden="true" size={16} />
-                  <span className="hidden sm:inline">Load</span>
+                  <span className="sr-only sm:not-sr-only">Load</span>
                 </button>
 
                 <button
@@ -219,7 +220,7 @@ export const Header: React.FC = () => {
                   title="Save Pipeline"
                 >
                   <Save aria-hidden="true" size={16} />
-                  <span className="hidden sm:inline">Save</span>
+                  <span className="sr-only sm:not-sr-only">Save</span>
                 </button>
               </>
             )}
@@ -271,7 +272,7 @@ export const Header: React.FC = () => {
                       <div
                         ref={menuRef}
                         onKeyDown={onMenuKeyDown}
-                        className="absolute right-0 mt-2 w-56 bg-white dark:bg-zinc-800 rounded-lg shadow-lg dark:shadow-black/40 border border-slate-300 dark:border-zinc-700 py-1 z-50">
+                        className="absolute right-0 mt-2 w-56 max-w-[calc(100vw-1rem)] bg-white dark:bg-zinc-800 rounded-lg shadow-lg dark:shadow-black/40 border border-slate-300 dark:border-zinc-700 py-1 z-50">
                         <div className="px-4 py-3 border-b border-slate-300 dark:border-zinc-700">
                           <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">
                             {user.full_name || user.username}
@@ -353,7 +354,7 @@ export const Header: React.FC = () => {
 
         {/* Notification Toast */}
         {notification && (
-          <div aria-hidden="true" className={`absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-4 py-2 rounded-lg shadow-lg z-50 animate-fade-in ${
+          <div aria-hidden="true" className={`absolute top-full left-1/2 transform -translate-x-1/2 mt-2 max-w-[90vw] px-4 py-2 rounded-lg shadow-lg z-50 animate-fade-in ${
             notification.type === 'success' 
               ? 'bg-green-700 dark:bg-green-700' 
               : 'bg-red-700 dark:bg-red-700'

@@ -104,7 +104,7 @@ const ParamControl: React.FC<ParamControlProps> = ({ spec, value, stepId, contro
     case 'color': {
       const hex = typeof value === 'string' ? value : spec.default ?? '#000000';
       return (
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <input
             type="color"
             id={controlId}
@@ -137,7 +137,7 @@ const ParamControl: React.FC<ParamControlProps> = ({ spec, value, stepId, contro
     case 'points':
     case 'rect':
       return (
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => arm({ stepId, paramName: spec.name, type: spec.type })}
@@ -159,7 +159,7 @@ const ParamControl: React.FC<ParamControlProps> = ({ spec, value, stepId, contro
               ? 'Re-pick'
               : 'Pick on image'}
           </button>
-          <span className="text-xs font-mono text-gray-600 dark:text-gray-400">
+          <span className="text-xs font-mono text-gray-600 dark:text-gray-400 break-all">
             {summarize(spec.type, value)}
           </span>
           {value && (

@@ -134,9 +134,9 @@ const Inspector: React.FC<InspectorProps> = ({
 
   return (
     <>
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-zinc-700">
+        <div className="flex flex-wrap items-center justify-between gap-2 p-3 sm:p-4 border-b border-gray-200 dark:border-zinc-700">
           <div className="flex items-center gap-2">
             <button type="button" onClick={onBack} className="btn-sm" title="Back to results grid" aria-label="Back to results grid">
               <LucideReact.ArrowLeft aria-hidden="true" className="w-5 h-5" />
@@ -146,7 +146,7 @@ const Inspector: React.FC<InspectorProps> = ({
           
           {/* Step Navigation - Center (normal view only) */}
           {hasIntermediates && view === 'normal' && (
-            <div className="flex items-center space-x-3 bg-gray-100 dark:bg-zinc-800 px-4 py-2 rounded-lg">
+            <div className="flex items-center space-x-3 bg-gray-100 dark:bg-zinc-800 px-3 py-2 rounded-lg">
               <button
                 onClick={handlePreviousStep}
                 disabled={currentStepIndex <= -1}
@@ -157,7 +157,7 @@ const Inspector: React.FC<InspectorProps> = ({
                 <LucideReact.ChevronLeft aria-hidden="true" className="w-5 h-5 text-gray-700 dark:text-gray-300" />
               </button>
               
-              <span className="text-sm font-semibold text-gray-900 dark:text-white min-w-[120px] text-center" aria-live="polite">
+              <span className="text-sm font-semibold text-gray-900 dark:text-white min-w-[96px] text-center" aria-live="polite">
                 {getStepLabel()}
               </span>
               
@@ -173,7 +173,7 @@ const Inspector: React.FC<InspectorProps> = ({
             </div>
           )}
           
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {/* View Controls */}
             <button
               onClick={() => onViewChange('normal')}
@@ -247,10 +247,10 @@ const Inspector: React.FC<InspectorProps> = ({
         </div>
 
         {/* Content */}
-        <div className="flex-1 p-4 flex flex-col min-h-0">
+        <div className="flex-1 p-3 sm:p-4 flex flex-col min-h-0">
           {/* A/B stage selectors for the comparison views */}
           {view !== 'normal' && (
-            <div className="flex items-center justify-center gap-4 mb-3 text-sm">
+            <div className="flex flex-wrap items-center justify-center gap-4 mb-3 text-sm">
               <label className="flex items-center gap-1 text-gray-700 dark:text-gray-300">
                 A:<span className="sr-only"> first image to compare</span>
                 <select
@@ -293,7 +293,7 @@ const Inspector: React.FC<InspectorProps> = ({
             )}
 
             {view === 'side-by-side' && (
-              <div className="w-full h-full grid grid-cols-2 gap-4">
+              <div className="w-full h-full grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[stageA, stageB].map((idx, k) => (
                   <div key={k} className="flex flex-col min-h-0">
                     <h3 className="text-sm font-bold text-zinc-900 dark:text-white mb-2 text-center">

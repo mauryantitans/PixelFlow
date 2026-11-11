@@ -74,20 +74,20 @@ const GalleryModal: React.FC<GalleryModalProps> = ({
   const selectedCount = images.filter(img => img.selected).length;
 
   return (
-    <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-8">
+    <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-2 sm:p-8">
       <div
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="gallery-title"
         tabIndex={-1}
-        className="bg-white dark:bg-zinc-900 rounded-lg shadow-xl w-full max-w-4xl h-full max-h-[80vh] flex flex-col">
+        className="bg-white dark:bg-zinc-900 rounded-lg shadow-xl w-full max-w-4xl h-full max-h-[95vh] sm:max-h-[80vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-zinc-700 flex-shrink-0">
+        <div className="flex flex-wrap items-center justify-between gap-2 p-3 sm:p-4 border-b border-gray-200 dark:border-zinc-700 flex-shrink-0">
           <h2 id="gallery-title" className="text-xl font-bold text-zinc-900 dark:text-white">
             Image Gallery ({images.length})
           </h2>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <button onClick={onSelectAll} className="btn-sm">Select All</button>
             <button onClick={onDeselectAll} className="btn-sm">Deselect All</button>
             {selectedCount > 0 && (

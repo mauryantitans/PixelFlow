@@ -526,7 +526,7 @@ Type DELETE to confirm.`)) {
   const hasChanges = settings && editedSettings && JSON.stringify(settings) !== JSON.stringify(editedSettings);
 
   return (
-    <div className="fixed inset-0 bg-black/60 z-[300] flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-black/60 z-[300] flex items-center justify-center p-2 sm:p-4">
       <div
         ref={panelRef}
         role="dialog"
@@ -536,7 +536,7 @@ Type DELETE to confirm.`)) {
         className="bg-white dark:bg-zinc-900 rounded-xl shadow-2xl w-full max-w-6xl h-[90vh] flex flex-col border-2 border-slate-300 dark:border-zinc-800"
       >
         {/* Header */}
-        <div className="flex-shrink-0 flex items-center justify-between p-6 border-b border-slate-300 dark:border-zinc-800">
+        <div className="flex-shrink-0 flex flex-wrap items-center justify-between gap-2 p-3 sm:p-6 border-b border-slate-300 dark:border-zinc-800">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
               <Settings aria-hidden="true" className="w-6 h-6 text-purple-600 dark:text-purple-400" />
@@ -548,7 +548,7 @@ Type DELETE to confirm.`)) {
               </p>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={async () => {
                 await loadData();
@@ -604,7 +604,7 @@ Type DELETE to confirm.`)) {
           onKeyDown={(e) =>
             handleTabListKeyDown(e, ['limits', 'cleanup', 'storage', 'retention', 'database'] as const, activeTab as any, (id) => setActiveTab(id as any), 'admin-tab')
           }
-          className="flex-shrink-0 flex space-x-1 p-4 border-b border-slate-300 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/50 overflow-x-auto"
+          className="flex-shrink-0 flex flex-wrap gap-1 p-2 sm:p-4 border-b border-slate-300 dark:border-zinc-800 bg-slate-50 dark:bg-zinc-900/50 overflow-x-auto"
         >
           {[
             { id: 'limits', icon: Settings, label: 'Limits' },
@@ -641,7 +641,7 @@ Type DELETE to confirm.`)) {
           id="admin-tabpanel"
           aria-labelledby={`admin-tab-${activeTab}`}
           tabIndex={0}
-          className="flex-1 overflow-y-auto p-6 min-h-0"
+          className="flex-1 overflow-y-auto p-3 sm:p-6 min-h-0"
         >
           {/* LIMITS TAB */}
           {activeTab === 'limits' && editedSettings && (
@@ -716,7 +716,7 @@ Type DELETE to confirm.`)) {
               {/* Image Limits */}
               <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 border border-slate-300 dark:border-zinc-700">
                 <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-4">Image Upload Limits</h3>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <label htmlFor="admin-field-4" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                       Guest Max Images/Session
@@ -887,7 +887,7 @@ Type DELETE to confirm.`)) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div className="bg-blue-100 dark:bg-blue-900/30 rounded-lg p-4">
                   <p className="text-sm text-blue-800 dark:text-blue-300 mb-1">Uploaded</p>
                   <p className="text-3xl font-bold text-blue-900 dark:text-blue-200">
@@ -1131,7 +1131,7 @@ Type DELETE to confirm.`)) {
 
               {/* Database Overview (always visible) */}
               {databaseData && (
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
                     <p className="text-sm text-blue-800 dark:text-blue-300 mb-1">Total Users</p>
                     <p className="text-3xl font-bold text-blue-900 dark:text-blue-200">{databaseData.users?.total || 0}</p>

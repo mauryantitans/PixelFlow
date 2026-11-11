@@ -108,9 +108,9 @@ const PipelineStepComponent: React.FC<PipelineStepProps> = ({
       </div>
 
       {/* Step Content */}
-      <div className="flex-grow">
+      <div className="flex-grow min-w-0">
         <div className="flex justify-between items-center mb-2">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <h3 className="font-semibold text-zinc-900 dark:text-white">
               <span className="sr-only">Step {index + 1} of {totalSteps}: </span>
               {stepLabel}

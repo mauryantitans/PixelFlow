@@ -76,7 +76,7 @@ export const SavePipelineModal: React.FC<SavePipelineModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-2 sm:p-4">
       <div
         ref={dialogRef}
         role="dialog"
@@ -85,7 +85,7 @@ export const SavePipelineModal: React.FC<SavePipelineModalProps> = ({
         tabIndex={-1}
         className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between gap-2 p-4 sm:p-6 border-b border-gray-200">
           <div className="flex items-center space-x-2">
             <Save aria-hidden="true" className="w-5 h-5 text-blue-600" />
             <h2 id="save-pipeline-title" className="text-xl font-bold text-gray-900">Save Pipeline</h2>

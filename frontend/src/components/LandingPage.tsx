@@ -29,7 +29,7 @@ export const LandingPage: React.FC = () => {
             />
           </div>
           
-          <h1 className="text-5xl font-bold text-slate-900 dark:text-slate-50 mb-6">
+          <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 dark:text-slate-50 mb-6">
             Visual Image Processing
             <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">
@@ -41,17 +41,17 @@ export const LandingPage: React.FC = () => {
             No coding required. Real-time preview. Export and share.
           </p>
           
-          <div className="flex items-center justify-center space-x-4">
+          <div className="flex flex-wrap items-center justify-center gap-4">
             <button
               onClick={() => navigate('/app')}
-              className="group flex items-center space-x-2 px-8 py-4 bg-blue-600 text-white text-lg font-semibold rounded-lg hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl"
+              className="group flex items-center space-x-2 px-6 sm:px-8 py-4 bg-blue-600 text-white text-lg font-semibold rounded-lg hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl"
             >
               <span>Start Building</span>
               <ArrowRight aria-hidden="true" className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button>
             <button
               onClick={() => navigate('/auth')}
-              className="px-8 py-4 bg-white dark:bg-zinc-800 text-slate-900 dark:text-slate-50 text-lg font-semibold rounded-lg hover:bg-slate-50 dark:hover:bg-zinc-700 transition-colors border-2 border-slate-300 dark:border-zinc-700 shadow-sm"
+              className="px-6 sm:px-8 py-4 bg-white dark:bg-zinc-800 text-slate-900 dark:text-slate-50 text-lg font-semibold rounded-lg hover:bg-slate-50 dark:hover:bg-zinc-700 transition-colors border-2 border-slate-300 dark:border-zinc-700 shadow-sm"
             >
               Sign Up Free
             </button>
@@ -220,24 +220,24 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="max-w-4xl mx-auto px-6 py-20 text-center">
-        <div className="bg-white dark:bg-zinc-900 rounded-2xl p-12 shadow-xl dark:shadow-black/50 border-2 border-slate-300 dark:border-zinc-800">
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 py-20 text-center">
+        <div className="bg-white dark:bg-zinc-900 rounded-2xl p-6 sm:p-12 shadow-xl dark:shadow-black/50 border-2 border-slate-300 dark:border-zinc-800">
           <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-50 mb-4">
             Ready to Transform Your Images?
           </h2>
           <p className="text-xl text-slate-600 dark:text-slate-300 mb-8">
             Start building powerful image processing pipelines in seconds.
           </p>
-          <div className="flex items-center justify-center space-x-4">
+          <div className="flex flex-wrap items-center justify-center gap-4">
             <button
               onClick={() => navigate('/app')}
-              className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold rounded-lg transition-colors shadow-lg hover:shadow-xl"
+              className="px-6 sm:px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold rounded-lg transition-colors shadow-lg hover:shadow-xl"
             >
               Try Without Account
             </button>
             <button
               onClick={() => navigate('/auth')}
-              className="px-8 py-4 bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-900 dark:text-slate-50 text-lg font-semibold rounded-lg transition-colors border-2 border-slate-300 dark:border-zinc-700"
+              className="px-6 sm:px-8 py-4 bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-900 dark:text-slate-50 text-lg font-semibold rounded-lg transition-colors border-2 border-slate-300 dark:border-zinc-700"
             >
               Create Free Account
             </button>
@@ -347,7 +347,7 @@ export const LandingPage: React.FC = () => {
                 Apache-2.0 License
               </a>
             </p>
-            <div className="flex items-center space-x-6 text-sm">
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
               <a href="https://github.com/Mauryantitans/PixelFlow" target="_blank" rel="noopener noreferrer" className="text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                 Privacy
               </a>
