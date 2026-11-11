@@ -1,0 +1,26 @@
+{
+  "state": "modal-method-details",
+  "tabStops": 3,
+  "noVisibleFocus": 0,
+  "focusEscapedDialog": 0,
+  "steps": [
+    {
+      "tag": "button",
+      "name": "Close method details",
+      "visibleFocus": true,
+      "insideDialog": true
+    },
+    {
+      "tag": "button",
+      "name": "Close method details",
+      "visibleFocus": true,
+      "insideDialog": true
+    },
+    {
+      "tag": "button",
+      "name": "Close method details",
+      "visibleFocus": true,
+      "insideDialog": true
+    }
+  ]
+}

@@ -1,0 +1,893 @@
+{
+ "testEngine": {
+  "name": "axe-core",
+  "version": "4.14.0"
+ },
+ "testRunner": {
+  "name": "axe"
+ },
+ "testEnvironment": {
+  "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+  "windowWidth": 1440,
+  "windowHeight": 900,
+  "orientationAngle": 0,
+  "orientationType": "landscape-primary"
+ },
+ "timestamp": "2026-11-11T01:19:27.930Z",
+ "url": "http://localhost:3000/",
+ "toolOptions": {
+  "runOnly": {
+   "type": "tag",
+   "values": [
+    "wcag2a",
+    "wcag2aa",
+    "wcag21a",
+    "wcag21aa",
+    "best-practice"
+   ]
+  },
+  "reporter": "v1"
+ },
+ "inapplicable": [
+  "accesskeys",
+  "area-alt",
+  "aria-allowed-role",
+  "aria-braille-equivalent",
+  "aria-command-name",
+  "aria-deprecated-role",
+  "aria-dialog-name",
+  "aria-input-field-name",
+  "aria-meter-name",
+  "aria-progressbar-name",
+  "aria-required-attr",
+  "aria-required-children",
+  "aria-required-parent",
+  "aria-roles",
+  "aria-tab-name",
+  "aria-text",
+  "aria-toggle-field-name",
+  "aria-tooltip-name",
+  "aria-treeitem-name",
+  "autocomplete-valid",
+  "avoid-inline-spacing",
+  "blink",
+  "definition-list",
+  "dlitem",
+  "duplicate-id-aria",
+  "empty-table-header",
+  "form-field-multiple-labels",
+  "frame-focusable-content",
+  "frame-tested",
+  "frame-title-unique",
+  "frame-title",
+  "html-xml-lang-mismatch",
+  "input-button-name",
+  "input-image-alt",
+  "label-content-name-mismatch",
+  "label-title-only",
+  "label",
+  "marquee",
+  "meta-refresh",
+  "object-alt",
+  "role-img-alt",
+  "scope-attr-valid",
+  "scrollable-region-focusable",
+  "select-name",
+  "server-side-image-map",
+  "summary-name",
+  "svg-img-alt",
+  "table-duplicate-name",
+  "td-headers-attr",
+  "th-has-data-cells",
+  "valid-lang",
+  "video-caption",
+  "no-autoplay-audio"
+ ],
+ "passes": [
+  {
+   "id": "aria-allowed-attr",
+   "impact": null,
+   "tags": [
+    "cat.aria",
+    "wcag2a",
+    "wcag412",
+    "EN-301-549",
+    "EN-9.4.1.2",
+    "RGAAv4",
+    "RGAA-7.1.1"
+   ],
+   "nodeCount": 3
+  },
+  {
+   "id": "aria-conditional-attr",
+   "impact": null,
+   "tags": [
+    "cat.aria",
+    "wcag2a",
+    "wcag412",
+    "EN-301-549",
+    "EN-9.4.1.2",
+    "RGAAv4",
+    "RGAA-7.1.1"
+   ],
+   "nodeCount": 3
+  },
+  {
+   "id": "aria-hidden-body",
+   "impact": null,
+   "tags": [
+    "cat.aria",
+    "wcag2a",
+    "wcag131",
+    "wcag412",
+    "EN-301-549",
+    "EN-9.1.3.1",
+    "EN-9.4.1.2",
+    "RGAAv4",
+    "RGAA-10.8.1"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "aria-hidden-focus",
+   "impact": null,
+   "tags": [
+    "cat.name-role-value",
+    "wcag2a",
+    "wcag412",
+    "TTv5",
+    "TT6.a",
+    "EN-301-549",
+    "EN-9.4.1.2",
+    "RGAAv4",
+    "RGAA-10.8.1"
+   ],
+   "nodeCount": 23
+  },
+  {
+   "id": "aria-prohibited-attr",
+   "impact": null,
+   "tags": [
+    "cat.aria",
+    "wcag2a",
+    "wcag412",
+    "EN-301-549",
+    "EN-9.4.1.2",
+    "RGAAv4",
+    "RGAA-7.1.1"
+   ],
+   "nodeCount": 3
+  },
+  {
+   "id": "aria-valid-attr-value",
+   "impact": null,
+   "tags": [
+    "cat.aria",
+    "wcag2a",
+    "wcag412",
+    "EN-301-549",
+    "EN-9.4.1.2",
+    "RGAAv4",
+    "RGAA-7.1.1"
+   ],
+   "nodeCount": 3
+  },
+  {
+   "id": "aria-valid-attr",
+   "impact": null,
+   "tags": [
+    "cat.aria",
+    "wcag2a",
+    "wcag412",
+    "EN-301-549",
+    "EN-9.4.1.2",
+    "RGAAv4",
+    "RGAA-7.1.1"
+   ],
+   "nodeCount": 3
+  },
+  {
+   "id": "button-name",
+   "impact": null,
+   "tags": [
+    "cat.name-role-value",
+    "wcag2a",
+    "wcag412",
+    "section508",
+    "section508.22.a",
+    "TTv5",
+    "TT6.a",
+    "EN-301-549",
+    "EN-9.4.1.2",
+    "ACT",
+    "RGAAv4",
+    "RGAA-11.9.1"
+   ],
+   "nodeCount": 8
+  },
+  {
+   "id": "bypass",
+   "impact": null,
+   "tags": [
+    "cat.keyboard",
+    "wcag2a",
+    "wcag241",
+    "section508",
+    "section508.22.o",
+    "TTv5",
+    "TT9.a",
+    "EN-301-549",
+    "EN-9.2.4.1",
+    "RGAAv4",
+    "RGAA-12.7.1"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "color-contrast",
+   "impact": "serious",
+   "tags": [
+    "cat.color",
+    "wcag2aa",
+    "wcag143",
+    "TTv5",
+    "TT13.c",
+    "EN-301-549",
+    "EN-9.1.4.3",
+    "ACT",
+    "RGAAv4",
+    "RGAA-3.2.1"
+   ],
+   "nodeCount": 58
+  },
+  {
+   "id": "document-title",
+   "impact": null,
+   "tags": [
+    "cat.text-alternatives",
+    "wcag2a",
+    "wcag242",
+    "TTv5",
+    "TT12.a",
+    "EN-301-549",
+    "EN-9.2.4.2",
+    "ACT",
+    "RGAAv4",
+    "RGAA-8.5.1"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "empty-heading",
+   "impact": null,
+   "tags": [
+    "cat.name-role-value",
+    "best-practice"
+   ],
+   "nodeCount": 20
+  },
+  {
+   "id": "heading-order",
+   "impact": null,
+   "tags": [
+    "cat.semantics",
+    "best-practice"
+   ],
+   "nodeCount": 20
+  },
+  {
+   "id": "html-has-lang",
+   "impact": null,
+   "tags": [
+    "cat.language",
+    "wcag2a",
+    "wcag311",
+    "TTv5",
+    "TT11.a",
+    "EN-301-549",
+    "EN-9.3.1.1",
+    "ACT",
+    "RGAAv4",
+    "RGAA-8.3.1"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "html-lang-valid",
+   "impact": null,
+   "tags": [
+    "cat.language",
+    "wcag2a",
+    "wcag311",
+    "TTv5",
+    "TT11.a",
+    "EN-301-549",
+    "EN-9.3.1.1",
+    "ACT",
+    "RGAAv4",
+    "RGAA-8.4.1"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "image-alt",
+   "impact": null,
+   "tags": [
+    "cat.text-alternatives",
+    "wcag2a",
+    "wcag111",
+    "section508",
+    "section508.22.a",
+    "TTv5",
+    "TT7.a",
+    "TT7.b",
+    "EN-301-549",
+    "EN-9.1.1.1",
+    "ACT",
+    "RGAAv4",
+    "RGAA-1.1.1"
+   ],
+   "nodeCount": 3
+  },
+  {
+   "id": "image-redundant-alt",
+   "impact": null,
+   "tags": [
+    "cat.text-alternatives",
+    "best-practice"
+   ],
+   "nodeCount": 3
+  },
+  {
+   "id": "landmark-banner-is-top-level",
+   "impact": null,
+   "tags": [
+    "cat.semantics",
+    "best-practice"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "landmark-contentinfo-is-top-level",
+   "impact": null,
+   "tags": [
+    "cat.semantics",
+    "best-practice"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "landmark-main-is-top-level",
+   "impact": null,
+   "tags": [
+    "cat.semantics",
+    "best-practice"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "landmark-no-duplicate-banner",
+   "impact": null,
+   "tags": [
+    "cat.semantics",
+    "best-practice"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "landmark-no-duplicate-contentinfo",
+   "impact": null,
+   "tags": [
+    "cat.semantics",
+    "best-practice"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "landmark-no-duplicate-main",
+   "impact": null,
+   "tags": [
+    "cat.semantics",
+    "best-practice"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "landmark-one-main",
+   "impact": null,
+   "tags": [
+    "cat.semantics",
+    "best-practice"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "landmark-unique",
+   "impact": null,
+   "tags": [
+    "cat.semantics",
+    "best-practice"
+   ],
+   "nodeCount": 4
+  },
+  {
+   "id": "link-in-text-block",
+   "impact": null,
+   "tags": [
+    "cat.color",
+    "wcag2a",
+    "wcag141",
+    "TTv5",
+    "TT13.a",
+    "EN-301-549",
+    "EN-9.1.4.1",
+    "RGAAv4",
+    "RGAA-10.6.1"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "link-name",
+   "impact": null,
+   "tags": [
+    "cat.name-role-value",
+    "wcag2a",
+    "wcag244",
+    "wcag412",
+    "section508",
+    "section508.22.a",
+    "TTv5",
+    "TT6.a",
+    "EN-301-549",
+    "EN-9.2.4.4",
+    "EN-9.4.1.2",
+    "ACT",
+    "RGAAv4",
+    "RGAA-6.2.1"
+   ],
+   "nodeCount": 17
+  },
+  {
+   "id": "list",
+   "impact": null,
+   "tags": [
+    "cat.structure",
+    "wcag2a",
+    "wcag131",
+    "EN-301-549",
+    "EN-9.1.3.1",
+    "RGAAv4",
+    "RGAA-9.3.1"
+   ],
+   "nodeCount": 3
+  },
+  {
+   "id": "listitem",
+   "impact": null,
+   "tags": [
+    "cat.structure",
+    "wcag2a",
+    "wcag131",
+    "EN-301-549",
+    "EN-9.1.3.1",
+    "RGAAv4",
+    "RGAA-9.3.1"
+   ],
+   "nodeCount": 9
+  },
+  {
+   "id": "meta-viewport-large",
+   "impact": null,
+   "tags": [
+    "cat.sensory-and-visual-cues",
+    "best-practice"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "meta-viewport",
+   "impact": null,
+   "tags": [
+    "cat.sensory-and-visual-cues",
+    "wcag2aa",
+    "wcag144",
+    "EN-301-549",
+    "EN-9.1.4.4",
+    "ACT",
+    "RGAAv4",
+    "RGAA-10.4.2"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "nested-interactive",
+   "impact": null,
+   "tags": [
+    "cat.keyboard",
+    "wcag2a",
+    "wcag412",
+    "TTv5",
+    "TT6.a",
+    "EN-301-549",
+    "EN-9.4.1.2",
+    "RGAAv4",
+    "RGAA-7.1.1"
+   ],
+   "nodeCount": 8
+  },
+  {
+   "id": "page-has-heading-one",
+   "impact": null,
+   "tags": [
+    "cat.semantics",
+    "best-practice"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "presentation-role-conflict",
+   "impact": null,
+   "tags": [
+    "cat.aria",
+    "best-practice",
+    "ACT"
+   ],
+   "nodeCount": 3
+  },
+  {
+   "id": "region",
+   "impact": null,
+   "tags": [
+    "cat.keyboard",
+    "best-practice",
+    "RGAAv4",
+    "RGAA-9.2.1"
+   ],
+   "nodeCount": 154
+  },
+  {
+   "id": "skip-link",
+   "impact": null,
+   "tags": [
+    "cat.keyboard",
+    "best-practice",
+    "RGAAv4",
+    "RGAA-12.7.1"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "tabindex",
+   "impact": null,
+   "tags": [
+    "cat.keyboard",
+    "best-practice"
+   ],
+   "nodeCount": 1
+  }
+ ],
+ "incomplete": [
+  {
+   "id": "color-contrast",
+   "impact": "serious",
+   "tags": [
+    "cat.color",
+    "wcag2aa",
+    "wcag143",
+    "TTv5",
+    "TT13.c",
+    "EN-301-549",
+    "EN-9.1.4.3",
+    "ACT",
+    "RGAAv4",
+    "RGAA-3.2.1"
+   ],
+   "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+   "help": "Elements must meet minimum color contrast ratio thresholds",
+   "helpUrl": "https://dequeuniversity.com/rules/axe/4.14/color-contrast?application=axe-puppeteer",
+   "nodes": [
+    {
+     "any": [
+      {
+       "id": "color-contrast",
+       "data": {
+        "contrastRatio": 0,
+        "fontSize": "36.0pt (48px)",
+        "fontWeight": "bold",
+        "messageKey": "bgGradient",
+        "expectedContrastRatio": "3:1"
+       },
+       "relatedNodes": [
+        {
+         "html": "<div class=\"min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950\">",
+         "target": [
+          ".min-h-screen"
+         ]
+        }
+       ],
+       "impact": "serious",
+       "message": "Element's background color could not be determined due to a background gradient"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "serious",
+     "html": "<h1 class=\"text-5xl font-bold text-slate-900 dark:text-slate-50 mb-6\">Visual Image Processing<br><span class=\"text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400\">Made Simple</span></h1>",
+     "target": [
+      "h1"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+    },
+    {
+     "any": [
+      {
+       "id": "color-contrast",
+       "data": {
+        "contrastRatio": 0,
+        "fontSize": "36.0pt (48px)",
+        "fontWeight": "bold",
+        "messageKey": "bgGradient",
+        "expectedContrastRatio": "3:1"
+       },
+       "relatedNodes": [
+        {
+         "html": "<span class=\"text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400\">Made Simple</span>",
+         "target": [
+          ".text-transparent"
+         ]
+        }
+       ],
+       "impact": "serious",
+       "message": "Element's background color could not be determined due to a background gradient"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "serious",
+     "html": "<span class=\"text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400\">Made Simple</span>",
+     "target": [
+      ".text-transparent"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+    },
+    {
+     "any": [
+      {
+       "id": "color-contrast",
+       "data": {
+        "contrastRatio": 0,
+        "fontSize": "15.0pt (20px)",
+        "fontWeight": "normal",
+        "messageKey": "bgGradient",
+        "expectedContrastRatio": "4.5:1"
+       },
+       "relatedNodes": [
+        {
+         "html": "<div class=\"min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950\">",
+         "target": [
+          ".min-h-screen"
+         ]
+        }
+       ],
+       "impact": "serious",
+       "message": "Element's background color could not be determined due to a background gradient"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "serious",
+     "html": "<p class=\"text-xl text-slate-600 dark:text-slate-300 mb-8 max-w-3xl mx-auto\">Build powerful image processing pipelines with 50+ operations from OpenCV and Scikit-Image. No coding required. Real-time preview. Export and share.</p>",
+     "target": [
+      ".max-w-3xl"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+    },
+    {
+     "any": [
+      {
+       "id": "color-contrast",
+       "data": {
+        "contrastRatio": 0,
+        "fontSize": "10.5pt (14px)",
+        "fontWeight": "normal",
+        "messageKey": "bgGradient",
+        "expectedContrastRatio": "4.5:1"
+       },
+       "relatedNodes": [
+        {
+         "html": "<div class=\"min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950\">",
+         "target": [
+          ".min-h-screen"
+         ]
+        }
+       ],
+       "impact": "serious",
+       "message": "Element's background color could not be determined due to a background gradient"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "serious",
+     "html": "<span>100% Free Forever</span>",
+     "target": [
+      ".flex-wrap > .space-x-2.items-center.flex:nth-child(1) > span"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+    },
+    {
+     "any": [
+      {
+       "id": "color-contrast",
+       "data": {
+        "contrastRatio": 0,
+        "fontSize": "10.5pt (14px)",
+        "fontWeight": "normal",
+        "messageKey": "bgGradient",
+        "expectedContrastRatio": "4.5:1"
+       },
+       "relatedNodes": [
+        {
+         "html": "<div class=\"min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950\">",
+         "target": [
+          ".min-h-screen"
+         ]
+        }
+       ],
+       "impact": "serious",
+       "message": "Element's background color could not be determined due to a background gradient"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "serious",
+     "html": "<span>No Sign-Up Required</span>",
+     "target": [
+      ".space-x-2.items-center.flex:nth-child(2) > span"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+    },
+    {
+     "any": [
+      {
+       "id": "color-contrast",
+       "data": {
+        "contrastRatio": 0,
+        "fontSize": "10.5pt (14px)",
+        "fontWeight": "normal",
+        "messageKey": "bgGradient",
+        "expectedContrastRatio": "4.5:1"
+       },
+       "relatedNodes": [
+        {
+         "html": "<div class=\"min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950\">",
+         "target": [
+          ".min-h-screen"
+         ]
+        }
+       ],
+       "impact": "serious",
+       "message": "Element's background color could not be determined due to a background gradient"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "serious",
+     "html": "<span>Browser-Based</span>",
+     "target": [
+      ".space-x-2.items-center.flex:nth-child(3) > span"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+    },
+    {
+     "any": [
+      {
+       "id": "color-contrast",
+       "data": {
+        "contrastRatio": 0,
+        "fontSize": "22.5pt (30px)",
+        "fontWeight": "bold",
+        "messageKey": "bgGradient",
+        "expectedContrastRatio": "3:1"
+       },
+       "relatedNodes": [
+        {
+         "html": "<div class=\"min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950\">",
+         "target": [
+          ".min-h-screen"
+         ]
+        }
+       ],
+       "impact": "serious",
+       "message": "Element's background color could not be determined due to a background gradient"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "serious",
+     "html": "<h2 class=\"text-3xl font-bold text-center text-slate-900 dark:text-slate-50 mb-12\">Everything You Need for Image Processing</h2>",
+     "target": [
+      "#features > .mb-12.text-3xl"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+    },
+    {
+     "any": [
+      {
+       "id": "color-contrast",
+       "data": {
+        "contrastRatio": 0,
+        "fontSize": "22.5pt (30px)",
+        "fontWeight": "bold",
+        "messageKey": "bgGradient",
+        "expectedContrastRatio": "3:1"
+       },
+       "relatedNodes": [
+        {
+         "html": "<section class=\"bg-slate-100 dark:bg-zinc-900/50 py-20 border-y-2 border-slate-300 dark:border-zinc-800\">",
+         "target": [
+          ".dark\\:bg-zinc-900\\/50"
+         ]
+        },
+        {
+         "html": "<div class=\"min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950\">",
+         "target": [
+          ".min-h-screen"
+         ]
+        }
+       ],
+       "impact": "serious",
+       "message": "Element's background color could not be determined due to a background gradient"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "serious",
+     "html": "<h2 class=\"text-3xl font-bold text-center text-slate-900 dark:text-slate-50 mb-4\">Perfect For</h2>",
+     "target": [
+      ".dark\\:bg-zinc-900\\/50 > .max-w-7xl.px-6.mx-auto > .text-3xl"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+    },
+    {
+     "any": [
+      {
+       "id": "color-contrast",
+       "data": {
+        "contrastRatio": 0,
+        "fontSize": "12.0pt (16px)",
+        "fontWeight": "normal",
+        "messageKey": "bgGradient",
+        "expectedContrastRatio": "4.5:1"
+       },
+       "relatedNodes": [
+        {
+         "html": "<section class=\"bg-slate-100 dark:bg-zinc-900/50 py-20 border-y-2 border-slate-300 dark:border-zinc-800\">",
+         "target": [
+          ".dark\\:bg-zinc-900\\/50"
+         ]
+        },
+        {
+         "html": "<div class=\"min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950\">",
+         "target": [
+          ".min-h-screen"
+         ]
+        }
+       ],
+       "impact": "serious",
+       "message": "Element's background color could not be determined due to a background gradient"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "serious",
+     "html": "<p class=\"text-center text-slate-600 dark:text-slate-400 mb-12 max-w-2xl mx-auto\">Whether you're a designer, researcher, or developer - PixelFlow has you covered.</p>",
+     "target": [
+      ".max-w-2xl"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+    }
+   ]
+  }
+ ],
+ "violations": []
+}
