@@ -151,7 +151,7 @@ const GalleryModal: React.FC<GalleryModalProps> = ({
                         />
                         
                         {/* Hover Controls - Using group-hover */}
-                        <div className="absolute top-1 left-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20">
+                        <div className="absolute top-1 left-1 flex gap-1 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-200 z-20">
                         <button
                             onClick={(e) => {
                             e.stopPropagation();

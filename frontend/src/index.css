@@ -8,6 +8,30 @@
   body {
     font-family: 'Inter', sans-serif;
   }
+
+  /* Visible keyboard focus everywhere (WCAG 2.4.7 Focus Visible).
+     3px blue ring has >= 3:1 contrast against both the light and dark
+     backgrounds (WCAG 1.4.11 Non-text Contrast). */
+  :focus-visible {
+    outline: 3px solid #1d4ed8; /* blue-700 */
+    outline-offset: 2px;
+  }
+
+  .dark :focus-visible {
+    outline-color: #93c5fd; /* blue-300 */
+  }
+
+  /* Respect the OS "reduce motion" setting. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
   
   /* Scrollbar styles */
   ::-webkit-scrollbar {
@@ -30,6 +54,17 @@
 
 /* Component styles */
 @layer components {
+  /* "Skip to main content" link: hidden until it receives keyboard focus
+     (WCAG 2.4.1 Bypass Blocks). */
+  .skip-link {
+    @apply sr-only;
+  }
+
+  .skip-link:focus,
+  .skip-link:focus-visible {
+    @apply not-sr-only fixed top-2 left-2 z-[1000] px-4 py-2 rounded-md bg-blue-700 text-white font-semibold shadow-lg;
+  }
+
   /* Button variants */
   .btn-primary {
     @apply bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-gray-100 px-4 py-2 rounded-md font-semibold transition-colors;
@@ -142,7 +177,8 @@
     @apply absolute inset-0 flex items-start justify-start p-1 gap-1 opacity-0 transition-opacity duration-200;
   }
   
-  .gallery-thumb:hover .thumb-overlay {
+  .gallery-thumb:hover .thumb-overlay,
+  .gallery-thumb:focus-within .thumb-overlay {
     @apply opacity-100;
   }
   
@@ -323,7 +359,8 @@ details > summary svg {
   @apply absolute bottom-full left-1/2 transform -translate-x-1/2 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 text-xs rounded px-2 py-1 opacity-0 pointer-events-none transition-opacity duration-200 z-50 whitespace-nowrap mb-2 shadow-lg;
 }
 
-.operation-btn-enhanced:hover .operation-tooltip {
+.operation-btn-enhanced:hover .operation-tooltip,
+.operation-btn-enhanced:focus-visible .operation-tooltip {
   @apply opacity-100;
 }
 

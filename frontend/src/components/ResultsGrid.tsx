@@ -185,7 +185,7 @@ const ResultsGridComponent: React.FC<ResultsGridProps> = ({
                 />
                 
                 {/* Hover overlay with actions */}
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-2">
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity flex items-center justify-center space-x-2">
                   <button
                     onClick={(e) => handleDownloadSingle(result, index, e)}
                     className="p-2 bg-white/90 dark:bg-zinc-800/90 rounded-full hover:bg-white dark:hover:bg-zinc-700 transition-colors"
