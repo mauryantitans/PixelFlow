@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { GoogleSignIn } from './GoogleSignIn';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import BrandMark from './BrandMark';
 
 interface RegisterProps {
   onSwitchToLogin?: () => void;
@@ -68,11 +69,7 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
         <div className="text-center mb-8">
           {/* Custom Icon */}
           <div className="flex justify-center mb-4">
-            <img 
-              src="/PixelFlow_Icon.png" 
-              alt="" 
-              className="w-16 h-16 rounded-lg"
-            />
+            <BrandMark size={64} />
           </div>
           
           <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-50">PixelFlow</h1>
