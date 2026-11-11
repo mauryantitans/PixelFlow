@@ -89,11 +89,36 @@ def process_image_bytes(content: bytes):
     return img_bytes, thumbnail_bytes, width, height, image_format, mime_type
 
 
+# 401 for a signed-out request on a user's own session/image: the client
+# refreshes its tokens and retries (services/tokenRefresh.ts).
+def _sign_in_expired() -> HTTPException:
+    return HTTPException(
+        status_code=401,
+        detail={"error": "sign_in_required", "message": "Your sign-in has expired. Please sign in again."},
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+
+def _require_owner(owner_id, current_user, what: str) -> None:
+    """Same rule everywhere: owner or admin; signed-out -> 401, other user -> 403."""
+    if owner_id is None:
+        return
+    if current_user is None:
+        raise _sign_in_expired()
+    if current_user.id != owner_id and not current_user.is_admin:
+        raise HTTPException(status_code=403, detail=f"Not authorized to {what}")
+
+
 def _record_upload_session(db: Session, session_id: str, user_id, device_info, ip_address):
     """Create/extend the upload's session, refusing sessions owned by someone else."""
     try:
         return create_or_update_session(db, session_id, user_id, device_info, ip_address)
     except SessionOwnershipError:
+        if user_id is None:
+            # The owner's access cookie expired (the browser stops sending it
+            # after 30 min). 401 lets the client refresh and retry instead of
+            # wrongly treating its own session as someone else's.
+            raise _sign_in_expired()
         raise HTTPException(
             status_code=409,
             detail={
@@ -413,9 +438,7 @@ async def get_session_images_list(
         session_obj = db.query(DBSession).filter(DBSession.id == session_id).first()
         if session_obj:
             # If the session is owned by a user, only that user (or an admin) may view it
-            if session_obj.user_id is not None:
-                if current_user is None or (current_user.id != session_obj.user_id and not current_user.is_admin):
-                    raise HTTPException(status_code=403, detail="Not authorized to view this session")
+            _require_owner(session_obj.user_id, current_user, "view this session")
             # Opening the workspace counts as activity (keeps the session alive),
             # except when an admin looks at someone else's session.
             if session_obj.user_id is None or (current_user and current_user.id == session_obj.user_id):
@@ -450,6 +473,8 @@ async def get_session_images_list(
             "images": result
         })
         
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error getting session images: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -471,9 +496,7 @@ async def get_image(
 
         # Enforce ownership: only the owning user (or admin) may retrieve a user-owned image.
         # Guest images (user_id=None) are accessible via session context (frontend passes session).
-        if img.user_id is not None:
-            if current_user is None or (current_user.id != img.user_id and not current_user.is_admin):
-                raise HTTPException(status_code=403, detail="Not authorized to access this image")
+        _require_owner(img.user_id, current_user, "access this image")
 
         # Update last accessed
         img.last_accessed = datetime.now(timezone.utc)
@@ -508,9 +531,7 @@ async def delete_image(
         # Ownership check: only the image owner or an admin may delete.
         # Guest images (user_id=None) can only be deleted when no user is set,
         # meaning the request must be from the same guest session (no token needed).
-        if img.user_id is not None:
-            if current_user is None or (current_user.id != img.user_id and not current_user.is_admin):
-                raise HTTPException(status_code=403, detail="Not authorized to delete this image")
+        _require_owner(img.user_id, current_user, "delete this image")
 
         db.delete(img)
         db.commit()
@@ -555,9 +576,8 @@ async def cleanup_session(
 
         # A signed-in user's session (and their images) may only be deleted by
         # that user or an admin; knowing the session id is not enough.
-        if session and session.user_id is not None:
-            if current_user is None or (current_user.id != session.user_id and not current_user.is_admin):
-                raise HTTPException(status_code=403, detail="Not authorized to delete this session")
+        if session:
+            _require_owner(session.user_id, current_user, "delete this session")
 
         if session:
             # Count images before deleting

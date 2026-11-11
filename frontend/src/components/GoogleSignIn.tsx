@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { markTokensFresh } from '../services/tokenRefresh';
 
 interface GoogleSignInProps {
   onSuccess?: () => void;
@@ -83,6 +84,7 @@ export const GoogleSignIn: React.FC<GoogleSignInProps> = ({ onSuccess, onError }
       );
 
       if (result.data.success) {
+        markTokensFresh();
         setUser(result.data.user);
 
         if (onSuccess) {

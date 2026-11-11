@@ -9,7 +9,8 @@ import {
   ProcessingTiming,
   StepErrorDTO,
 } from '../types';
-import { ApiService, getCookie } from '../services/api';
+import { ApiService } from '../services/api';
+import { hasSignedInSession } from '../services/tokenRefresh';
 import { SessionUtils, ThemeUtils } from '../utils';
 
 /**
@@ -113,9 +114,14 @@ export function useImages() {
         if (!cancelled) setImages(savedImages);
       })
       .catch((error: any) => {
-        // 403: this browser's session belongs to a different account; start
-        // a fresh one instead of silently showing nothing and failing uploads.
-        if (!cancelled && error?.status === 403) SessionUtils.startNewSession();
+        // The session belongs to an account this browser isn't signed in as
+        // (403 = another account; 401 while not signed in = a previous user's
+        // session). Start a fresh one instead of showing nothing and failing
+        // uploads. A 401 while signed in is retried by the refresh interceptor.
+        if (cancelled) return;
+        if (error?.status === 403 || (error?.status === 401 && !hasSignedInSession())) {
+          SessionUtils.startNewSession();
+        }
       });
     return () => {
       cancelled = true;
@@ -164,7 +170,10 @@ export function useImages() {
 
           // The browser's session belongs to another account (shared computer):
           // switch to a fresh session so the next upload works.
-          if (error.code === 'session_owned_by_another_user') {
+          if (
+            error.code === 'session_owned_by_another_user' ||
+            (error.code === 'sign_in_required' && !hasSignedInSession())
+          ) {
             SessionUtils.startNewSession();
             const err: any = new Error('Your browser session belonged to a different account and was reset. Please upload again.');
             throw err;
@@ -205,24 +214,31 @@ export function useImages() {
     }
   }, [sessionId]);
   
-  const removeImage = useCallback(async (imageId: string) => {
-    // Remove from UI immediately for instant feedback
-    setImages(prev => prev.filter(img => img.id !== imageId));
-
-    // Delete from database — auth travels in the httpOnly cookie; echo the CSRF
-    // cookie back as a header (state-changing request).
+  const removeImage = useCallback(async (imageId: string): Promise<boolean> => {
+    // Optimistic: hide it right away, but put it back if the server refuses
+    // (e.g. 403/404). Before, failures were ignored and the "deleted" image
+    // came back on the next reload.
+    let removed: ImageData | undefined;
+    let removedIndex = -1;
+    setImages((prev) => {
+      removedIndex = prev.findIndex((img) => img.id === imageId);
+      removed = prev[removedIndex];
+      return prev.filter((img) => img.id !== imageId);
+    });
     try {
-      const csrf = getCookie('pf_csrf');
-      await fetch(
-        `${process.env.REACT_APP_API_URL || 'http://localhost:8000/api'}/images/image/${imageId}`,
-        {
-          method: 'DELETE',
-          credentials: 'include',
-          headers: csrf ? { 'X-CSRF-Token': csrf } : {},
-        }
-      );
+      await ApiService.deleteImage(imageId);
+      return true;
     } catch {
-      // Image is already removed from the UI; silently ignore network errors
+      if (removed) {
+        const restore = removed;
+        setImages((prev) => {
+          if (prev.some((img) => img.id === imageId)) return prev;
+          const next = [...prev];
+          next.splice(Math.min(Math.max(removedIndex, 0), next.length), 0, restore);
+          return next;
+        });
+      }
+      return false;
     }
   }, []);
   

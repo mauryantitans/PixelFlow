@@ -130,7 +130,7 @@ def test_cleanup_session_requires_the_owner(client, db):
     alice = _user(db, 6)
     create_or_update_session(db, "sess-owned", alice.id)
     r = client.post("/api/images/cleanup-session", json={"session_id": "sess-owned"})
-    assert r.status_code == 403
+    assert r.status_code == 401  # signed out: "sign-in expired", not "forbidden"
     assert db.query(DBSession).filter_by(id="sess-owned").first() is not None
 
 
@@ -146,7 +146,7 @@ def test_processing_someone_elses_image_is_forbidden(client, db):
     image_id = r.json()["image"]["id"]
     body = {"image_id": image_id, "pipeline": [], "session_id": "sess-b"}
     # An empty pipeline returns the original image, so this used to leak it.
-    assert client.post("/api/processing/process-live", json=body).status_code == 403
+    assert client.post("/api/processing/process-live", json=body).status_code == 401
     assert (
         client.post("/api/processing/process-live", json=body, headers=_auth(bob)).status_code
         == 403
@@ -221,3 +221,27 @@ def test_valid_settings_are_saved(db):
         False,
         90,
     )
+
+
+def test_signed_out_owner_gets_401_not_409(client, db):
+    """After the 30-min access cookie lapses the owner's requests arrive without
+    auth; they must get 401 (refresh and retry), not 'session owned by another
+    user' (which made the frontend throw the user's own session away)."""
+    dave = _user(db, 9)
+    files = {"file": ("a.png", _png_bytes(), "image/png")}
+    assert (
+        client.post(
+            "/api/images/upload", files=files, data={"session_id": "sess-d"}, headers=_auth(dave)
+        ).status_code
+        == 200
+    )
+    r = client.post("/api/images/upload", files=files, data={"session_id": "sess-d"})
+    assert r.status_code == 401
+    assert r.json()["detail"]["error"] == "sign_in_required"
+    assert client.get("/api/images/session/sess-d/images").status_code == 401
+
+
+def test_listing_another_users_session_is_403_not_500(client, db):
+    erin, frank = _user(db, 10), _user(db, 11)
+    create_or_update_session(db, "sess-e", erin.id)
+    assert client.get("/api/images/session/sess-e/images", headers=_auth(frank)).status_code == 403

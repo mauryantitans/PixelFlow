@@ -41,11 +41,18 @@ const App: React.FC = () => {
     const selectedIds = images.filter(img => img.selected).map(img => img.id);
     const count = selectedIds.length;
     
-    // Delete from database
-    const deletePromises = selectedIds.map(id => removeImage(id));
-    await Promise.all(deletePromises);
-    
-    updateStatus(`Deleted ${count} image(s)`, 'success');
+    // Delete from database (failed deletes are put back in the gallery)
+    const results = await Promise.all(selectedIds.map(id => removeImage(id)));
+    const failed = results.filter(ok => !ok).length;
+    if (failed === 0) {
+      updateStatus(`Deleted ${count} image(s)`, 'success');
+    } else {
+      updateStatus(`Deleted ${count - failed} of ${count} image(s); ${failed} could not be deleted`, 'error');
+    }
+  };
+
+  const handleRemoveImage = async (imageId: string) => {
+    if (!(await removeImage(imageId))) updateStatus('Could not delete the image. Please try again.', 'error');
   };
   
   const {
@@ -931,7 +938,7 @@ const App: React.FC = () => {
         images={images}
         onClose={galleryModal.closeModal}
         onImageSelect={toggleImageSelection}
-        onImageRemove={removeImage}
+        onImageRemove={handleRemoveImage}
         onDeleteSelected={handleDeleteSelected}
         onSelectAll={selectAllImages}
         onDeselectAll={deselectAllImages}

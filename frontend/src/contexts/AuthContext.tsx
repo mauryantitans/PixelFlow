@@ -3,6 +3,20 @@ import { User, AuthContextType, RegisterRequest } from '../types';
 import { authService } from '../services/auth';
 import { getCookie } from '../services/api';
 import { SessionUtils } from '../utils';
+import { AUTH_EXPIRED_EVENT } from '../services/tokenRefresh';
+
+/** Readable text from a FastAPI error: `detail` may be a string, an object, or a
+ *  422 list like [{msg: 'value is not a valid email address'}]. */
+function apiErrorMessage(error: any, fallback: string): string {
+  const detail = error?.response?.data?.detail;
+  if (typeof detail === 'string') return detail;
+  if (Array.isArray(detail)) {
+    const msgs = detail.map((d: any) => (typeof d?.msg === 'string' ? d.msg.replace(/^Value error, /, '') : null)).filter(Boolean);
+    if (msgs.length) return msgs.join('. ');
+  }
+  if (detail && typeof detail === 'object' && typeof detail.message === 'string') return detail.message;
+  return fallback;
+}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -55,7 +69,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const userData = await authService.login(email, password);
       setUser(userData);
     } catch (error: any) {
-      throw new Error(error.response?.data?.detail || 'Login failed');
+      throw new Error(apiErrorMessage(error, 'Login failed'));
     }
   };
 
@@ -65,7 +79,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Auto-login after registration
       await login(data.email, data.password);
     } catch (error: any) {
-      throw new Error(error.response?.data?.detail || 'Registration failed');
+      throw new Error(apiErrorMessage(error, 'Registration failed'));
     }
   };
 
@@ -73,6 +87,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     await authService.logout(SessionUtils.getSessionId());
     setUser(null);
   };
+
+  // The refresh token was rejected (expired / revoked): treat as signed out.
+  useEffect(() => {
+    const onExpired = () => setUser(null);
+    window.addEventListener(AUTH_EXPIRED_EVENT, onExpired);
+    return () => window.removeEventListener(AUTH_EXPIRED_EVENT, onExpired);
+  }, []);
 
   // Keep the browser's image session in step with who is signed in (no
   // sharing between accounts on one browser). Waits until the initial auth

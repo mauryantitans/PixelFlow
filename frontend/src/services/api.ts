@@ -10,13 +10,9 @@ import {
   OperationSchema
 } from '../types';
 
-// Read a cookie value by name (used for the CSRF double-submit token).
-export function getCookie(name: string): string | null {
-  const match = document.cookie.match(new RegExp('(^|;\\s*)' + name + '=([^;]*)'));
-  return match ? decodeURIComponent(match[2]) : null;
-}
+import { prepareRequest, retryOn401 } from './tokenRefresh';
 
-const UNSAFE_METHODS = ['post', 'put', 'delete', 'patch'];
+export { getCookie } from './cookies';
 
 // Create axios instance with base configuration.
 // withCredentials sends the httpOnly auth cookies on every request.
@@ -29,24 +25,12 @@ const api = axios.create({
   },
 });
 
-// Request interceptor: echo the CSRF cookie back as a header on state-changing
-// requests (double-submit-cookie CSRF protection; the backend verifies the match).
-api.interceptors.request.use((config) => {
-  if (config.method && UNSAFE_METHODS.includes(config.method.toLowerCase())) {
-    const csrf = getCookie('pf_csrf');
-    if (csrf) {
-      config.headers = config.headers ?? {};
-      (config.headers as any)['X-CSRF-Token'] = csrf;
-    }
-  }
-  return config;
-});
+// Keep the signed-in user's tokens fresh before each call, then echo the CSRF
+// cookie as a header on state-changing requests (double-submit-cookie CSRF).
+api.interceptors.request.use(prepareRequest);
 
-// Response interceptor for error handling
-api.interceptors.response.use(
-  (response) => response,
-  (error) => Promise.reject(error)
-);
+// On 401: refresh once and retry (see services/tokenRefresh.ts).
+api.interceptors.response.use((response) => response, retryOn401((config) => api(config)));
 
 export class ApiService {
   /**
@@ -182,6 +166,15 @@ export class ApiService {
       if (error.response?.status === 404) {
         return [];
       }
+      throw this.handleError(error);
+    }
+  }
+
+  /** Delete one uploaded image (owner or same guest session). */
+  static async deleteImage(imageId: string): Promise<void> {
+    try {
+      await api.delete(`/images/image/${encodeURIComponent(imageId)}`);
+    } catch (error: any) {
       throw this.handleError(error);
     }
   }

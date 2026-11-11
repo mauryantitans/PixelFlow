@@ -5,7 +5,7 @@ import {
   SavedPipeline,
   CreatePipelineRequest
 } from '../types';
-import { getCookie } from './api';
+import { markTokensFresh, prepareRequest, refreshTokens, retryOn401 } from './tokenRefresh';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
 
@@ -14,17 +14,8 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api
 // cookie back as a header on state-changing requests (double-submit-cookie).
 axios.defaults.withCredentials = true;
 
-const UNSAFE_METHODS = ['post', 'put', 'delete', 'patch'];
-axios.interceptors.request.use((config) => {
-  if (config.method && UNSAFE_METHODS.includes(config.method.toLowerCase())) {
-    const csrf = getCookie('pf_csrf');
-    if (csrf) {
-      config.headers = config.headers ?? {};
-      (config.headers as any)['X-CSRF-Token'] = csrf;
-    }
-  }
-  return config;
-});
+// Shared with the `api` instance: proactive token refresh + CSRF header.
+axios.interceptors.request.use(prepareRequest);
 
 export const authService = {
   // Login — backend sets httpOnly cookies and returns the user record.
@@ -33,6 +24,7 @@ export const authService = {
       email,
       password,
     });
+    markTokensFresh();
     return response.data;
   },
 
@@ -56,13 +48,8 @@ export const authService = {
 
   // Silently rotate tokens using the httpOnly refresh cookie.
   // Returns true on success, false if the refresh token is invalid/expired.
-  async refreshTokens(): Promise<boolean> {
-    try {
-      await axios.post(`${API_BASE_URL}/auth/refresh`, {});
-      return true;
-    } catch {
-      return false;
-    }
+  refreshTokens(): Promise<boolean> {
+    return refreshTokens();
   },
 
   // Logout: backend clears the cookies and cleans up session data.
@@ -131,54 +118,5 @@ export const pipelineService = {
 };
 
 // Track whether a refresh is already in-flight to avoid parallel refresh storms.
-let isRefreshing = false;
-let refreshQueue: Array<(ok: boolean) => void> = [];
-
-function processQueue(ok: boolean) {
-  refreshQueue.forEach((resolve) => resolve(ok));
-  refreshQueue = [];
-}
-
-// Axios interceptor: on 401, attempt a silent cookie refresh then retry the
-// original request once. The fresh access token arrives as a cookie, so the
-// retry needs no header changes. If the refresh fails, redirect to /auth.
-axios.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-    const isAuthRefresh = originalRequest?.url?.includes('/auth/refresh');
-
-    if (
-      error.response?.status === 401 &&
-      originalRequest &&
-      !originalRequest._retried &&
-      !isAuthRefresh
-    ) {
-      originalRequest._retried = true;
-
-      if (isRefreshing) {
-        // Another refresh is in-flight — queue this request until it resolves.
-        return new Promise((resolve, reject) => {
-          refreshQueue.push((ok) => (ok ? resolve(axios(originalRequest)) : reject(error)));
-        });
-      }
-
-      isRefreshing = true;
-      const success = await authService.refreshTokens();
-      isRefreshing = false;
-      processQueue(success);
-
-      if (success) {
-        return axios(originalRequest);
-      }
-      const isPublicPage = ['/', '/auth', '/login', '/register', '/app'].includes(
-        window.location.pathname
-      );
-      if (!isPublicPage) {
-        window.location.href = '/auth';
-      }
-    }
-
-    return Promise.reject(error);
-  }
-);
+// On 401: refresh once (single-flight, shared with the api instance) and retry.
+axios.interceptors.response.use((response) => response, retryOn401((config) => axios(config)));
