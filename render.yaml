@@ -61,6 +61,14 @@ services:
           name: pixelflow-db
           property: connectionString
 
+      # ── Rate limiting behind proxies ─────────────────────────────────────────
+      # Without this, all visitors share one rate-limit bucket (they all reach
+      # the app from Render's proxy IP). Uncomment ONE:
+      #   1 = browser calls Render directly (REACT_APP_API_URL=https://…onrender.com/api)
+      #   2 = browser calls Vercel, which proxies /api to Render (REACT_APP_API_URL=/api)
+      # - key: TRUSTED_PROXY_HOPS
+      #   value: 2
+
       # ── Security ─────────────────────────────────────────────────────────────
       # Render generates a unique, stable value on first deploy.
       - key: SECRET_KEY

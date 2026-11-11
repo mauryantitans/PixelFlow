@@ -5,6 +5,7 @@ All security-related settings in one place for easy management.
 Modify these values to adjust security behavior across the entire application.
 """
 
+import os
 from datetime import timedelta
 from typing import List, Optional
 
@@ -53,14 +54,24 @@ class RateLimiting:
     UPLOAD_REQUESTS: int = 30
     UPLOAD_WINDOW: timedelta = timedelta(minutes=1)  # 30 uploads per minute
     
-    # Rate limit for processing endpoints
-    PROCESS_REQUESTS: int = 50
-    PROCESS_WINDOW: timedelta = timedelta(minutes=1)  # 50 processing requests per minute
+    # Rate limit for processing endpoints. Live preview sends one request per
+    # parameter change (debounced) and batch mode one per image, so 50/min was
+    # easy to hit in normal use.
+    PROCESS_REQUESTS: int = 150
+    PROCESS_WINDOW: timedelta = timedelta(minutes=1)  # 150 processing requests per minute
     
     # Rate limit for admin endpoints (most restrictive)
     ADMIN_REQUESTS: int = 30
     ADMIN_WINDOW: timedelta = timedelta(minutes=1)  # 30 requests per minute
     
+    # How many proxies in front of the app you trust to append the client IP
+    # to X-Forwarded-For. 0 = use the TCP peer (default; safe when nothing is
+    # in front). Behind Render only: 1. Behind Vercel's /api rewrite AND
+    # Render: 2. The client IP is then X-Forwarded-For[-hops], i.e. the entry
+    # written by the outermost trusted proxy, so a client can't spoof it.
+    # Without this, every visitor behind the proxy shares one rate-limit bucket.
+    TRUSTED_PROXY_HOPS: int = int(os.environ.get("TRUSTED_PROXY_HOPS", "0"))
+
     # Paths that are never rate limited. The frontend's connection indicator
     # polls the health check; behind Render's proxy every visitor shares one
     # client IP, so counting it would put all users in the same bucket.

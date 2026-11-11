@@ -22,6 +22,22 @@ logger = logging.getLogger(__name__)
 request_history: Dict[str, Dict[str, list]] = defaultdict(lambda: defaultdict(list))
 
 
+def client_ip_for(request: Request) -> str:
+    """The client's IP for rate limiting.
+
+    With RateLimiting.TRUSTED_PROXY_HOPS = n > 0, take the n-th entry from the
+    right of X-Forwarded-For (the one written by the outermost proxy we
+    trust); entries further left are client-supplied and ignored.
+    """
+    hops = RateLimiting.TRUSTED_PROXY_HOPS
+    if hops > 0:
+        xff = request.headers.get("x-forwarded-for", "")
+        parts = [p.strip() for p in xff.split(",") if p.strip()]
+        if len(parts) >= hops:
+            return parts[-hops]
+    return request.client.host if request.client else "unknown"
+
+
 class RateLimitMiddleware(BaseHTTPMiddleware):
     """Middleware to enforce rate limiting on API endpoints"""
     
@@ -36,8 +52,8 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         if not self.enabled:
             return await call_next(request)
         
-        # Get client IP
-        client_ip = request.client.host if request.client else "unknown"
+        # Get client IP (honours TRUSTED_PROXY_HOPS behind Render / Vercel)
+        client_ip = client_ip_for(request)
         
         # Check if IP is exempted
         if client_ip in RateLimiting.EXEMPTED_IPS:
