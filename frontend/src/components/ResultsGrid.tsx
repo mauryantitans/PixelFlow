@@ -183,45 +183,47 @@ const ResultsGridComponent: React.FC<ResultsGridProps> = ({
                   className="w-full h-auto block"
                   loading="lazy"
                 />
-                
-                {/* Hover overlay with actions */}
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity flex items-center justify-center space-x-2">
-                  <button
-                    onClick={(e) => handleDownloadSingle(result, index, e)}
-                    className="p-2 bg-white/90 dark:bg-zinc-800/90 rounded-full hover:bg-white dark:hover:bg-zinc-700 transition-colors"
-                    title="Download"
-                    aria-label={`Download result ${index + 1}`}
-                  >
-                    <LucideReact.Download aria-hidden="true" className="w-4 h-4 text-gray-900 dark:text-white" />
-                  </button>
-                  
-                  <button
-                    onClick={(e) => handleShowAnalytics(result, index, e)}
-                    className="p-2 bg-white/90 dark:bg-zinc-800/90 rounded-full hover:bg-white dark:hover:bg-zinc-700 transition-colors"
-                    title="Analytics"
-                    aria-label={`Analytics for result ${index + 1}`}
-                  >
-                    <LucideReact.BarChart3 aria-hidden="true" className="w-4 h-4 text-gray-900 dark:text-white" />
-                  </button>
-                  
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onResultSelect(result);
-                    }}
-                    className="p-2 bg-white/90 dark:bg-zinc-800/90 rounded-full hover:bg-white dark:hover:bg-zinc-700 transition-colors"
-                    title="Inspect"
-                    aria-label={`Inspect result ${index + 1}`}
-                  >
-                    <LucideReact.Eye aria-hidden="true" className="w-4 h-4 text-gray-900 dark:text-white" />
-                  </button>
-                </div>
               </div>
-              
+
+              {/* Actions are always visible (they used to appear only on hover
+                  as an overlay covering the image, which touch users could not
+                  reach; WCAG 1.4.13, 2.1.1). */}
               <div className="p-2">
                 <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
                   Result {index + 1}
                 </p>
+                <div className="mt-1 flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={(e) => handleDownloadSingle(result, index, e)}
+                    className="p-1.5 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-700 transition-colors"
+                    title="Download"
+                    aria-label={`Download result ${index + 1}`}
+                  >
+                    <LucideReact.Download aria-hidden="true" className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => handleShowAnalytics(result, index, e)}
+                    className="p-1.5 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-700 transition-colors"
+                    title="Analytics"
+                    aria-label={`Analytics for result ${index + 1}`}
+                  >
+                    <LucideReact.BarChart3 aria-hidden="true" className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onResultSelect(result);
+                    }}
+                    className="p-1.5 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-700 transition-colors"
+                    title="Inspect"
+                    aria-label={`Inspect result ${index + 1}`}
+                  >
+                    <LucideReact.Eye aria-hidden="true" className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
           ))}

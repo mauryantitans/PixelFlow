@@ -178,8 +178,9 @@ const GalleryModal: React.FC<GalleryModalProps> = ({
                       </span>
                     </button>
 
-                    {/* Hover / focus controls */}
-                    <div className="absolute top-1 left-1 flex gap-1 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-200 z-20">
+                    {/* View / delete controls are always visible: hover-only
+                        controls were unreachable on touch screens (WCAG 1.4.13). */}
+                    <div className="absolute top-1 left-1 flex gap-1 z-20">
                       <button
                         type="button"
                         onClick={(e) => {

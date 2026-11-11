@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { X, BarChart3, Info } from 'lucide-react';
+import { X, BarChart3 } from 'lucide-react';
 import { useDialog } from '../hooks/useDialog';
 import { calculateHistogram, calculateImageStats } from '../utils/download';
 
@@ -230,15 +230,11 @@ export const ImageAnalytics: React.FC<ImageAnalyticsProps> = ({
               {/* Histograms */}
               {histogram && (
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center space-x-2">
-                    <span>Histograms</span>
-                    <div className="group relative">
-                      <Info aria-hidden="true" size={16} className="text-gray-600 cursor-help dark:text-gray-400" />
-                      <div className="hidden group-hover:block absolute left-0 top-full mt-1 w-64 p-2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs rounded shadow-lg z-10">
-                        Histograms show the distribution of pixel values across different color channels.
-                      </div>
-                    </div>
-                  </h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Histograms</h3>
+                  {/* Was a hover-only tooltip (unreachable by keyboard/touch); now plain text. */}
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                    Histograms show the distribution of pixel values across different color channels.
+                  </p>
                   
                   {renderHistogram(histogram.red, '#ef4444', 'Red Channel')}
                   {renderHistogram(histogram.green, '#22c55e', 'Green Channel')}

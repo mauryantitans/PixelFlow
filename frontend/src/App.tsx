@@ -94,6 +94,8 @@ const App: React.FC = () => {
   
   // State for search functionality
   const [operationSearch, setOperationSearch] = useState('');
+  // Operation whose description is shown under the search box (hover/focus).
+  const [hintOp, setHintOp] = useState<string | null>(null);
   
   // State for selected result in batch mode
   const [selectedResult, setSelectedResult] = useState<ProcessedResult | null>(null);
@@ -556,6 +558,20 @@ const App: React.FC = () => {
               <LucideReact.Search aria-hidden="true" className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-600 dark:text-gray-400" />
             </div>
 
+            {/* Description of the hovered/focused operation. It replaces a
+                tooltip that was clipped by the button (never visible). Being in
+                the normal flow it never covers other content and stays until
+                another operation is hovered or focused (WCAG 1.4.13). Screen
+                readers get the same text through aria-describedby. */}
+            <p aria-hidden="true" className="text-xs text-slate-700 dark:text-slate-300 mb-3 min-h-[2.5rem]">
+              {hintOp && getOp(hintOp)?.description ? (
+                <>
+                  <span className="font-semibold">{hintOp}:</span> {getOp(hintOp)?.description}
+                </>
+              ) : (
+                'Hover over or focus an operation to see what it does. Click or press Enter to add it.'
+              )}
+            </p>
             
             {/* Enhanced Operations List */}
             <div className="flex-grow overflow-y-auto space-y-1 pr-1 max-h-[60vh] md:max-h-none">
@@ -624,19 +640,17 @@ const App: React.FC = () => {
                                   type="button"
                                   data-op={op}
                                   onClick={() => handleAddOperation(op)}
+                                  onMouseEnter={() => setHintOp(op)}
+                                  onFocus={() => setHintOp(op)}
                                   aria-label={`Add ${op}`}
                                   aria-describedby={getOp(op)?.description ? `op-desc-${op.replace(/[^a-zA-Z0-9]/g, '-')}` : undefined}
                                   className="operation-btn-enhanced group"
                                 >
                                   {op}
                                   {getOp(op)?.description && (
-                                    <div
-                                      id={`op-desc-${op.replace(/[^a-zA-Z0-9]/g, '-')}`}
-                                      aria-hidden="true"
-                                      className="operation-tooltip"
-                                    >
+                                    <span id={`op-desc-${op.replace(/[^a-zA-Z0-9]/g, '-')}`} hidden>
                                       {getOp(op)?.description}
-                                    </div>
+                                    </span>
                                   )}
                                 </button>
                               ))}
