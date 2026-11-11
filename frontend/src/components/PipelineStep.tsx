@@ -89,7 +89,7 @@ const PipelineStepComponent: React.FC<PipelineStepProps> = ({
           aria-label={`Move ${stepLabel} up`}
           aria-keyshortcuts="Alt+ArrowUp"
           title="Move up"
-          className="reorder-btn text-gray-600 hover:text-zinc-800 dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed dark:text-gray-400"
+          className="reorder-btn p-1 rounded text-gray-600 hover:text-zinc-800 dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed dark:text-gray-400"
         >
           <LucideReact.ArrowUp aria-hidden="true" className="w-4 h-4" />
         </button>
@@ -101,7 +101,7 @@ const PipelineStepComponent: React.FC<PipelineStepProps> = ({
           aria-label={`Move ${stepLabel} down`}
           aria-keyshortcuts="Alt+ArrowDown"
           title="Move down"
-          className="reorder-btn text-gray-600 hover:text-zinc-800 dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed dark:text-gray-400"
+          className="reorder-btn p-1 rounded text-gray-600 hover:text-zinc-800 dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed dark:text-gray-400"
         >
           <LucideReact.ArrowDown aria-hidden="true" className="w-4 h-4" />
         </button>

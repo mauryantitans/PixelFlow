@@ -144,7 +144,6 @@ const GalleryModal: React.FC<GalleryModalProps> = ({
                       type="button"
                       onClick={() => onImageSelect(image.id)}
                       aria-pressed={!!image.selected}
-                      aria-label={`${image.filename}, ${image.width} × ${image.height}`}
                       className="block w-full text-left cursor-pointer"
                     >
                       <span className="relative block">

@@ -238,7 +238,6 @@ export const Header: React.FC = () => {
                     aria-haspopup="menu"
                     aria-expanded={showMenu}
                     aria-controls="account-menu"
-                    aria-label={`Account menu for ${user.username}`}
                     className="flex items-center space-x-2 px-3 py-1.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-md transition-colors"
                   >
                     {user.profile_picture ? (
@@ -254,7 +253,10 @@ export const Header: React.FC = () => {
                         </span>
                       </div>
                     )}
-                    <span className="hidden sm:inline max-w-[120px] truncate font-medium text-slate-900 dark:text-slate-50">
+                    {/* Name comes from the content so it always includes the
+                        visible username (WCAG 2.5.3 Label in Name). */}
+                    <span className="sr-only">Account menu for </span>
+                    <span className="sr-only sm:not-sr-only sm:inline-block max-w-[120px] truncate font-medium text-slate-900 dark:text-slate-50">
                       {user.username}
                     </span>
                   </button>

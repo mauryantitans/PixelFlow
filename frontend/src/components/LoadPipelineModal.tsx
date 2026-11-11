@@ -144,7 +144,7 @@ export const LoadPipelineModal: React.FC<LoadPipelineModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Close load pipeline dialog"
-            className="text-gray-600 hover:text-gray-600 transition-colors dark:text-gray-400"
+            className="text-gray-600 hover:text-gray-600 transition-colors"
           >
             <X aria-hidden="true" className="w-6 h-6" />
           </button>
@@ -231,11 +231,11 @@ export const LoadPipelineModal: React.FC<LoadPipelineModalProps> = ({
             </div>
           ) : pipelines.length === 0 ? (
             <div className="text-center py-12">
-              <FolderOpen aria-hidden="true" className="w-16 h-16 text-gray-600 mx-auto mb-4 dark:text-gray-400" />
+              <FolderOpen aria-hidden="true" className="w-16 h-16 text-gray-600 mx-auto mb-4" />
               <p className="text-gray-600 font-medium mb-2">
                 {activeTab === 'my' ? 'No saved pipelines yet' : 'No public pipelines available'}
               </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-gray-600">
                 {activeTab === 'my' 
                   ? 'Create your first pipeline and save it!' 
                   : 'Check back later for community pipelines'}
@@ -266,7 +266,7 @@ export const LoadPipelineModal: React.FC<LoadPipelineModalProps> = ({
                     )}
                   </div>
 
-                  <div className="flex items-center space-x-4 text-xs text-gray-600 mb-3 dark:text-gray-400">
+                  <div className="flex items-center space-x-4 text-xs text-gray-600 mb-3">
                     <div className="flex items-center space-x-1">
                       <Layers aria-hidden="true" size={14} />
                       <span>{pipeline.pipeline_data?.length || 0} operations</span>

@@ -94,7 +94,7 @@ export const SavePipelineModal: React.FC<SavePipelineModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Close save pipeline dialog"
-            className="text-gray-600 hover:text-gray-600 transition-colors dark:text-gray-400"
+            className="text-gray-600 hover:text-gray-600 transition-colors"
           >
             <X aria-hidden="true" className="w-6 h-6" />
           </button>
@@ -202,7 +202,7 @@ export const SavePipelineModal: React.FC<SavePipelineModalProps> = ({
             />
             <label htmlFor="is_public" className="ml-2 block text-sm text-gray-700">
               <span className="font-medium">Make this pipeline public</span>
-              <p className="text-gray-600 text-xs mt-1 dark:text-gray-400">
+              <p className="text-gray-600 text-xs mt-1">
                 Other users will be able to view and use this pipeline
               </p>
             </label>
