@@ -52,6 +52,9 @@ export function useConnectionStatus({ intervalMs = 60000, slowMs = 4000, timeout
     const hardTimeout = window.setTimeout(() => ctrl.abort(), timeoutMs);
     try {
       const res = await fetch(HEALTH_URL, { cache: 'no-store', credentials: 'omit', signal: ctrl.signal });
+      // Read the (tiny) body: an unread response stays open in the browser,
+      // holding a connection and keeping the page from ever going idle.
+      await res.text();
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       failures.current = 0;
       setState('connected');
