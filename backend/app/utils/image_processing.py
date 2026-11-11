@@ -125,6 +125,20 @@ class ImageProcessor:
             return image
     
     @staticmethod
+    def _to_uint8(arr: np.ndarray) -> np.ndarray:
+        """Convert an operation's output to uint8 safely.
+
+        scikit-image keeps the input dtype for some functions (adjust_gamma and
+        rescale_intensity return 0-255 uint8 for uint8 input) and returns 0-1
+        floats for others. Multiplying a uint8 result by 255 overflowed and
+        wrapped the colours, so convert by dtype and clip.
+        """
+        if np.issubdtype(arr.dtype, np.floating):
+            arr = np.nan_to_num(arr, nan=0.0, posinf=1.0, neginf=0.0)
+            return (np.clip(arr, 0.0, 1.0) * 255.0 + 0.5).astype(np.uint8)
+        return np.clip(arr, 0, 255).astype(np.uint8)
+
+    @staticmethod
     def apply_exposure(image: Image.Image, amount: int) -> Image.Image:
         """Apply exposure adjustment (-100 to 100)"""
         try:
@@ -132,7 +146,7 @@ class ImageProcessor:
             gamma = 1.0 + (amount / 200.0)
             gamma = max(0.3, min(gamma, 2.5))
             corrected = exposure.adjust_gamma(img_array, gamma)
-            return Image.fromarray((corrected * 255).astype(np.uint8))
+            return Image.fromarray(ImageProcessor._to_uint8(corrected))
         except Exception as e:
             logger.error(f"Error applying exposure: {e}")
             return image
@@ -700,7 +714,7 @@ class ImageProcessor:
         try:
             img_array = np.array(image)
             corrected = exposure.adjust_gamma(img_array, gamma)
-            return Image.fromarray((corrected * 255).astype(np.uint8))
+            return Image.fromarray(ImageProcessor._to_uint8(corrected))
         except Exception as e:
             logger.error(f"Error applying gamma correction: {e}")
             return image
@@ -717,7 +731,7 @@ class ImageProcessor:
             else:  # dtype
                 stretched = exposure.rescale_intensity(img_array)
                 
-            return Image.fromarray((stretched * 255).astype(np.uint8))
+            return Image.fromarray(ImageProcessor._to_uint8(stretched))
         except Exception as e:
             logger.error(f"Error applying contrast stretching: {e}")
             return image
@@ -728,7 +742,7 @@ class ImageProcessor:
         try:
             img_array = np.array(image).astype(np.float32) / 255.0
             adjusted = exposure.adjust_log(img_array, gain=gain)
-            return Image.fromarray((adjusted * 255).astype(np.uint8))
+            return Image.fromarray(ImageProcessor._to_uint8(adjusted))
         except Exception as e:
             logger.error(f"Error applying log adjustment: {e}")
             return image
@@ -739,7 +753,7 @@ class ImageProcessor:
         try:
             img_array = np.array(image).astype(np.float32) / 255.0
             adjusted = exposure.adjust_sigmoid(img_array, cutoff=cutoff, gain=gain)
-            return Image.fromarray((adjusted * 255).astype(np.uint8))
+            return Image.fromarray(ImageProcessor._to_uint8(adjusted))
         except Exception as e:
             logger.error(f"Error applying sigmoid adjustment: {e}")
             return image
@@ -752,7 +766,7 @@ class ImageProcessor:
             img_array = np.array(image)
             img_float = img_array.astype(np.float32) / 255.0
             denoised = restoration.denoise_wavelet(img_float, sigma=sigma, channel_axis=-1)
-            return Image.fromarray((denoised * 255).astype(np.uint8))
+            return Image.fromarray(ImageProcessor._to_uint8(denoised))
         except Exception as e:
             logger.error(f"Error applying wavelet denoising: {e}")
             return image
@@ -762,9 +776,14 @@ class ImageProcessor:
         """Apply unsharp mask sharpening"""
         try:
             img_array = np.array(image)
-            img_float = img_array.astype(np.float32) / 255.0
-            sharpened = filters.unsharp_mask(img_float, radius=radius, amount=amount, channel_axis=-1)
-            return Image.fromarray((sharpened * 255).astype(np.uint8))
+            # Classic unsharp mask: image + amount * (image - gaussian blur).
+            # Implemented directly: scikit-image 0.22's filters.unsharp_mask
+            # returned wrong values here (amount=0 changed every pixel, a flat
+            # grey image came back white).
+            img_float = img_array.astype(np.float64) / 255.0
+            blurred = cv2.GaussianBlur(img_float, (0, 0), sigmaX=max(float(radius), 0.1))
+            sharpened = img_float + float(amount) * (img_float - blurred)
+            return Image.fromarray(ImageProcessor._to_uint8(sharpened))
         except Exception as e:
             logger.error(f"Error applying unsharp mask: {e}")
             return image
@@ -840,7 +859,7 @@ class ImageProcessor:
             img_array = np.array(image).astype(np.float32) / 255.0
             segments = segmentation.slic(img_array, n_segments=n_segments, compactness=compactness)
             segmented = segmentation.mark_boundaries(img_array, segments)
-            return Image.fromarray((segmented * 255).astype(np.uint8))
+            return Image.fromarray(ImageProcessor._to_uint8(segmented))
         except Exception as e:
             logger.error(f"Error applying SLIC superpixels: {e}")
             return image
