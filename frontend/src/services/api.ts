@@ -226,24 +226,35 @@ export class ApiService {
   /**
    * Handle API errors and convert to standard format
    */
+  /**
+   * Turn an axios error into an Error with a readable message, keeping the
+   * HTTP status and response so callers can react to specific cases (quota
+   * popups check `response.status === 507` / the 400 "Image limit reached"
+   * detail; a 403/409 on the session starts a new one). FastAPI puts the
+   * reason in `detail` (a string, or an object with `message`/`error`).
+   */
   private static handleError(error: any): Error {
+    let err: any;
     if (error.response) {
-      // Server responded with error status
-      const errorData = error.response.data;
-      if (errorData && errorData.message) {
-        return new Error(errorData.message);
-      } else if (errorData && errorData.error) {
-        return new Error(errorData.error);
-      } else {
-        return new Error(`HTTP ${error.response.status}: ${error.response.statusText}`);
-      }
+      const data = error.response.data;
+      const detail = data?.detail;
+      const message =
+        (typeof detail === 'string' && detail) ||
+        (detail && typeof detail === 'object' && (detail.message || detail.error)) ||
+        data?.message ||
+        data?.error ||
+        `HTTP ${error.response.status}: ${error.response.statusText}`;
+      err = new Error(message);
+      err.status = error.response.status;
+      err.response = error.response;
+      err.code = detail && typeof detail === 'object' ? detail.error : undefined;
     } else if (error.request) {
-      // Request made but no response
-      return new Error('Network error: Unable to connect to server');
+      err = new Error('Network error: Unable to connect to server');
+      err.isNetworkError = true;
     } else {
-      // Something else happened
-      return new Error(error.message || 'An unexpected error occurred');
+      err = new Error(error.message || 'An unexpected error occurred');
     }
+    return err;
   }
 
   /**
