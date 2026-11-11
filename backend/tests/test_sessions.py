@@ -179,6 +179,23 @@ def test_full_cleanup_removes_expired_sessions_but_keeps_active_ones(db):
     assert db.query(DBSession).filter_by(id="sess-active").first() is not None
 
 
+def test_auto_cleanup_switch_stops_the_scheduler_but_not_a_manual_run(db):
+    from app.utils.settings_manager import get_settings
+
+    get_settings(db, use_cache=False).enable_auto_cleanup = False
+    db.commit()
+    old = create_or_update_session(db, "sess-old2")
+    old.expires_at = datetime.now(timezone.utc) - timedelta(days=2)
+    db.commit()
+
+    assert CleanupService.run_full_cleanup(db) == {"enabled": False, "total_deleted": 0}
+    assert db.query(DBSession).filter_by(id="sess-old2").first() is not None
+
+    result = CleanupService.run_full_cleanup(db, force=True)
+    assert result["sessions"]["sessions_deleted"] == 1
+    assert db.query(DBSession).filter_by(id="sess-old2").first() is None
+
+
 # --- admin settings validation ------------------------------------------------
 
 

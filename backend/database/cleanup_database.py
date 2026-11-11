@@ -8,18 +8,19 @@ Run this script to clean up:
 - Old processed images
 - Orphaned data
 
-Configure cleanup rules in: app/core/business_rules.py
+Retention periods come from the admin panel (Admin -> Retention). Runs even
+when automatic cleanup is switched off.
 """
 
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))  # backend/, so "app" imports
 
 from app.utils.cleanup_service import manual_cleanup
 
 if __name__ == "__main__":
     print("\n🧹 Starting manual database cleanup...")
-    print("📋 Cleanup rules from: app/core/business_rules.py\n")
+    print("📋 Retention periods from the admin settings (system_settings table)\n")
     
     manual_cleanup()

@@ -241,8 +241,8 @@ async def run_cleanup(
     current_user: User = Depends(get_current_active_admin),
     db: Session = Depends(get_db)
 ):
-    """Manually trigger cleanup (admin only)"""
-    results = CleanupService.run_full_cleanup(db)
+    """Manually trigger cleanup (admin only). Runs even when auto-cleanup is off."""
+    results = CleanupService.run_full_cleanup(db, force=True)
     
     return {
         "success": True,

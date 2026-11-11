@@ -177,10 +177,14 @@ class CleanupService:
         return {"deleted": deleted}
 
     @staticmethod
-    def run_full_cleanup(db: Session) -> dict:
-        """Run all cleanup tasks"""
-        if not get_settings(db).enable_auto_cleanup:
-            return {"enabled": False}
+    def run_full_cleanup(db: Session, *, force: bool = False) -> dict:
+        """Run all cleanup tasks.
+
+        The admin's auto-cleanup switch governs the background scheduler only;
+        an explicit run (admin button, manual script) passes ``force=True``.
+        """
+        if not force and not get_settings(db).enable_auto_cleanup:
+            return {"enabled": False, "total_deleted": 0}
         
         logger.info("Starting automated cleanup...")
         
@@ -251,7 +255,7 @@ def manual_cleanup():
     """Manually run cleanup (can be called via script or cron)"""
     db = SessionLocal()
     try:
-        results = CleanupService.run_full_cleanup(db)
+        results = CleanupService.run_full_cleanup(db, force=True)
         print("\n" + "="*70)
         print("🧹 MANUAL CLEANUP COMPLETE")
         print("="*70)
