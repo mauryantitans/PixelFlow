@@ -42,9 +42,11 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         # Check if IP is exempted
         if client_ip in RateLimiting.EXEMPTED_IPS:
             return await call_next(request)
-        
+
         # Get endpoint path
         path = request.url.path
+        if path in RateLimiting.EXEMPTED_PATHS:
+            return await call_next(request)
         
         # Determine rate limit based on endpoint
         limit, window = self._get_rate_limit(path)

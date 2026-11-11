@@ -2,7 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { usePipelineContext } from '../contexts/PipelineContext';
-import { useTheme, useSessionHeartbeat } from '../hooks';
+import { useTheme } from '../hooks';
+import { ConnectionStatus } from './ConnectionStatus';
 import { LogOut, Save, FolderOpen, LogIn, Home, BookOpen, Github, Zap, Moon, Sun, Settings } from 'lucide-react';
 import { SavePipelineModal } from './SavePipelineModal';
 import { LoadPipelineModal } from './LoadPipelineModal';
@@ -14,7 +15,6 @@ export const Header: React.FC = () => {
   const { user, logout, isAuthenticated } = useAuth();
   const { pipeline, setPipeline } = usePipelineContext();
   const { theme, toggleTheme } = useTheme();
-  const { isActive } = useSessionHeartbeat(); // Get session status
   const navigate = useNavigate();
   const location = useLocation();
   const [showMenu, setShowMenu] = useState(false);
@@ -175,15 +175,8 @@ export const Header: React.FC = () => {
             </nav>
           </div>
 
-          {/* Center - Session Status */}
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-700">
-            <div className={`w-2 h-2 rounded-full ${
-              isActive ? 'bg-green-500 animate-pulse' : 'bg-red-500'
-            }`}></div>
-            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-              Session - {isActive ? 'Active' : 'Inactive'}
-            </span>
-          </div>
+          {/* Backend connection (pings /api/health; no session/database writes) */}
+          <ConnectionStatus />
 
           {/* Right Side Actions */}
           <div className="flex flex-wrap items-center gap-2">

@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Response
 from .routes import images_db, processing_db, auth, oauth, pipelines, admin
 
 api_router = APIRouter()
@@ -49,7 +49,13 @@ async def root():
     }
 
 @api_router.get("/health")
-async def health():
+async def health(response: Response):
+    """Liveness check used by the frontend connection indicator.
+
+    Deliberately cheap: no database access, no session writes, never cached,
+    and exempt from rate limiting (see RateLimiting.EXEMPTED_PATHS).
+    """
+    response.headers["Cache-Control"] = "no-store"
     return {
         "status": "healthy",
         "service": "PixelFlow API"

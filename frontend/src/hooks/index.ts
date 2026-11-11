@@ -27,48 +27,6 @@ export function useSession() {
 }
 
 /**
- * Session heartbeat hook - Keeps session active with periodic pings
- */
-export function useSessionHeartbeat() {
-  const { sessionId } = useSession();
-  const [isActive, setIsActive] = useState(true);
-  
-  useEffect(() => {
-    // Send initial heartbeat immediately
-    const sendHeartbeat = async () => {
-      try {
-        // Auth travels in the httpOnly cookie; credentials: 'include' sends it.
-        const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8000/api'}/images/heartbeat`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ session_id: sessionId })
-        });
-        
-        const data = await response.json();
-
-        if (data.success) {
-          setIsActive(true);
-        } else {
-          setIsActive(false);
-        }
-      } catch {
-        setIsActive(false);
-      }
-    };
-
-    sendHeartbeat();
-    const heartbeatInterval = setInterval(sendHeartbeat, 30000);
-
-    return () => {
-      clearInterval(heartbeatInterval);
-    };
-  }, [sessionId]);
-  
-  return { sessionId, isActive };
-}
-
-/**
  * Theme management hook
  */
 export function useTheme() {

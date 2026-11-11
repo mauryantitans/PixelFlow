@@ -61,6 +61,11 @@ class RateLimiting:
     ADMIN_REQUESTS: int = 30
     ADMIN_WINDOW: timedelta = timedelta(minutes=1)  # 30 requests per minute
     
+    # Paths that are never rate limited. The frontend's connection indicator
+    # polls the health check; behind Render's proxy every visitor shares one
+    # client IP, so counting it would put all users in the same bucket.
+    EXEMPTED_PATHS: List[str] = ["/health", "/api/health"]
+
     # Exempted IPs (won't be rate limited)
     EXEMPTED_IPS: List[str] = [
         "127.0.0.1",
