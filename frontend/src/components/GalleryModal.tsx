@@ -65,6 +65,26 @@ const GalleryModal: React.FC<GalleryModalProps> = ({
     }
   }, [isOpen, images]);
 
+  // Re-run the masonry layout whenever a card changes size, e.g. when a
+  // label wraps under text-only zoom, so cards never overlap or clip their
+  // text (WCAG 1.4.4 Resize Text).
+  useEffect(() => {
+    const grid = gridRef.current;
+    if (!grid || typeof ResizeObserver === 'undefined') return;
+    const thumbs = Array.from(grid.querySelectorAll('.gallery-thumb')) as HTMLElement[];
+    if (!thumbs.length) return;
+    let raf = 0;
+    const ro = new ResizeObserver(() => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => MasonryUtils.applyLayout(grid, thumbs, 120, 16));
+    });
+    thumbs.forEach((t) => ro.observe(t));
+    return () => {
+      ro.disconnect();
+      cancelAnimationFrame(raf);
+    };
+  }, [isOpen, images]);
+
   // Escape, focus trap and focus return are handled by useDialog.
 
   const dialogRef = useDialog<HTMLDivElement>(isOpen, onClose);
@@ -169,7 +189,7 @@ const GalleryModal: React.FC<GalleryModalProps> = ({
 
                       {/* Image Info */}
                       <span className="block p-2">
-                        <span className="block text-xs text-gray-600 dark:text-gray-400 truncate" title={image.filename}>
+                        <span className="block text-xs text-gray-600 dark:text-gray-400 break-all" title={image.filename}>
                           {image.filename}
                         </span>
                         <span className="block text-xs text-gray-600 dark:text-gray-400">
@@ -187,11 +207,11 @@ const GalleryModal: React.FC<GalleryModalProps> = ({
                           e.stopPropagation();
                           onImageView(index);
                         }}
-                        className="p-1 bg-blue-700 text-white rounded hover:bg-blue-800 shadow-lg"
+                        className="p-1.5 bg-blue-700 text-white rounded hover:bg-blue-800 shadow-lg"
                         title="View full size"
                         aria-label={`View full size: ${image.filename}`}
                       >
-                        <LucideReact.ZoomIn aria-hidden="true" className="w-3 h-3" />
+                        <LucideReact.ZoomIn aria-hidden="true" className="w-3.5 h-3.5" />
                       </button>
                       <button
                         type="button"
@@ -199,11 +219,11 @@ const GalleryModal: React.FC<GalleryModalProps> = ({
                           e.stopPropagation();
                           onImageRemove(image.id);
                         }}
-                        className="p-1 bg-red-700 text-white rounded hover:bg-red-800 shadow-lg"
+                        className="p-1.5 bg-red-700 text-white rounded hover:bg-red-800 shadow-lg"
                         title="Delete image"
                         aria-label={`Delete image: ${image.filename}`}
                       >
-                        <LucideReact.Trash2 aria-hidden="true" className="w-3 h-3" />
+                        <LucideReact.Trash2 aria-hidden="true" className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </div>

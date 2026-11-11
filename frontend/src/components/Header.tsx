@@ -319,7 +319,7 @@ export const Header: React.FC = () => {
                             setShowMenu(false);
                             navigate('/');
                           }}
-                          className="w-full flex items-center space-x-2 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                          className="w-full flex items-center space-x-2 px-4 py-2 text-sm text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                         >
                           <LogOut aria-hidden="true" size={16} />
                           <span>Logout</span>

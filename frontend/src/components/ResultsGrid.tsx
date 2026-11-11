@@ -62,6 +62,26 @@ const ResultsGridComponent: React.FC<ResultsGridProps> = ({
     }
   }, [results]);
 
+  // Re-run the masonry layout whenever a card changes size, e.g. when a
+  // label wraps under text-only zoom, so cards never overlap or clip their
+  // text (WCAG 1.4.4 Resize Text).
+  useEffect(() => {
+    const grid = gridRef.current;
+    if (!grid || typeof ResizeObserver === 'undefined') return;
+    const thumbs = Array.from(grid.querySelectorAll('.result-thumb')) as HTMLElement[];
+    if (!thumbs.length) return;
+    let raf = 0;
+    const ro = new ResizeObserver(() => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => MasonryUtils.applyLayout(grid, thumbs, 120, 16));
+    });
+    thumbs.forEach((t) => ro.observe(t));
+    return () => {
+      ro.disconnect();
+      cancelAnimationFrame(raf);
+    };
+  }, [results]);
+
   // Handle window resize
   useEffect(() => {
     const handleResize = () => {
@@ -189,10 +209,10 @@ const ResultsGridComponent: React.FC<ResultsGridProps> = ({
                   as an overlay covering the image, which touch users could not
                   reach; WCAG 1.4.13, 2.1.1). */}
               <div className="p-2">
-                <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
+                <p className="text-xs text-gray-600 dark:text-gray-400 break-words">
                   Result {index + 1}
                 </p>
-                <div className="mt-1 flex items-center justify-between">
+                <div className="mt-1 flex flex-wrap items-center justify-between gap-1">
                   <button
                     type="button"
                     onClick={(e) => handleDownloadSingle(result, index, e)}
