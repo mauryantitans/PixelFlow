@@ -1,0 +1,1484 @@
+{
+ "testEngine": {
+  "name": "axe-core",
+  "version": "4.14.0"
+ },
+ "testRunner": {
+  "name": "axe"
+ },
+ "testEnvironment": {
+  "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+  "windowWidth": 320,
+  "windowHeight": 640,
+  "orientationAngle": 0,
+  "orientationType": "landscape-primary"
+ },
+ "timestamp": "2026-11-11T18:34:49.465Z",
+ "url": "http://localhost:3000/app",
+ "toolOptions": {
+  "runOnly": {
+   "type": "tag",
+   "values": [
+    "wcag2a",
+    "wcag2aa",
+    "wcag21a",
+    "wcag21aa",
+    "best-practice"
+   ]
+  },
+  "reporter": "v1"
+ },
+ "inapplicable": [
+  "accesskeys",
+  "area-alt",
+  "aria-allowed-attr",
+  "aria-allowed-role",
+  "aria-braille-equivalent",
+  "aria-command-name",
+  "aria-conditional-attr",
+  "aria-deprecated-role",
+  "aria-dialog-name",
+  "aria-hidden-focus",
+  "aria-input-field-name",
+  "aria-meter-name",
+  "aria-progressbar-name",
+  "aria-prohibited-attr",
+  "aria-required-attr",
+  "aria-required-children",
+  "aria-required-parent",
+  "aria-roles",
+  "aria-tab-name",
+  "aria-text",
+  "aria-toggle-field-name",
+  "aria-tooltip-name",
+  "aria-treeitem-name",
+  "aria-valid-attr-value",
+  "aria-valid-attr",
+  "autocomplete-valid",
+  "avoid-inline-spacing",
+  "blink",
+  "definition-list",
+  "dlitem",
+  "empty-table-header",
+  "frame-focusable-content",
+  "frame-tested",
+  "frame-title-unique",
+  "frame-title",
+  "html-xml-lang-mismatch",
+  "input-button-name",
+  "input-image-alt",
+  "label-content-name-mismatch",
+  "landmark-banner-is-top-level",
+  "landmark-contentinfo-is-top-level",
+  "landmark-no-duplicate-contentinfo",
+  "link-in-text-block",
+  "link-name",
+  "list",
+  "listitem",
+  "marquee",
+  "meta-refresh",
+  "object-alt",
+  "presentation-role-conflict",
+  "role-img-alt",
+  "scope-attr-valid",
+  "server-side-image-map",
+  "skip-link",
+  "svg-img-alt",
+  "tabindex",
+  "table-duplicate-name",
+  "td-headers-attr",
+  "th-has-data-cells",
+  "valid-lang",
+  "video-caption",
+  "no-autoplay-audio"
+ ],
+ "passes": [
+  {
+   "id": "aria-hidden-body",
+   "impact": null,
+   "tags": [
+    "cat.aria",
+    "wcag2a",
+    "wcag131",
+    "wcag412",
+    "EN-301-549",
+    "EN-9.1.3.1",
+    "EN-9.4.1.2",
+    "RGAAv4",
+    "RGAA-10.8.1"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "button-name",
+   "impact": "critical",
+   "tags": [
+    "cat.name-role-value",
+    "wcag2a",
+    "wcag412",
+    "section508",
+    "section508.22.a",
+    "TTv5",
+    "TT6.a",
+    "EN-301-549",
+    "EN-9.4.1.2",
+    "ACT",
+    "RGAAv4",
+    "RGAA-11.9.1"
+   ],
+   "nodeCount": 26
+  },
+  {
+   "id": "bypass",
+   "impact": null,
+   "tags": [
+    "cat.keyboard",
+    "wcag2a",
+    "wcag241",
+    "section508",
+    "section508.22.o",
+    "TTv5",
+    "TT9.a",
+    "EN-301-549",
+    "EN-9.2.4.1",
+    "RGAAv4",
+    "RGAA-12.7.1"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "color-contrast",
+   "impact": "serious",
+   "tags": [
+    "cat.color",
+    "wcag2aa",
+    "wcag143",
+    "TTv5",
+    "TT13.c",
+    "EN-301-549",
+    "EN-9.1.4.3",
+    "ACT",
+    "RGAAv4",
+    "RGAA-3.2.1"
+   ],
+   "nodeCount": 38
+  },
+  {
+   "id": "document-title",
+   "impact": null,
+   "tags": [
+    "cat.text-alternatives",
+    "wcag2a",
+    "wcag242",
+    "TTv5",
+    "TT12.a",
+    "EN-301-549",
+    "EN-9.2.4.2",
+    "ACT",
+    "RGAAv4",
+    "RGAA-8.5.1"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "duplicate-id-aria",
+   "impact": null,
+   "tags": [
+    "cat.parsing",
+    "wcag2a",
+    "wcag412",
+    "EN-301-549",
+    "EN-9.4.1.2",
+    "RGAAv4",
+    "RGAA-8.2.1"
+   ],
+   "nodeCount": 6
+  },
+  {
+   "id": "empty-heading",
+   "impact": null,
+   "tags": [
+    "cat.name-role-value",
+    "best-practice"
+   ],
+   "nodeCount": 5
+  },
+  {
+   "id": "form-field-multiple-labels",
+   "impact": null,
+   "tags": [
+    "cat.forms",
+    "wcag2a",
+    "wcag332",
+    "TTv5",
+    "TT5.c",
+    "EN-301-549",
+    "EN-9.3.3.2",
+    "RGAAv4",
+    "RGAA-11.2.1"
+   ],
+   "nodeCount": 7
+  },
+  {
+   "id": "heading-order",
+   "impact": null,
+   "tags": [
+    "cat.semantics",
+    "best-practice"
+   ],
+   "nodeCount": 5
+  },
+  {
+   "id": "html-has-lang",
+   "impact": null,
+   "tags": [
+    "cat.language",
+    "wcag2a",
+    "wcag311",
+    "TTv5",
+    "TT11.a",
+    "EN-301-549",
+    "EN-9.3.1.1",
+    "ACT",
+    "RGAAv4",
+    "RGAA-8.3.1"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "html-lang-valid",
+   "impact": null,
+   "tags": [
+    "cat.language",
+    "wcag2a",
+    "wcag311",
+    "TTv5",
+    "TT11.a",
+    "EN-301-549",
+    "EN-9.3.1.1",
+    "ACT",
+    "RGAAv4",
+    "RGAA-8.4.1"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "image-alt",
+   "impact": null,
+   "tags": [
+    "cat.text-alternatives",
+    "wcag2a",
+    "wcag111",
+    "section508",
+    "section508.22.a",
+    "TTv5",
+    "TT7.a",
+    "TT7.b",
+    "EN-301-549",
+    "EN-9.1.1.1",
+    "ACT",
+    "RGAAv4",
+    "RGAA-1.1.1"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "image-redundant-alt",
+   "impact": null,
+   "tags": [
+    "cat.text-alternatives",
+    "best-practice"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "label-title-only",
+   "impact": null,
+   "tags": [
+    "cat.forms",
+    "best-practice"
+   ],
+   "nodeCount": 7
+  },
+  {
+   "id": "label",
+   "impact": "critical",
+   "tags": [
+    "cat.forms",
+    "wcag2a",
+    "wcag412",
+    "section508",
+    "section508.22.n",
+    "TTv5",
+    "TT5.c",
+    "EN-301-549",
+    "EN-9.4.1.2",
+    "ACT",
+    "RGAAv4",
+    "RGAA-11.1.1"
+   ],
+   "nodeCount": 5
+  },
+  {
+   "id": "landmark-main-is-top-level",
+   "impact": null,
+   "tags": [
+    "cat.semantics",
+    "best-practice"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "landmark-no-duplicate-banner",
+   "impact": null,
+   "tags": [
+    "cat.semantics",
+    "best-practice"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "landmark-no-duplicate-main",
+   "impact": null,
+   "tags": [
+    "cat.semantics",
+    "best-practice"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "landmark-one-main",
+   "impact": null,
+   "tags": [
+    "cat.semantics",
+    "best-practice"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "landmark-unique",
+   "impact": null,
+   "tags": [
+    "cat.semantics",
+    "best-practice"
+   ],
+   "nodeCount": 2
+  },
+  {
+   "id": "meta-viewport-large",
+   "impact": null,
+   "tags": [
+    "cat.sensory-and-visual-cues",
+    "best-practice"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "meta-viewport",
+   "impact": null,
+   "tags": [
+    "cat.sensory-and-visual-cues",
+    "wcag2aa",
+    "wcag144",
+    "EN-301-549",
+    "EN-9.1.4.4",
+    "ACT",
+    "RGAAv4",
+    "RGAA-10.4.2"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "nested-interactive",
+   "impact": null,
+   "tags": [
+    "cat.keyboard",
+    "wcag2a",
+    "wcag412",
+    "TTv5",
+    "TT6.a",
+    "EN-301-549",
+    "EN-9.4.1.2",
+    "RGAAv4",
+    "RGAA-7.1.1"
+   ],
+   "nodeCount": 48
+  },
+  {
+   "id": "page-has-heading-one",
+   "impact": null,
+   "tags": [
+    "cat.semantics",
+    "best-practice"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "region",
+   "impact": "moderate",
+   "tags": [
+    "cat.keyboard",
+    "best-practice",
+    "RGAAv4",
+    "RGAA-9.2.1"
+   ],
+   "nodeCount": 279
+  },
+  {
+   "id": "scrollable-region-focusable",
+   "impact": null,
+   "tags": [
+    "cat.keyboard",
+    "wcag2a",
+    "wcag211",
+    "wcag213",
+    "TTv5",
+    "TT4.a",
+    "EN-301-549",
+    "EN-9.2.1.1",
+    "EN-9.2.1.3",
+    "RGAAv4",
+    "RGAA-7.3.2"
+   ],
+   "nodeCount": 2
+  },
+  {
+   "id": "select-name",
+   "impact": null,
+   "tags": [
+    "cat.forms",
+    "wcag2a",
+    "wcag412",
+    "section508",
+    "section508.22.n",
+    "TTv5",
+    "TT5.c",
+    "EN-301-549",
+    "EN-9.4.1.2",
+    "ACT",
+    "RGAAv4",
+    "RGAA-11.1.1"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "summary-name",
+   "impact": null,
+   "tags": [
+    "cat.name-role-value",
+    "wcag2a",
+    "wcag412",
+    "section508",
+    "section508.22.a",
+    "TTv5",
+    "TT6.a",
+    "EN-301-549",
+    "EN-9.4.1.2"
+   ],
+   "nodeCount": 8
+  }
+ ],
+ "incomplete": [
+  {
+   "id": "color-contrast",
+   "impact": "serious",
+   "tags": [
+    "cat.color",
+    "wcag2aa",
+    "wcag143",
+    "TTv5",
+    "TT13.c",
+    "EN-301-549",
+    "EN-9.1.4.3",
+    "ACT",
+    "RGAAv4",
+    "RGAA-3.2.1"
+   ],
+   "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+   "help": "Elements must meet minimum color contrast ratio thresholds",
+   "helpUrl": "https://dequeuniversity.com/rules/axe/4.14/color-contrast?application=axe-puppeteer",
+   "nodes": [
+    {
+     "any": [
+      {
+       "id": "color-contrast",
+       "data": {
+        "contrastRatio": 0,
+        "fontSize": "10.5pt (14px)",
+        "fontWeight": "normal",
+        "messageKey": "elmPartiallyObscuring",
+        "expectedContrastRatio": "4.5:1"
+       },
+       "relatedNodes": [],
+       "impact": "serious",
+       "message": "Element's background color could not be determined because it partially overlaps other elements"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "serious",
+     "html": "<span class=\"text-sm font-medium text-slate-700 dark:text-slate-300\">Session - Active</span>",
+     "target": [
+      ".bg-slate-100 > .font-medium.text-sm.text-slate-700"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements"
+    },
+    {
+     "any": [
+      {
+       "id": "color-contrast",
+       "data": {
+        "contrastRatio": 0,
+        "fontSize": "9.0pt (12px)",
+        "fontWeight": "normal",
+        "messageKey": "shortTextContent",
+        "expectedContrastRatio": "4.5:1"
+       },
+       "relatedNodes": [
+        {
+         "html": "<div class=\"w-7 h-7 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-full flex items-center justify-center\"><span class=\"text-white text-xs font-semibold\">A</span></div>",
+         "target": [
+          ".w-7"
+         ]
+        }
+       ],
+       "impact": "serious",
+       "message": "Element content is too short to determine if it is actual text content"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "serious",
+     "html": "<span class=\"text-white text-xs font-semibold\">A</span>",
+     "target": [
+      ".text-white.font-semibold.text-xs"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element content is too short to determine if it is actual text content"
+    },
+    {
+     "any": [
+      {
+       "id": "color-contrast",
+       "data": {
+        "contrastRatio": 0,
+        "fontSize": "10.5pt (14px)",
+        "fontWeight": "bold",
+        "messageKey": "bgGradient",
+        "expectedContrastRatio": "4.5:1"
+       },
+       "relatedNodes": [
+        {
+         "html": "<div class=\"library-container library-basic\">",
+         "target": [
+          ".library-basic"
+         ]
+        }
+       ],
+       "impact": "serious",
+       "message": "Element's background color could not be determined due to a background gradient"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "serious",
+     "html": "<div class=\"flex items-center\">",
+     "target": [
+      "details[open=\"\"] > .library-header > .items-center.flex"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+    },
+    {
+     "any": [
+      {
+       "id": "color-contrast",
+       "data": {
+        "contrastRatio": 0,
+        "fontSize": "10.5pt (14px)",
+        "fontWeight": "normal",
+        "messageKey": "bgGradient",
+        "expectedContrastRatio": "4.5:1"
+       },
+       "relatedNodes": [
+        {
+         "html": "<div class=\"category-container\">",
+         "target": [
+          "details[open=\"\"] > .space-y-2.mt-2 > .category-container:nth-child(1)"
+         ]
+        },
+        {
+         "html": "<div class=\"library-container library-basic\">",
+         "target": [
+          ".library-basic"
+         ]
+        }
+       ],
+       "impact": "serious",
+       "message": "Element's background color could not be determined due to a background gradient"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "serious",
+     "html": "<span class=\"text-slate-700 dark:text-slate-300\">Adjustments</span>",
+     "target": [
+      "details[open=\"\"] > .space-y-2.mt-2 > .category-container:nth-child(1) > details[open=\"\"] > .category-header > .items-center.flex > .text-slate-700.dark\\:text-slate-300"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+    },
+    {
+     "any": [
+      {
+       "id": "color-contrast",
+       "data": {
+        "contrastRatio": 0,
+        "fontSize": "10.5pt (14px)",
+        "fontWeight": "normal",
+        "messageKey": "bgGradient",
+        "expectedContrastRatio": "4.5:1"
+       },
+       "relatedNodes": [
+        {
+         "html": "<div class=\"category-container\">",
+         "target": [
+          "details[open=\"\"] > .space-y-2.mt-2 > .category-container:nth-child(2)"
+         ]
+        },
+        {
+         "html": "<div class=\"library-container library-basic\">",
+         "target": [
+          ".library-basic"
+         ]
+        }
+       ],
+       "impact": "serious",
+       "message": "Element's background color could not be determined due to a background gradient"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "serious",
+     "html": "<span class=\"text-slate-700 dark:text-slate-300\">Filters</span>",
+     "target": [
+      "details[open=\"\"] > .space-y-2.mt-2 > .category-container:nth-child(2) > details[open=\"\"] > .category-header > .items-center.flex > .text-slate-700.dark\\:text-slate-300"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+    },
+    {
+     "any": [
+      {
+       "id": "color-contrast",
+       "data": {
+        "contrastRatio": 0,
+        "fontSize": "10.5pt (14px)",
+        "fontWeight": "normal",
+        "messageKey": "bgGradient",
+        "expectedContrastRatio": "4.5:1"
+       },
+       "relatedNodes": [
+        {
+         "html": "<div class=\"category-container\">",
+         "target": [
+          "details[open=\"\"] > .space-y-2.mt-2 > .category-container:nth-child(3)"
+         ]
+        },
+        {
+         "html": "<div class=\"library-container library-basic\">",
+         "target": [
+          ".library-basic"
+         ]
+        }
+       ],
+       "impact": "serious",
+       "message": "Element's background color could not be determined due to a background gradient"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "serious",
+     "html": "<span class=\"text-slate-700 dark:text-slate-300\">Blur &amp; Sharpen</span>",
+     "target": [
+      "details[open=\"\"] > .space-y-2.mt-2 > .category-container:nth-child(3) > details > .category-header > .items-center.flex > .text-slate-700.dark\\:text-slate-300"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+    },
+    {
+     "any": [
+      {
+       "id": "color-contrast",
+       "data": {
+        "contrastRatio": 0,
+        "fontSize": "10.5pt (14px)",
+        "fontWeight": "normal",
+        "messageKey": "bgGradient",
+        "expectedContrastRatio": "4.5:1"
+       },
+       "relatedNodes": [
+        {
+         "html": "<div class=\"category-container\">",
+         "target": [
+          "details[open=\"\"] > .space-y-2.mt-2 > .category-container:nth-child(4)"
+         ]
+        },
+        {
+         "html": "<div class=\"library-container library-basic\">",
+         "target": [
+          ".library-basic"
+         ]
+        }
+       ],
+       "impact": "serious",
+       "message": "Element's background color could not be determined due to a background gradient"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "serious",
+     "html": "<span class=\"text-slate-700 dark:text-slate-300\">Effects</span>",
+     "target": [
+      "details[open=\"\"] > .space-y-2.mt-2 > .category-container:nth-child(4) > details > .category-header > .items-center.flex > .text-slate-700.dark\\:text-slate-300"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+    },
+    {
+     "any": [
+      {
+       "id": "color-contrast",
+       "data": {
+        "contrastRatio": 0,
+        "fontSize": "10.5pt (14px)",
+        "fontWeight": "normal",
+        "messageKey": "bgGradient",
+        "expectedContrastRatio": "4.5:1"
+       },
+       "relatedNodes": [
+        {
+         "html": "<div class=\"category-container\">",
+         "target": [
+          "details[open=\"\"] > .space-y-2.mt-2 > .category-container:nth-child(5)"
+         ]
+        },
+        {
+         "html": "<div class=\"library-container library-basic\">",
+         "target": [
+          ".library-basic"
+         ]
+        }
+       ],
+       "impact": "serious",
+       "message": "Element's background color could not be determined due to a background gradient"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "serious",
+     "html": "<span class=\"text-slate-700 dark:text-slate-300\">Stylize</span>",
+     "target": [
+      "details[open=\"\"] > .space-y-2.mt-2 > .category-container:nth-child(5) > details > .category-header > .items-center.flex > .text-slate-700.dark\\:text-slate-300"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+    },
+    {
+     "any": [
+      {
+       "id": "color-contrast",
+       "data": {
+        "contrastRatio": 0,
+        "fontSize": "10.5pt (14px)",
+        "fontWeight": "bold",
+        "messageKey": "bgGradient",
+        "expectedContrastRatio": "4.5:1"
+       },
+       "relatedNodes": [
+        {
+         "html": "<div class=\"library-container library-opencv\">",
+         "target": [
+          ".library-opencv"
+         ]
+        }
+       ],
+       "impact": "serious",
+       "message": "Element's background color could not be determined due to a background gradient"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "serious",
+     "html": "<div class=\"flex items-center\">",
+     "target": [
+      ".library-opencv > details > .library-header > .items-center.flex"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+    },
+    {
+     "any": [
+      {
+       "id": "color-contrast",
+       "data": {
+        "contrastRatio": 0,
+        "fontSize": "10.5pt (14px)",
+        "fontWeight": "bold",
+        "messageKey": "bgGradient",
+        "expectedContrastRatio": "4.5:1"
+       },
+       "relatedNodes": [
+        {
+         "html": "<div class=\"library-container library-scikit\">",
+         "target": [
+          ".library-scikit"
+         ]
+        }
+       ],
+       "impact": "serious",
+       "message": "Element's background color could not be determined due to a background gradient"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "serious",
+     "html": "<div class=\"flex items-center\">",
+     "target": [
+      ".library-scikit > details > .library-header > .items-center.flex"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+    }
+   ]
+  }
+ ],
+ "violations": [
+  {
+   "id": "button-name",
+   "impact": "critical",
+   "tags": [
+    "cat.name-role-value",
+    "wcag2a",
+    "wcag412",
+    "section508",
+    "section508.22.a",
+    "TTv5",
+    "TT6.a",
+    "EN-301-549",
+    "EN-9.4.1.2",
+    "ACT",
+    "RGAAv4",
+    "RGAA-11.9.1"
+   ],
+   "description": "Ensure buttons have discernible text",
+   "help": "Buttons must have discernible text",
+   "helpUrl": "https://dequeuniversity.com/rules/axe/4.14/button-name?application=axe-puppeteer",
+   "nodes": [
+    {
+     "any": [
+      {
+       "id": "button-has-visible-text",
+       "data": null,
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "Element does not have inner text that is visible to screen readers"
+      },
+      {
+       "id": "aria-label",
+       "data": null,
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "aria-label attribute does not exist or is empty"
+      },
+      {
+       "id": "aria-labelledby",
+       "data": null,
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty"
+      },
+      {
+       "id": "non-empty-title",
+       "data": {
+        "messageKey": "noAttr"
+       },
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "Element has no title attribute"
+      },
+      {
+       "id": "implicit-label",
+       "data": null,
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "Element does not have an implicit (wrapped) <label>"
+      },
+      {
+       "id": "explicit-label",
+       "data": null,
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "Element does not have an explicit <label>"
+      },
+      {
+       "id": "presentational-role",
+       "data": null,
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "critical",
+     "html": "<button class=\"text-gray-400 hover:text-gray-600 transition-colors\">",
+     "target": [
+      ".hover\\:text-gray-600"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element does not have inner text that is visible to screen readers\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+    },
+    {
+     "any": [
+      {
+       "id": "button-has-visible-text",
+       "data": null,
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "Element does not have inner text that is visible to screen readers"
+      },
+      {
+       "id": "aria-label",
+       "data": null,
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "aria-label attribute does not exist or is empty"
+      },
+      {
+       "id": "aria-labelledby",
+       "data": null,
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty"
+      },
+      {
+       "id": "non-empty-title",
+       "data": {
+        "messageKey": "noAttr"
+       },
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "Element has no title attribute"
+      },
+      {
+       "id": "implicit-label",
+       "data": null,
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "Element does not have an implicit (wrapped) <label>"
+      },
+      {
+       "id": "explicit-label",
+       "data": null,
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "Element does not have an explicit <label>"
+      },
+      {
+       "id": "presentational-role",
+       "data": null,
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "critical",
+     "html": "<button class=\"p-1 rounded-md hover:bg-slate-100 dark:hover:bg-zinc-800 text-slate-600 dark:text-slate-300\">",
+     "target": [
+      ".p-1"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element does not have inner text that is visible to screen readers\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+    },
+    {
+     "any": [
+      {
+       "id": "button-has-visible-text",
+       "data": null,
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "Element does not have inner text that is visible to screen readers"
+      },
+      {
+       "id": "aria-label",
+       "data": null,
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "aria-label attribute does not exist or is empty"
+      },
+      {
+       "id": "aria-labelledby",
+       "data": null,
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty"
+      },
+      {
+       "id": "non-empty-title",
+       "data": {
+        "messageKey": "noAttr"
+       },
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "Element has no title attribute"
+      },
+      {
+       "id": "implicit-label",
+       "data": null,
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "Element does not have an implicit (wrapped) <label>"
+      },
+      {
+       "id": "explicit-label",
+       "data": null,
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "Element does not have an explicit <label>"
+      },
+      {
+       "id": "presentational-role",
+       "data": null,
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "critical",
+     "html": "<button disabled=\"\" class=\"reorder-btn text-gray-400 hover:text-zinc-800 dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed\">",
+     "target": [
+      ".reorder-btn.disabled\\:opacity-30.hover\\:text-zinc-800:nth-child(1)"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element does not have inner text that is visible to screen readers\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+    },
+    {
+     "any": [
+      {
+       "id": "button-has-visible-text",
+       "data": null,
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "Element does not have inner text that is visible to screen readers"
+      },
+      {
+       "id": "aria-label",
+       "data": null,
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "aria-label attribute does not exist or is empty"
+      },
+      {
+       "id": "aria-labelledby",
+       "data": null,
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty"
+      },
+      {
+       "id": "non-empty-title",
+       "data": {
+        "messageKey": "noAttr"
+       },
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "Element has no title attribute"
+      },
+      {
+       "id": "implicit-label",
+       "data": null,
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "Element does not have an implicit (wrapped) <label>"
+      },
+      {
+       "id": "explicit-label",
+       "data": null,
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "Element does not have an explicit <label>"
+      },
+      {
+       "id": "presentational-role",
+       "data": null,
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "critical",
+     "html": "<button disabled=\"\" class=\"reorder-btn text-gray-400 hover:text-zinc-800 dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed\">",
+     "target": [
+      ".reorder-btn.disabled\\:opacity-30.hover\\:text-zinc-800:nth-child(2)"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element does not have inner text that is visible to screen readers\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+    }
+   ]
+  },
+  {
+   "id": "color-contrast",
+   "impact": "serious",
+   "tags": [
+    "cat.color",
+    "wcag2aa",
+    "wcag143",
+    "TTv5",
+    "TT13.c",
+    "EN-301-549",
+    "EN-9.1.4.3",
+    "ACT",
+    "RGAAv4",
+    "RGAA-3.2.1"
+   ],
+   "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+   "help": "Elements must meet minimum color contrast ratio thresholds",
+   "helpUrl": "https://dequeuniversity.com/rules/axe/4.14/color-contrast?application=axe-puppeteer",
+   "nodes": [
+    {
+     "any": [
+      {
+       "id": "color-contrast",
+       "data": {
+        "fgColor": "#6b7280",
+        "bgColor": "#18181b",
+        "contrastRatio": 3.66,
+        "fontSize": "13.5pt (18px)",
+        "fontWeight": "normal",
+        "messageKey": null,
+        "expectedContrastRatio": "4.5:1"
+       },
+       "relatedNodes": [
+        {
+         "html": "<div class=\"flex-1 bg-white dark:bg-zinc-900 rounded-lg border-2 border-slate-300 dark:border-zinc-800 flex flex-col\">",
+         "target": [
+          ".border-2.flex-1.dark\\:bg-zinc-900"
+         ]
+        }
+       ],
+       "impact": "serious",
+       "message": "Element has insufficient color contrast of 3.66 (foreground color: #6b7280, background color: #18181b, font size: 13.5pt (18px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "serious",
+     "html": "<p class=\"font-semibold text-lg mb-2\">Processed results will appear here</p>",
+     "target": [
+      ".text-lg.mb-2.font-semibold"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.66 (foreground color: #6b7280, background color: #18181b, font size: 13.5pt (18px), font weight: normal). Expected contrast ratio of 4.5:1"
+    },
+    {
+     "any": [
+      {
+       "id": "color-contrast",
+       "data": {
+        "fgColor": "#6b7280",
+        "bgColor": "#18181b",
+        "contrastRatio": 3.66,
+        "fontSize": "10.5pt (14px)",
+        "fontWeight": "normal",
+        "messageKey": null,
+        "expectedContrastRatio": "4.5:1"
+       },
+       "relatedNodes": [
+        {
+         "html": "<div class=\"flex-1 bg-white dark:bg-zinc-900 rounded-lg border-2 border-slate-300 dark:border-zinc-800 flex flex-col\">",
+         "target": [
+          ".border-2.flex-1.dark\\:bg-zinc-900"
+         ]
+        }
+       ],
+       "impact": "serious",
+       "message": "Element has insufficient color contrast of 3.66 (foreground color: #6b7280, background color: #18181b, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "serious",
+     "html": "<p class=\"text-sm\">Apply a pipeline to your selected images</p>",
+     "target": [
+      "p:nth-child(3)"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 3.66 (foreground color: #6b7280, background color: #18181b, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+    }
+   ]
+  },
+  {
+   "id": "label",
+   "impact": "critical",
+   "tags": [
+    "cat.forms",
+    "wcag2a",
+    "wcag412",
+    "section508",
+    "section508.22.n",
+    "TTv5",
+    "TT5.c",
+    "EN-301-549",
+    "EN-9.4.1.2",
+    "ACT",
+    "RGAAv4",
+    "RGAA-11.1.1"
+   ],
+   "description": "Ensure every form element has a label",
+   "help": "Form elements must have labels",
+   "helpUrl": "https://dequeuniversity.com/rules/axe/4.14/label?application=axe-puppeteer",
+   "nodes": [
+    {
+     "any": [
+      {
+       "id": "implicit-label",
+       "data": null,
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "Element does not have an implicit (wrapped) <label>"
+      },
+      {
+       "id": "explicit-label",
+       "data": null,
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "Element does not have an explicit <label>"
+      },
+      {
+       "id": "aria-label",
+       "data": null,
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "aria-label attribute does not exist or is empty"
+      },
+      {
+       "id": "aria-labelledby",
+       "data": null,
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty"
+      },
+      {
+       "id": "non-empty-title",
+       "data": {
+        "messageKey": "noAttr"
+       },
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "Element has no title attribute"
+      },
+      {
+       "id": "non-empty-placeholder",
+       "data": {
+        "messageKey": "noAttr"
+       },
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "Element has no placeholder attribute"
+      },
+      {
+       "id": "presentational-role",
+       "data": null,
+       "relatedNodes": [],
+       "impact": "critical",
+       "message": "Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "critical",
+     "html": "<input type=\"checkbox\" disabled=\"\" class=\"toggle-checkbox\">",
+     "target": [
+      ".toggle-checkbox"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element has no placeholder attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+    }
+   ]
+  },
+  {
+   "id": "region",
+   "impact": "moderate",
+   "tags": [
+    "cat.keyboard",
+    "best-practice",
+    "RGAAv4",
+    "RGAA-9.2.1"
+   ],
+   "description": "Ensure all page content is contained by landmarks",
+   "help": "All page content should be contained by landmarks",
+   "helpUrl": "https://dequeuniversity.com/rules/axe/4.14/region?application=axe-puppeteer",
+   "nodes": [
+    {
+     "any": [
+      {
+       "id": "region",
+       "data": {
+        "isIframe": false
+       },
+       "relatedNodes": [],
+       "impact": "moderate",
+       "message": "Some page content is not contained by landmarks"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "moderate",
+     "html": "<div class=\"flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-700\"><div class=\"w-2 h-2 rounded-full bg-green-500 animate-pulse\"></div><span class=\"text-sm font-medium text-slate-700 dark:text-slate-300\">Session - Active</span></div>",
+     "target": [
+      ".bg-slate-100"
+     ],
+     "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+    },
+    {
+     "any": [
+      {
+       "id": "region",
+       "data": {
+        "isIframe": false
+       },
+       "relatedNodes": [],
+       "impact": "moderate",
+       "message": "Some page content is not contained by landmarks"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "moderate",
+     "html": "<h2 class=\"text-xl font-bold text-gray-900\">Save Pipeline</h2>",
+     "target": [
+      ".text-gray-900"
+     ],
+     "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+    },
+    {
+     "any": [
+      {
+       "id": "region",
+       "data": {
+        "isIframe": false
+       },
+       "relatedNodes": [],
+       "impact": "moderate",
+       "message": "Some page content is not contained by landmarks"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "moderate",
+     "html": "<div class=\"p-3 bg-blue-50 border border-blue-200 rounded-md\"><p class=\"text-sm text-blue-800\"><strong>1</strong> operation in pipeline</p></div>",
+     "target": [
+      ".p-3"
+     ],
+     "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+    },
+    {
+     "any": [
+      {
+       "id": "region",
+       "data": {
+        "isIframe": false
+       },
+       "relatedNodes": [],
+       "impact": "moderate",
+       "message": "Some page content is not contained by landmarks"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "moderate",
+     "html": "<div>",
+     "target": [
+      "form > div:nth-child(2)"
+     ],
+     "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+    },
+    {
+     "any": [
+      {
+       "id": "region",
+       "data": {
+        "isIframe": false
+       },
+       "relatedNodes": [],
+       "impact": "moderate",
+       "message": "Some page content is not contained by landmarks"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "moderate",
+     "html": "<div>",
+     "target": [
+      "form > div:nth-child(3)"
+     ],
+     "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+    },
+    {
+     "any": [
+      {
+       "id": "region",
+       "data": {
+        "isIframe": false
+       },
+       "relatedNodes": [],
+       "impact": "moderate",
+       "message": "Some page content is not contained by landmarks"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "moderate",
+     "html": "<div>",
+     "target": [
+      "form > div:nth-child(4)"
+     ],
+     "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+    },
+    {
+     "any": [
+      {
+       "id": "region",
+       "data": {
+        "isIframe": false
+       },
+       "relatedNodes": [],
+       "impact": "moderate",
+       "message": "Some page content is not contained by landmarks"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "moderate",
+     "html": "<div>",
+     "target": [
+      "form > div:nth-child(5)"
+     ],
+     "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+    },
+    {
+     "any": [
+      {
+       "id": "region",
+       "data": {
+        "isIframe": false
+       },
+       "relatedNodes": [],
+       "impact": "moderate",
+       "message": "Some page content is not contained by landmarks"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "moderate",
+     "html": "<div class=\"flex items-start\">",
+     "target": [
+      ".items-start"
+     ],
+     "failureSummary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,56 @@
+{
+  "state": "modal-admin-userdata",
+  "tabStops": 8,
+  "noVisibleFocus": 0,
+  "focusEscapedDialog": 0,
+  "steps": [
+    {
+      "tag": "button",
+      "name": "Refresh",
+      "visibleFocus": true,
+      "insideDialog": true
+    },
+    {
+      "tag": "button",
+      "name": "Close admin tools",
+      "visibleFocus": true,
+      "insideDialog": true
+    },
+    {
+      "tag": "button",
+      "name": "Database\n(PIN protected)",
+      "visibleFocus": true,
+      "insideDialog": true
+    },
+    {
+      "tag": "div",
+      "name": "Sensitive Data Area - PIN Protected\n\nVie",
+      "visibleFocus": true,
+      "insideDialog": true
+    },
+    {
+      "tag": "input",
+      "name": "admin-user-data-toggle",
+      "visibleFocus": true,
+      "insideDialog": true
+    },
+    {
+      "tag": "button",
+      "name": "View Details",
+      "visibleFocus": true,
+      "insideDialog": true
+    },
+    {
+      "tag": "button",
+      "name": "View Details",
+      "visibleFocus": true,
+      "insideDialog": true
+    },
+    {
+      "tag": "button",
+      "name": "View Details",
+      "visibleFocus": true,
+      "insideDialog": true
+    }
+  ]
+}

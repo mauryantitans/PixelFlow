@@ -1,0 +1,14 @@
+{
+  "viewport": "320x640",
+  "reflow": {
+    "overflowX": 32,
+    "offenders": [
+      "div.flex.items-center.space-x-2 \"Sign In\" right=352"
+    ]
+  },
+  "textSpacing": {
+    "newlyClipped": [],
+    "newOverflowX": 40
+  },
+  "alreadyClipped": []
+}

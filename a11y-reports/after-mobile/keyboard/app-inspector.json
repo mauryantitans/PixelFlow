@@ -1,0 +1,362 @@
+{
+  "state": "app-inspector",
+  "tabStops": 59,
+  "noVisibleFocus": 0,
+  "focusEscapedDialog": null,
+  "steps": [
+    {
+      "tag": "summary",
+      "name": "Blur & Sharpen",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "summary",
+      "name": "Effects",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "summary",
+      "name": "Stylize",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "summary",
+      "name": "OpenCV",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "summary",
+      "name": "Scikit-Image",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "input",
+      "name": "upload-image",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Gallery (1)",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Apply Pipeline",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "input",
+      "name": "live-toggle",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Undo",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Reset",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Move Brightness down",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Method details for Brightness",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "input",
+      "name": "step_1794422830536_fn7n5j-amount",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Remove Brightness step",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Preview Brightness step",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Move Sharpen up",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Move Sharpen down",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Method details for Sharpen",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "select",
+      "name": "Low\nMedium\nHigh",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Remove Sharpen step",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Preview Sharpen step",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Move Threshold Binary up",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Move Threshold Binary down",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Method details for Threshold Binary",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "input",
+      "name": "step_1794422831552_q04ihj-threshold",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "input",
+      "name": "",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Remove Threshold Binary step",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Preview Threshold Binary step",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Move Flood Fill up",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Method details for Flood Fill",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Pick on image",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "input",
+      "name": "step_1794422832052_mqt6nk-fill_color",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Eyedropper: pick Fill color from the image",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "input",
+      "name": "step_1794422832052_mqt6nk-tolerance",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Remove Flood Fill step",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Preview Flood Fill step",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Back to results grid",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Next step",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Normal View",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Side-by-side View",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Before/After slider",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Difference / overlay",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "View Analytics",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Download All Steps",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Download Final Result",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "a",
+      "name": "Skip to main content",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "a",
+      "name": "PixelFlow\nImage Processing Pipeline Buil",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "a",
+      "name": "Home",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "a",
+      "name": "App",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "a",
+      "name": "Docs",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "a",
+      "name": "Source",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Switch to dark mode",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Sign In",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Collapse operations panel",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "input",
+      "name": "Search operations... (Ctrl+K)",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "summary",
+      "name": "Basic Operations",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "summary",
+      "name": "Adjustments",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Add Brightness",
+      "visibleFocus": true,
+      "insideDialog": null
+    }
+  ]
+}

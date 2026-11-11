@@ -9,8 +9,15 @@ WCAG 2.1 Level AA. I used free tools (Lighthouse, axe-core) and a scripted keybo
 fixed what they found, and then ran the same checks again.
 
 <!--SUMMARY-->
-Across 23 audited pages and states, the average Lighthouse accessibility score went from **75 to 100**. The worst page went from 62 to 100. axe-core findings rated critical or serious went from **492 to 0** (light and dark theme combined). Before, keyboard focus escaped all 8 dialogs I measured; now it stays inside every one.
+Across the 23 pages and states audited before and after (desktop), the average Lighthouse accessibility score went from **75 to 100**. The worst page went from 62 to 100. axe-core findings rated critical or serious went from **492 to 0** (light and dark theme combined). Before, keyboard focus escaped all 8 dialogs I measured; now it stays inside every one.
 <!--/SUMMARY-->
+
+A second pass covered what the first one didn't. On phones and at high zoom (320px,
+WCAG 1.4.10), 18 of 24 states needed sideways scrolling (up to 1073px wide) and the
+mobile Lighthouse average was 74. Now every state fits 320px and scores 100. Text
+spacing (1.4.12) and 200% text (1.4.4) now cause no clipped text in any state. No
+content appears only on hover anymore (1.4.13), and the admin user-data view behind
+the PIN is audited too.
 
 The biggest problems were in the main workspace (`/app`), which is where people actually
 use the app:
@@ -21,6 +28,8 @@ use the app:
 - None of the 9 pop-up dialogs kept keyboard focus inside them.
 - Several features worked only with a mouse: uploading, picking images in the gallery,
   the before/after slider, and picking a point or region on the image.
+- On a phone, or zoomed in, the workspace was up to 1073px wide, and the header
+  navigation disappeared completely.
 
 ## 2. How I tested
 
@@ -30,6 +39,8 @@ use the app:
 | Lighthouse | 12.8.2, accessibility category only, desktop, 1440×900. **Navigation mode** for the 3 real routes, **snapshot mode** for in-page states such as open dialogs. |
 | axe-core | 4.14.0 via `@axe-core/puppeteer`, tags `wcag2a wcag2aa wcag21a wcag21aa best-practice`. Every state is checked in **both light and dark theme**. |
 | Keyboard | Scripted Tab walk per state. It records each focused element, whether it looks different when focused (outline, ring, border or background change), and, for dialogs, whether focus escapes the dialog. |
+| Mobile / Reflow | The whole audit was run again at a **320×640** viewport (`VIEWPORT=320x640`). This is the size WCAG 1.4.10 Reflow uses, and equals a 1280px screen at 400% zoom. For every state it records the page's scrollable width and which elements stick out. It ran once on the original code (`before-mobile/`) and once on the fixed code (`after-mobile/`). |
+| Text spacing / 200% text | In every desktop state, the script applies the WCAG 1.4.12 text-spacing values, then doubles the root font size (1.4.4). Each time it counts text that becomes cut off by an `overflow:hidden` box, and any new sideways overflow. |
 | Driver | `a11y-reports/scripts/audit.js` (puppeteer-core). It logs in, uploads a test image, builds a 4-step pipeline (Brightness, Sharpen, Threshold Binary, Flood Fill), runs it, and opens every dialog. |
 
 **What was built and run:** the frontend's production build (`npm run build`), served
@@ -47,7 +58,7 @@ Sign-In hides itself when `REACT_APP_GOOGLE_CLIENT_ID` is not set, so the real l
 is unchanged. I made two throwaway accounts in the local SQLite database only: a normal
 user, and an admin (promoted in SQLite) so I could audit the Admin Tools.
 
-### Pages and states audited (23)
+### Pages and states audited (24)
 
 - **Routes (Lighthouse navigation):** `/` landing, `/auth` sign-in, `/app` workspace.
 - **States (Lighthouse snapshot + axe + keyboard):**
@@ -57,18 +68,16 @@ user, and an admin (promoted in SQLite) so I could audit the Admin Tools.
   - Results grid; image analytics dialog; Inspector (normal view); Inspector before/after
     slider; live-processing mode.
   - Signed-in workspace; account menu; Save Pipeline dialog; Load Pipeline dialog.
-  - Admin Tools dialog; Admin PIN dialog.
+  - Admin Tools dialog; Admin PIN dialog; Admin user-data view behind the PIN (added in
+    the second pass, so it has no desktop "before" score).
 
 ### What I could not reach or did not cover
 
 - **Google "Continue with Google" button.** Google renders it in its own iframe, and it
   only appears with a real OAuth client id. It is not our code.
-- **Admin "View user data" table after entering the PIN.** I audited the PIN dialog, but
-  not the data table behind it.
-- **Mobile and small screens** (WCAG 1.4.10 Reflow, 1.4.4 Resize text). The workspace
-  is a fixed desktop layout with a 320 px sidebar, so it will not reflow to 320 px width
-  without a responsive redesign. I'm calling this out as known, remaining work. It isn't
-  something a few attribute fixes can solve.
+- **Real phones and tablets.** The mobile run uses Chrome at a 320px viewport, not iOS
+  Safari or Android TalkBack on a device. It proves the layout reflows, not that every
+  gesture feels right on a phone.
 - **Real screen-reader testing** has to be done by a person. Section 6 has a VoiceOver
   checklist for that.
 
@@ -105,11 +114,88 @@ of 25 scripted Tab presses landed outside the open dialog.
 | Load Pipeline dialog | 74 | **100** | 14 → 0 | 22 → 0 | 21 → 0 |
 | Admin Tools dialog | 74 | **100** | 24 → 0 | 32 → 0 | 10 → 0 |
 | Admin PIN dialog | 74 | **100** | 12 → 0 | 30 → 0 | 23 → 0 |
+| Admin user-data view (behind the PIN) | – | **100** | – | – | – |
 
 **Average Lighthouse score: 75 → 100** (lowest 62 → 100). **axe critical + serious: 492 → 0**; all axe violations: 800 → 0.
 <!--/SCORES-->
 
-Raw results: `a11y-reports/before/` and `a11y-reports/after/`.
+### Mobile (320×640) and reflow
+
+<!--MOBILE-->
+Same states at a **320×640** viewport, which is what WCAG 1.4.10 Reflow asks for
+(320 CSS px = a 1280px screen at 400% zoom). "Page width" is the scrollable width of
+the page. Anything over 320 means sideways scrolling.
+
+| Page / state | Lighthouse before | Lighthouse after | Page width before → after (px) | axe critical+serious before → after |
+|---|---:|---:|---:|---:|
+| `/` landing page (navigation) | 91 | **100** | – | – |
+| `/auth` sign-in (navigation) | 100 | **100** | – | – |
+| `/app` workspace, guest (navigation) | 72 | **100** | – | – |
+| Landing page | 91 | **100** | 352 → **320** | 1 → 0 |
+| Sign in | 100 | **100** | 320 → **320** | 0 → 0 |
+| Create account | 100 | **100** | 320 → **320** | 0 → 0 |
+| Sign in with error message | 100 | **100** | 320 → **320** | 0 → 0 |
+| Workspace, empty | 72 | **100** | 826 → **320** | 8 → 0 |
+| Workspace with 4-step pipeline | 59 | **100** | 905 → **320** | 43 → 0 |
+| Gallery dialog | 59 | **100** | 905 → **320** | 47 → 0 |
+| Image lightbox | 59 | **100** | 905 → **320** | 53 → 0 |
+| Method details dialog | 59 | **100** | 905 → **320** | 45 → 0 |
+| Results grid | 59 | **100** | 905 → **320** | 43 → 0 |
+| Image analytics dialog | 59 | **100** | 905 → **320** | 44 → 0 |
+| Inspector | 59 | **100** | 1073 → **320** | 41 → 0 |
+| Inspector, before/after slider | 59 | **100** | 905 → **320** | 41 → 0 |
+| Live processing mode | 59 | **100** | 924 → **320** | 42 → 0 |
+| Workspace, signed in | 72 | **100** | 826 → **320** | 12 → 0 |
+| Account menu open | 72 | **100** | 826 → **320** | 12 → 0 |
+| Save Pipeline dialog | 74 | **100** | 826 → **320** | 14 → 0 |
+| Load Pipeline dialog | 72 | **100** | 826 → **320** | 14 → 0 |
+| Admin Tools dialog | 72 | **100** | 826 → **320** | 24 → 0 |
+| Admin PIN dialog | 72 | **100** | 826 → **320** | 12 → 0 |
+| Admin user-data view (behind the PIN) | 74 | **100** | 826 → **320** | 12 → 0 |
+
+**Mobile average Lighthouse: 74 → 100** (lowest 59 → 100). States wider than the 320px screen: **18 → 0** (widest 1073px → 320px).
+<!--/MOBILE-->
+
+### Text spacing and 200% text (WCAG 1.4.12, 1.4.4)
+
+<!--LAYOUT-->
+Checked on the fixed version (desktop run). *Text spacing* applies the exact WCAG 1.4.12
+values: line height 1.5, paragraph spacing 2×, letter spacing 0.12em, word spacing 0.16em.
+*200% text* doubles the root font size. Every size in the app is rem-based, so this
+scales all text. Each check counts text that becomes cut off (clipped by an
+`overflow:hidden` box) and that was not cut off before.
+
+| Page / state | Text spacing: newly clipped text | 200% text: newly clipped text | 200% text: sideways overflow (px) |
+|---|---:|---:|---:|
+| Landing page | 0 | 0 | 0 |
+| Sign in | 0 | 0 | 0 |
+| Create account | 0 | 0 | 0 |
+| Sign in with error message | 0 | 0 | 0 |
+| Workspace, empty | 0 | 0 | 0 |
+| Workspace with 4-step pipeline | 0 | 0 | 0 |
+| Gallery dialog | 0 | 0 | 0 |
+| Image lightbox | 0 | 0 | 0 |
+| Method details dialog | 0 | 0 | 0 |
+| Results grid | 0 | 0 | 0 |
+| Image analytics dialog | 0 | 0 | 0 |
+| Inspector | 0 | 0 | 0 |
+| Inspector, before/after slider | 0 | 0 | 0 |
+| Live processing mode | 0 | 0 | 0 |
+| Workspace, signed in | 0 | 0 | 0 |
+| Account menu open | 0 | 0 | 0 |
+| Save Pipeline dialog | 0 | 0 | 0 |
+| Load Pipeline dialog | 0 | 0 | 0 |
+| Admin Tools dialog | 0 | 0 | 0 |
+| Admin PIN dialog | 0 | 0 | 0 |
+| Admin user-data view (behind the PIN) | 0 | 0 | 0 |
+
+States with a text-spacing problem: **0**. States with a 200%-text problem: **0**.
+<!--/LAYOUT-->
+
+Raw results: `a11y-reports/before/` and `a11y-reports/after/` (desktop), plus
+`a11y-reports/before-mobile/` and `a11y-reports/after-mobile/`. Each mobile folder has a
+`screenshots/` folder with one screenshot per state, and every folder has a `layout/`
+folder with the reflow, text-spacing and 200%-text details per state.
 
 - `lighthouse/*.json`: open these in https://googlechrome.github.io/lighthouse/viewer/
 - `axe/*-light.json` and `axe/*-dark.json`
@@ -151,6 +237,11 @@ To keep the repo small, axe "passes" are stored as rule id + node count, and the
 | 25 | Heading order: landing page started at h2 and skipped h4 to h5; workspace had no h1 and the logo `<h1>` was inside a button | **1.3.1**; 2.4.6 | `LandingPage`, `Header`, `App`, `ResultsGrid`, `Inspector`, `PipelineStep`, dialogs | One h1 per page and no skipped levels: hero h1 → sections h2 → cards h3; workspace has an sr-only h1, panels are h2, steps are h3. |
 | 26 | Every route had the same `<title>` | **2.4.2 Page Titled** | All routes | New `useDocumentTitle` hook: "Visual image processing pipeline builder", "Sign in", "Create account", "Workspace" (each followed by "\| PixelFlow"). |
 | 27 | Ctrl+Z / Ctrl+Y were hijacked even while typing in a text field (native undo didn't work) | 2.1.1 (keyboard behaviour) | `hooks/index.ts` `useKeyboardShortcuts` | Shortcuts are now ignored inside editable fields, except Ctrl+K and Ctrl+/ (focus search). |
+| 28 | **No reflow on small screens or at high zoom.** At 320px the workspace was 826–1073px wide, so every row needed sideways scrolling. Below 768px the header hid Home / App / Docs / Source entirely, so phone users lost them. | **1.4.10 Reflow** | `App` (workspace, toolbar, pipeline), `Header`, `Inspector`, `ResultsGrid`, `GalleryModal`, `AdminPanel`, `LandingPage`, dialogs | Below `md` the workspace is one column: operations, toolbar, pipeline, results. Toolbars, headers and dialog headers wrap. The header nav is always shown. Sticky bars stick only from `md` up, so they don't eat a zoomed screen. Side-by-side compare stacks. Every state now fits 320px with no sideways scrolling. |
+| 29 | **The operation-description tooltip was never visible.** The button's `overflow:hidden` clipped it, so only screen-reader users ever got the descriptions. Other content appeared only on hover: the results-grid action overlay, the gallery view/delete buttons, and the "what is a histogram" tooltip. Keyboard and touch users couldn't reach that content, and it covered the image. | **1.4.13 Content on Hover or Focus**; 2.1.1 Keyboard | `App` operations panel, `ResultsGrid`, `GalleryModal`, `ImageAnalytics` | Descriptions now show in a fixed line under the search box. It updates on hover or focus, covers nothing, and stays until you move to another operation. The result and gallery actions are always visible. The histogram note is plain text. |
+| 30 | Operation labels such as "Temperature" were cut off when the WCAG text-spacing values were applied (the button had `overflow:hidden`) | **1.4.12 Text Spacing** | `.operation-btn-enhanced` | Removed `overflow:hidden`, so labels can wrap (`break-words`). |
+| 31 | With text-only zoom at 200%, file names and "Result N" labels were cut off in the fixed 120px gallery/result cards | **1.4.4 Resize Text** | `GalleryModal`, `ResultsGrid` | Labels wrap instead of truncating. A `ResizeObserver` re-runs the masonry layout when a card grows, so cards never overlap. |
+| 32 | Logout menu item text was 4.41:1 on its hover/focus background (only caught at mobile width, where the pointer rests on it) | **1.4.3 Contrast (Minimum)** | `Header` account menu | red-600 → red-700. |
 
 Two real bugs I found along the way (not accessibility, but they affected everyone):
 
@@ -190,28 +281,30 @@ checks focus, ARIA state and announcements. Result: **20/20 passed**
 
 ### Remaining issues
 
-- **axe-core: 0 violations of any severity** (critical, serious, moderate or minor)
-  in all 20 in-page states, in both light and dark theme. Nothing serious or critical is
-  left.
+- **Automated results on the final version:**
+  - axe-core finds 0 violations of any severity in all 21 in-page states, in light and
+    dark theme, at both 1440px and 320px.
+  - Lighthouse scores 100 everywhere.
+  - Reflow, text-spacing and 200%-text checks find 0 problems.
+  - 20/20 keyboard-only checks pass.
 - **axe "needs review" items** are things axe can't decide on its own, mostly text on
   gradient or semi-transparent backgrounds. I checked the important ones by hand: the
-  operation-library headers, which led to fix #7, and the white captions on
-  `bg-black/75`, which pass. The rest are large headings on the landing page's soft
-  gradient, which pass easily.
-- **Not covered by automated tools, and still open:**
-  - Reflow at 320 px and 400% zoom (1.4.10). The desktop-only layout needs a responsive
-    redesign.
-  - The content of user-uploaded images. Their alt text is the file name, because the app
-    can't know what a photo shows.
-- **Regressions the re-audit caught and I fixed:**
+  operation-library headers (fix #7) and the white captions on `bg-black/75`, which pass.
+- **What still needs a person:**
+  - A real screen-reader pass (section 6).
+  - A check on a real phone with VoiceOver or TalkBack.
+  - The alt text of user-uploaded images. It's the file name, because the app can't know
+    what a photo shows. That's acceptable for a tool where the user supplies the images.
+- **Not our code:** the Google sign-in button, rendered by Google.
+- **Regressions the re-audits caught and I fixed:**
   - The Label in Name issue in row 4.
-  - My contrast pass had added dark-mode text colors to the Save/Load dialogs, but those
-    dialogs stay white in dark mode, so the text dropped to 2.5:1. I removed those
-    classes.
+  - Dark-mode text colors I had wrongly added to the always-white Save/Load dialogs.
+  - The Logout hover contrast, visible only at mobile width.
+  - The 200%-text issue in the result cards.
 
-  This is why I re-ran the full audit instead of trusting the first fix.
+  Re-running the full audit after each round is what found them.
 - **Beyond 2.1 AA:** Lighthouse's `target-size` check (WCAG **2.2** SC 2.5.8) flagged
-  the 16 px Move up/down arrows. I enlarged them to 24 px anyway.
+  the small Move up/down and gallery buttons. I enlarged them to at least 24px anyway.
 
 ## 5. Production outage (Render): what happened and what changed
 
@@ -300,23 +393,31 @@ VoiceOver on and off with **Cmd+F5**.
 | 15 | Add "Flood Fill", press "Pick on image" (with live mode on) | Keyboard picker | "Image picker. Click to place the point, application". Arrow keys announce "x 51%, y 50%"; Enter says "Point set at …". |
 | 16 | Signed in: account button | Menu button | "Account menu for <name>, menu button, collapsed". Enter opens it and you hear "Logout, menu item" (or "Admin Tools"). Esc closes it. |
 | 17 | Header icons | No unnamed buttons | VO+U → Form Controls lists no items that say just "button". |
+| 18 | Any page: zoom to 400% (Cmd and + several times), or make the window narrow | Reflow (no VoiceOver needed) | Everything is one column, nothing needs sideways scrolling, and the header links are still there. |
+| 19 | Operations panel: hover over or Tab to "Brightness" | Description line (visual) | The line under the search box changes to "Brightness: …" and stays until you move to another operation. |
 
 If any row sounds different, note the page, what you pressed, and what VoiceOver said.
 
 ## 7. Interview talking points
 
-1. **What I found.** I ran Lighthouse and axe on 23 real pages and states of the app, not just the
-   home page. The landing page scored 91, but the main workspace scored 62. Automated
-   tools also missed things I only found by tabbing: none of the 9 dialogs trapped focus,
-   the upload button was `display:none`, and gallery selection, the compare slider and
-   image picking were mouse-only.
+1. **What I found.** I audited 24 real pages and states, not just the home page, at
+   desktop size and again at 320px (phone / 400% zoom).
+   - The landing page scored 91, but the main workspace scored 62 (59 on mobile).
+   - On a phone the workspace was up to 1073px wide, and the header navigation vanished.
+   - Tabbing found what tools missed: none of the dialogs trapped focus, the upload
+     button was `display:none`, and several features were mouse-only.
+   - The operation tooltip had never been visible to anyone, because it was clipped.
 2. **How I fixed it.** I fixed by pattern rather than one by one. I wrote a single
    `useDialog` hook for all modals (focus in, trap, Escape, return focus), a live-region
    `announce()` helper for status messages, and a token-level contrast pass over the
    Tailwind classes. Then I added keyboard equivalents for each pointer interaction:
    Move up/down + Alt+arrows instead of drag, a `role="slider"` divider, and an
-   arrow-key crosshair for picking points. Every fix type is its own commit with the WCAG
-   criterion in the message, and the same script re-measures the before/after scores.
+   arrow-key crosshair for picking points.
+
+   For reflow I reworked the layout to one column below 768px and made every toolbar
+   wrap. I extended the audit script to measure page width, text spacing and 200% text
+   in every state. Every fix type is its own commit with the WCAG criterion in the
+   message, and the same script re-measures before and after.
 3. **What I learned.** A Lighthouse score of 100 doesn't mean a page is usable. The tools
    catch missing names and contrast, but not focus traps or mouse-only features, so the
    scripted Tab walk and a real screen reader are essential. Accessibility work also
@@ -332,6 +433,21 @@ mkdir -p /tmp/a11y-tools && cd /tmp/a11y-tools && npm init -y >/dev/null && npm 
 
 With the backend (:8000) and the frontend build (:3000) running, from the repo root:
 
+Desktop run (writes `a11y-reports/after/`):
+
 ```bash
 TOOLS=/tmp/a11y-tools PHASE=after CHROME_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" IMG1="$PWD/images/PixelFlow (1).png" USER_EMAIL=you@example.com USER_PASSWORD='…' ADMIN_EMAIL=admin@example.com ADMIN_PASSWORD='…' node a11y-reports/scripts/audit.js
+```
+
+Mobile / reflow run (writes `a11y-reports/after-mobile/`, with screenshots). Same
+command plus a viewport:
+
+```bash
+VIEWPORT=320x640 TOOLS=/tmp/a11y-tools PHASE=after-mobile CHROME_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" IMG1="$PWD/images/PixelFlow (1).png" USER_EMAIL=you@example.com USER_PASSWORD='…' ADMIN_EMAIL=admin@example.com ADMIN_PASSWORD='…' node a11y-reports/scripts/audit.js
+```
+
+Then rebuild the tables in this report:
+
+```bash
+python3 a11y-reports/scripts/make_tables.py
 ```

@@ -1,0 +1,12 @@
+{
+  "viewport": "320x640",
+  "reflow": {
+    "overflowX": 0,
+    "offenders": []
+  },
+  "textSpacing": {
+    "newlyClipped": [],
+    "newOverflowX": 0
+  },
+  "alreadyClipped": []
+}

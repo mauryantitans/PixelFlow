@@ -1,0 +1,152 @@
+{
+  "state": "modal-lightbox",
+  "tabStops": 24,
+  "noVisibleFocus": 0,
+  "focusEscapedDialog": 21,
+  "steps": [
+    {
+      "tag": "input",
+      "name": "",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Eyedropper",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "input",
+      "name": "",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Remove step",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Preview this step",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Select All",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Deselect All",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Delete Selected (1)",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "View full size",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Delete image",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "",
+      "visibleFocus": true,
+      "insideDialog": true
+    },
+    {
+      "tag": "button",
+      "name": "",
+      "visibleFocus": true,
+      "insideDialog": true
+    },
+    {
+      "tag": "button",
+      "name": "",
+      "visibleFocus": true,
+      "insideDialog": true
+    },
+    {
+      "tag": "button",
+      "name": "PixelFlow\nImage Processing Pipeline Buil",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Switch to dark mode",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Sign In",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "input",
+      "name": "Search operations... (Ctrl+K)",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "summary",
+      "name": "Basic Operations",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "summary",
+      "name": "Adjustments",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Brightness\nAdjust image brightness",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Contrast\nAdjust image contrast",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Saturation\nAdjust color saturation",
+      "visibleFocus": true,
+      "insideDialog": false
+    }
+  ]
+}

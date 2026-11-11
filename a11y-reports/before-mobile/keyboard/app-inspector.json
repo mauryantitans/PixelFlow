@@ -1,0 +1,50 @@
+{
+  "state": "app-inspector",
+  "tabStops": 7,
+  "noVisibleFocus": 0,
+  "focusEscapedDialog": null,
+  "steps": [
+    {
+      "tag": "button",
+      "name": "Preview this step",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Method details",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "input",
+      "name": "",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "input",
+      "name": "",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Remove step",
+      "visibleFocus": true,
+      "insideDialog": false
+    }
+  ]
+}

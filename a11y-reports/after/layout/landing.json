@@ -1,0 +1,17 @@
+{
+  "viewport": "1440x900",
+  "reflow": {
+    "overflowX": 0,
+    "offenders": []
+  },
+  "textSpacing": {
+    "newlyClipped": [],
+    "newOverflowX": 0
+  },
+  "text200": {
+    "newlyClipped": [],
+    "overflowX": 0,
+    "offenders": []
+  },
+  "alreadyClipped": []
+}

@@ -1,0 +1,32 @@
+{
+  "state": "modal-admin-pin",
+  "tabStops": 4,
+  "noVisibleFocus": 0,
+  "focusEscapedDialog": 0,
+  "steps": [
+    {
+      "tag": "input",
+      "name": "Enter your PIN",
+      "visibleFocus": true,
+      "insideDialog": true
+    },
+    {
+      "tag": "button",
+      "name": "Cancel",
+      "visibleFocus": true,
+      "insideDialog": true
+    },
+    {
+      "tag": "input",
+      "name": "Enter your PIN",
+      "visibleFocus": true,
+      "insideDialog": true
+    },
+    {
+      "tag": "button",
+      "name": "Cancel",
+      "visibleFocus": true,
+      "insideDialog": true
+    }
+  ]
+}

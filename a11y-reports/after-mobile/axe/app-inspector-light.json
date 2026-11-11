@@ -1,0 +1,1038 @@
+{
+ "testEngine": {
+  "name": "axe-core",
+  "version": "4.14.0"
+ },
+ "testRunner": {
+  "name": "axe"
+ },
+ "testEnvironment": {
+  "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.0.0 Safari/537.36",
+  "windowWidth": 320,
+  "windowHeight": 640,
+  "orientationAngle": 0,
+  "orientationType": "landscape-primary"
+ },
+ "timestamp": "2026-11-11T18:47:53.679Z",
+ "url": "http://localhost:3000/app",
+ "toolOptions": {
+  "runOnly": {
+   "type": "tag",
+   "values": [
+    "wcag2a",
+    "wcag2aa",
+    "wcag21a",
+    "wcag21aa",
+    "best-practice"
+   ]
+  },
+  "reporter": "v1"
+ },
+ "inapplicable": [
+  "accesskeys",
+  "area-alt",
+  "aria-braille-equivalent",
+  "aria-command-name",
+  "aria-dialog-name",
+  "aria-input-field-name",
+  "aria-meter-name",
+  "aria-progressbar-name",
+  "aria-required-children",
+  "aria-required-parent",
+  "aria-tab-name",
+  "aria-text",
+  "aria-toggle-field-name",
+  "aria-tooltip-name",
+  "aria-treeitem-name",
+  "autocomplete-valid",
+  "avoid-inline-spacing",
+  "blink",
+  "definition-list",
+  "dlitem",
+  "empty-table-header",
+  "frame-focusable-content",
+  "frame-tested",
+  "frame-title-unique",
+  "frame-title",
+  "html-xml-lang-mismatch",
+  "input-button-name",
+  "input-image-alt",
+  "landmark-contentinfo-is-top-level",
+  "landmark-no-duplicate-contentinfo",
+  "link-in-text-block",
+  "list",
+  "listitem",
+  "marquee",
+  "meta-refresh",
+  "object-alt",
+  "role-img-alt",
+  "scope-attr-valid",
+  "server-side-image-map",
+  "svg-img-alt",
+  "table-duplicate-name",
+  "td-headers-attr",
+  "th-has-data-cells",
+  "valid-lang",
+  "video-caption",
+  "no-autoplay-audio"
+ ],
+ "passes": [
+  {
+   "id": "aria-allowed-attr",
+   "impact": null,
+   "tags": [
+    "cat.aria",
+    "wcag2a",
+    "wcag412",
+    "EN-301-549",
+    "EN-9.4.1.2",
+    "RGAAv4",
+    "RGAA-7.1.1"
+   ],
+   "nodeCount": 57
+  },
+  {
+   "id": "aria-allowed-role",
+   "impact": null,
+   "tags": [
+    "cat.aria",
+    "best-practice"
+   ],
+   "nodeCount": 3
+  },
+  {
+   "id": "aria-conditional-attr",
+   "impact": null,
+   "tags": [
+    "cat.aria",
+    "wcag2a",
+    "wcag412",
+    "EN-301-549",
+    "EN-9.4.1.2",
+    "RGAAv4",
+    "RGAA-7.1.1"
+   ],
+   "nodeCount": 57
+  },
+  {
+   "id": "aria-deprecated-role",
+   "impact": null,
+   "tags": [
+    "cat.aria",
+    "wcag2a",
+    "wcag412",
+    "EN-301-549",
+    "EN-9.4.1.2",
+    "RGAAv4",
+    "RGAA-7.1.1"
+   ],
+   "nodeCount": 3
+  },
+  {
+   "id": "aria-hidden-body",
+   "impact": null,
+   "tags": [
+    "cat.aria",
+    "wcag2a",
+    "wcag131",
+    "wcag412",
+    "EN-301-549",
+    "EN-9.1.3.1",
+    "EN-9.4.1.2",
+    "RGAAv4",
+    "RGAA-10.8.1"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "aria-hidden-focus",
+   "impact": null,
+   "tags": [
+    "cat.name-role-value",
+    "wcag2a",
+    "wcag412",
+    "TTv5",
+    "TT6.a",
+    "EN-301-549",
+    "EN-9.4.1.2",
+    "RGAAv4",
+    "RGAA-10.8.1"
+   ],
+   "nodeCount": 94
+  },
+  {
+   "id": "aria-prohibited-attr",
+   "impact": null,
+   "tags": [
+    "cat.aria",
+    "wcag2a",
+    "wcag412",
+    "EN-301-549",
+    "EN-9.4.1.2",
+    "RGAAv4",
+    "RGAA-7.1.1"
+   ],
+   "nodeCount": 57
+  },
+  {
+   "id": "aria-required-attr",
+   "impact": null,
+   "tags": [
+    "cat.aria",
+    "wcag2a",
+    "wcag412",
+    "EN-301-549",
+    "EN-9.4.1.2",
+    "RGAAv4",
+    "RGAA-7.1.1"
+   ],
+   "nodeCount": 3
+  },
+  {
+   "id": "aria-roles",
+   "impact": null,
+   "tags": [
+    "cat.aria",
+    "wcag2a",
+    "wcag412",
+    "EN-301-549",
+    "EN-9.4.1.2",
+    "RGAAv4",
+    "RGAA-7.1.1"
+   ],
+   "nodeCount": 3
+  },
+  {
+   "id": "aria-valid-attr-value",
+   "impact": null,
+   "tags": [
+    "cat.aria",
+    "wcag2a",
+    "wcag412",
+    "EN-301-549",
+    "EN-9.4.1.2",
+    "RGAAv4",
+    "RGAA-7.1.1"
+   ],
+   "nodeCount": 57
+  },
+  {
+   "id": "aria-valid-attr",
+   "impact": null,
+   "tags": [
+    "cat.aria",
+    "wcag2a",
+    "wcag412",
+    "EN-301-549",
+    "EN-9.4.1.2",
+    "RGAAv4",
+    "RGAA-7.1.1"
+   ],
+   "nodeCount": 57
+  },
+  {
+   "id": "button-name",
+   "impact": null,
+   "tags": [
+    "cat.name-role-value",
+    "wcag2a",
+    "wcag412",
+    "section508",
+    "section508.22.a",
+    "TTv5",
+    "TT6.a",
+    "EN-301-549",
+    "EN-9.4.1.2",
+    "ACT",
+    "RGAAv4",
+    "RGAA-11.9.1"
+   ],
+   "nodeCount": 52
+  },
+  {
+   "id": "bypass",
+   "impact": null,
+   "tags": [
+    "cat.keyboard",
+    "wcag2a",
+    "wcag241",
+    "section508",
+    "section508.22.o",
+    "TTv5",
+    "TT9.a",
+    "EN-301-549",
+    "EN-9.2.4.1",
+    "RGAAv4",
+    "RGAA-12.7.1"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "color-contrast",
+   "impact": "serious",
+   "tags": [
+    "cat.color",
+    "wcag2aa",
+    "wcag143",
+    "TTv5",
+    "TT13.c",
+    "EN-301-549",
+    "EN-9.1.4.3",
+    "ACT",
+    "RGAAv4",
+    "RGAA-3.2.1"
+   ],
+   "nodeCount": 62
+  },
+  {
+   "id": "document-title",
+   "impact": null,
+   "tags": [
+    "cat.text-alternatives",
+    "wcag2a",
+    "wcag242",
+    "TTv5",
+    "TT12.a",
+    "EN-301-549",
+    "EN-9.2.4.2",
+    "ACT",
+    "RGAAv4",
+    "RGAA-8.5.1"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "duplicate-id-aria",
+   "impact": null,
+   "tags": [
+    "cat.parsing",
+    "wcag2a",
+    "wcag412",
+    "EN-301-549",
+    "EN-9.4.1.2",
+    "RGAAv4",
+    "RGAA-8.2.1"
+   ],
+   "nodeCount": 89
+  },
+  {
+   "id": "empty-heading",
+   "impact": null,
+   "tags": [
+    "cat.name-role-value",
+    "best-practice"
+   ],
+   "nodeCount": 8
+  },
+  {
+   "id": "form-field-multiple-labels",
+   "impact": "moderate",
+   "tags": [
+    "cat.forms",
+    "wcag2a",
+    "wcag332",
+    "TTv5",
+    "TT5.c",
+    "EN-301-549",
+    "EN-9.3.3.2",
+    "RGAAv4",
+    "RGAA-11.2.1"
+   ],
+   "nodeCount": 8
+  },
+  {
+   "id": "heading-order",
+   "impact": null,
+   "tags": [
+    "cat.semantics",
+    "best-practice"
+   ],
+   "nodeCount": 8
+  },
+  {
+   "id": "html-has-lang",
+   "impact": null,
+   "tags": [
+    "cat.language",
+    "wcag2a",
+    "wcag311",
+    "TTv5",
+    "TT11.a",
+    "EN-301-549",
+    "EN-9.3.1.1",
+    "ACT",
+    "RGAAv4",
+    "RGAA-8.3.1"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "html-lang-valid",
+   "impact": null,
+   "tags": [
+    "cat.language",
+    "wcag2a",
+    "wcag311",
+    "TTv5",
+    "TT11.a",
+    "EN-301-549",
+    "EN-9.3.1.1",
+    "ACT",
+    "RGAAv4",
+    "RGAA-8.4.1"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "image-alt",
+   "impact": null,
+   "tags": [
+    "cat.text-alternatives",
+    "wcag2a",
+    "wcag111",
+    "section508",
+    "section508.22.a",
+    "TTv5",
+    "TT7.a",
+    "TT7.b",
+    "EN-301-549",
+    "EN-9.1.1.1",
+    "ACT",
+    "RGAAv4",
+    "RGAA-1.1.1"
+   ],
+   "nodeCount": 2
+  },
+  {
+   "id": "image-redundant-alt",
+   "impact": null,
+   "tags": [
+    "cat.text-alternatives",
+    "best-practice"
+   ],
+   "nodeCount": 2
+  },
+  {
+   "id": "label-content-name-mismatch",
+   "impact": null,
+   "tags": [
+    "cat.semantics",
+    "wcag21a",
+    "wcag253",
+    "EN-301-549",
+    "EN-9.2.5.3",
+    "RGAAv4",
+    "RGAA-6.1.5"
+   ],
+   "nodeCount": 14
+  },
+  {
+   "id": "label-title-only",
+   "impact": null,
+   "tags": [
+    "cat.forms",
+    "best-practice"
+   ],
+   "nodeCount": 9
+  },
+  {
+   "id": "label",
+   "impact": null,
+   "tags": [
+    "cat.forms",
+    "wcag2a",
+    "wcag412",
+    "section508",
+    "section508.22.n",
+    "TTv5",
+    "TT5.c",
+    "EN-301-549",
+    "EN-9.4.1.2",
+    "ACT",
+    "RGAAv4",
+    "RGAA-11.1.1"
+   ],
+   "nodeCount": 8
+  },
+  {
+   "id": "landmark-banner-is-top-level",
+   "impact": null,
+   "tags": [
+    "cat.semantics",
+    "best-practice"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "landmark-main-is-top-level",
+   "impact": null,
+   "tags": [
+    "cat.semantics",
+    "best-practice"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "landmark-no-duplicate-banner",
+   "impact": null,
+   "tags": [
+    "cat.semantics",
+    "best-practice"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "landmark-no-duplicate-main",
+   "impact": null,
+   "tags": [
+    "cat.semantics",
+    "best-practice"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "landmark-one-main",
+   "impact": null,
+   "tags": [
+    "cat.semantics",
+    "best-practice"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "landmark-unique",
+   "impact": null,
+   "tags": [
+    "cat.semantics",
+    "best-practice"
+   ],
+   "nodeCount": 6
+  },
+  {
+   "id": "link-name",
+   "impact": null,
+   "tags": [
+    "cat.name-role-value",
+    "wcag2a",
+    "wcag244",
+    "wcag412",
+    "section508",
+    "section508.22.a",
+    "TTv5",
+    "TT6.a",
+    "EN-301-549",
+    "EN-9.2.4.4",
+    "EN-9.4.1.2",
+    "ACT",
+    "RGAAv4",
+    "RGAA-6.2.1"
+   ],
+   "nodeCount": 6
+  },
+  {
+   "id": "meta-viewport-large",
+   "impact": null,
+   "tags": [
+    "cat.sensory-and-visual-cues",
+    "best-practice"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "meta-viewport",
+   "impact": null,
+   "tags": [
+    "cat.sensory-and-visual-cues",
+    "wcag2aa",
+    "wcag144",
+    "EN-301-549",
+    "EN-9.1.4.4",
+    "ACT",
+    "RGAAv4",
+    "RGAA-10.4.2"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "nested-interactive",
+   "impact": null,
+   "tags": [
+    "cat.keyboard",
+    "wcag2a",
+    "wcag412",
+    "TTv5",
+    "TT6.a",
+    "EN-301-549",
+    "EN-9.4.1.2",
+    "RGAAv4",
+    "RGAA-7.1.1"
+   ],
+   "nodeCount": 69
+  },
+  {
+   "id": "page-has-heading-one",
+   "impact": null,
+   "tags": [
+    "cat.semantics",
+    "best-practice"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "presentation-role-conflict",
+   "impact": null,
+   "tags": [
+    "cat.aria",
+    "best-practice",
+    "ACT"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "region",
+   "impact": null,
+   "tags": [
+    "cat.keyboard",
+    "best-practice",
+    "RGAAv4",
+    "RGAA-9.2.1"
+   ],
+   "nodeCount": 239
+  },
+  {
+   "id": "scrollable-region-focusable",
+   "impact": null,
+   "tags": [
+    "cat.keyboard",
+    "wcag2a",
+    "wcag211",
+    "wcag213",
+    "TTv5",
+    "TT4.a",
+    "EN-301-549",
+    "EN-9.2.1.1",
+    "EN-9.2.1.3",
+    "RGAAv4",
+    "RGAA-7.3.2"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "select-name",
+   "impact": null,
+   "tags": [
+    "cat.forms",
+    "wcag2a",
+    "wcag412",
+    "section508",
+    "section508.22.n",
+    "TTv5",
+    "TT5.c",
+    "EN-301-549",
+    "EN-9.4.1.2",
+    "ACT",
+    "RGAAv4",
+    "RGAA-11.1.1"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "skip-link",
+   "impact": null,
+   "tags": [
+    "cat.keyboard",
+    "best-practice",
+    "RGAAv4",
+    "RGAA-12.7.1"
+   ],
+   "nodeCount": 1
+  },
+  {
+   "id": "summary-name",
+   "impact": null,
+   "tags": [
+    "cat.name-role-value",
+    "wcag2a",
+    "wcag412",
+    "section508",
+    "section508.22.a",
+    "TTv5",
+    "TT6.a",
+    "EN-301-549",
+    "EN-9.4.1.2"
+   ],
+   "nodeCount": 8
+  },
+  {
+   "id": "tabindex",
+   "impact": null,
+   "tags": [
+    "cat.keyboard",
+    "best-practice"
+   ],
+   "nodeCount": 2
+  }
+ ],
+ "incomplete": [
+  {
+   "id": "color-contrast",
+   "impact": "serious",
+   "tags": [
+    "cat.color",
+    "wcag2aa",
+    "wcag143",
+    "TTv5",
+    "TT13.c",
+    "EN-301-549",
+    "EN-9.1.4.3",
+    "ACT",
+    "RGAAv4",
+    "RGAA-3.2.1"
+   ],
+   "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+   "help": "Elements must meet minimum color contrast ratio thresholds",
+   "helpUrl": "https://dequeuniversity.com/rules/axe/4.14/color-contrast?application=axe-puppeteer",
+   "nodes": [
+    {
+     "any": [
+      {
+       "id": "color-contrast",
+       "data": {
+        "contrastRatio": 0,
+        "fontSize": "10.5pt (14px)",
+        "fontWeight": "bold",
+        "messageKey": "bgGradient",
+        "expectedContrastRatio": "4.5:1"
+       },
+       "relatedNodes": [
+        {
+         "html": "<div class=\"library-container library-basic\">",
+         "target": [
+          ".library-basic"
+         ]
+        }
+       ],
+       "impact": "serious",
+       "message": "Element's background color could not be determined due to a background gradient"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "serious",
+     "html": "<div class=\"flex items-center\">",
+     "target": [
+      "details[open=\"\"] > .library-header > .items-center.flex"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+    },
+    {
+     "any": [
+      {
+       "id": "color-contrast",
+       "data": {
+        "contrastRatio": 0,
+        "fontSize": "10.5pt (14px)",
+        "fontWeight": "normal",
+        "messageKey": "bgGradient",
+        "expectedContrastRatio": "4.5:1"
+       },
+       "relatedNodes": [
+        {
+         "html": "<div class=\"category-container\">",
+         "target": [
+          "details[open=\"\"] > .space-y-2.mt-2 > .category-container:nth-child(1)"
+         ]
+        },
+        {
+         "html": "<div class=\"library-container library-basic\">",
+         "target": [
+          ".library-basic"
+         ]
+        }
+       ],
+       "impact": "serious",
+       "message": "Element's background color could not be determined due to a background gradient"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "serious",
+     "html": "<span class=\"text-slate-700 dark:text-slate-300\">Adjustments</span>",
+     "target": [
+      "details[open=\"\"] > .space-y-2.mt-2 > .category-container:nth-child(1) > details[open=\"\"] > .category-header > .items-center.flex > .text-slate-700.dark\\:text-slate-300"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+    },
+    {
+     "any": [
+      {
+       "id": "color-contrast",
+       "data": {
+        "contrastRatio": 0,
+        "fontSize": "10.5pt (14px)",
+        "fontWeight": "normal",
+        "messageKey": "bgGradient",
+        "expectedContrastRatio": "4.5:1"
+       },
+       "relatedNodes": [
+        {
+         "html": "<div class=\"category-container\">",
+         "target": [
+          "details[open=\"\"] > .space-y-2.mt-2 > .category-container:nth-child(2)"
+         ]
+        },
+        {
+         "html": "<div class=\"library-container library-basic\">",
+         "target": [
+          ".library-basic"
+         ]
+        }
+       ],
+       "impact": "serious",
+       "message": "Element's background color could not be determined due to a background gradient"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "serious",
+     "html": "<span class=\"text-slate-700 dark:text-slate-300\">Filters</span>",
+     "target": [
+      "details[open=\"\"] > .space-y-2.mt-2 > .category-container:nth-child(2) > details[open=\"\"] > .category-header > .items-center.flex > .text-slate-700.dark\\:text-slate-300"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+    },
+    {
+     "any": [
+      {
+       "id": "color-contrast",
+       "data": {
+        "contrastRatio": 0,
+        "fontSize": "10.5pt (14px)",
+        "fontWeight": "normal",
+        "messageKey": "bgGradient",
+        "expectedContrastRatio": "4.5:1"
+       },
+       "relatedNodes": [
+        {
+         "html": "<div class=\"category-container\">",
+         "target": [
+          "details[open=\"\"] > .space-y-2.mt-2 > .category-container:nth-child(3)"
+         ]
+        },
+        {
+         "html": "<div class=\"library-container library-basic\">",
+         "target": [
+          ".library-basic"
+         ]
+        }
+       ],
+       "impact": "serious",
+       "message": "Element's background color could not be determined due to a background gradient"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "serious",
+     "html": "<span class=\"text-slate-700 dark:text-slate-300\">Blur &amp; Sharpen</span>",
+     "target": [
+      "details[open=\"\"] > .space-y-2.mt-2 > .category-container:nth-child(3) > details > .category-header > .items-center.flex > .text-slate-700.dark\\:text-slate-300"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+    },
+    {
+     "any": [
+      {
+       "id": "color-contrast",
+       "data": {
+        "contrastRatio": 0,
+        "fontSize": "10.5pt (14px)",
+        "fontWeight": "normal",
+        "messageKey": "bgGradient",
+        "expectedContrastRatio": "4.5:1"
+       },
+       "relatedNodes": [
+        {
+         "html": "<div class=\"category-container\">",
+         "target": [
+          "details[open=\"\"] > .space-y-2.mt-2 > .category-container:nth-child(4)"
+         ]
+        },
+        {
+         "html": "<div class=\"library-container library-basic\">",
+         "target": [
+          ".library-basic"
+         ]
+        }
+       ],
+       "impact": "serious",
+       "message": "Element's background color could not be determined due to a background gradient"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "serious",
+     "html": "<span class=\"text-slate-700 dark:text-slate-300\">Effects</span>",
+     "target": [
+      "details[open=\"\"] > .space-y-2.mt-2 > .category-container:nth-child(4) > details > .category-header > .items-center.flex > .text-slate-700.dark\\:text-slate-300"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+    },
+    {
+     "any": [
+      {
+       "id": "color-contrast",
+       "data": {
+        "contrastRatio": 0,
+        "fontSize": "10.5pt (14px)",
+        "fontWeight": "normal",
+        "messageKey": "bgGradient",
+        "expectedContrastRatio": "4.5:1"
+       },
+       "relatedNodes": [
+        {
+         "html": "<div class=\"category-container\">",
+         "target": [
+          "details[open=\"\"] > .space-y-2.mt-2 > .category-container:nth-child(5)"
+         ]
+        },
+        {
+         "html": "<div class=\"library-container library-basic\">",
+         "target": [
+          ".library-basic"
+         ]
+        }
+       ],
+       "impact": "serious",
+       "message": "Element's background color could not be determined due to a background gradient"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "serious",
+     "html": "<span class=\"text-slate-700 dark:text-slate-300\">Stylize</span>",
+     "target": [
+      "details[open=\"\"] > .space-y-2.mt-2 > .category-container:nth-child(5) > details > .category-header > .items-center.flex > .text-slate-700.dark\\:text-slate-300"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+    },
+    {
+     "any": [
+      {
+       "id": "color-contrast",
+       "data": {
+        "contrastRatio": 0,
+        "fontSize": "10.5pt (14px)",
+        "fontWeight": "bold",
+        "messageKey": "bgGradient",
+        "expectedContrastRatio": "4.5:1"
+       },
+       "relatedNodes": [
+        {
+         "html": "<div class=\"library-container library-opencv\">",
+         "target": [
+          ".library-opencv"
+         ]
+        }
+       ],
+       "impact": "serious",
+       "message": "Element's background color could not be determined due to a background gradient"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "serious",
+     "html": "<div class=\"flex items-center\">",
+     "target": [
+      ".library-opencv > details > .library-header > .items-center.flex"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+    },
+    {
+     "any": [
+      {
+       "id": "color-contrast",
+       "data": {
+        "contrastRatio": 0,
+        "fontSize": "10.5pt (14px)",
+        "fontWeight": "bold",
+        "messageKey": "bgGradient",
+        "expectedContrastRatio": "4.5:1"
+       },
+       "relatedNodes": [
+        {
+         "html": "<div class=\"library-container library-scikit\">",
+         "target": [
+          ".library-scikit"
+         ]
+        }
+       ],
+       "impact": "serious",
+       "message": "Element's background color could not be determined due to a background gradient"
+      }
+     ],
+     "all": [],
+     "none": [],
+     "impact": "serious",
+     "html": "<div class=\"flex items-center\">",
+     "target": [
+      ".library-scikit > details > .library-header > .items-center.flex"
+     ],
+     "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+    }
+   ]
+  },
+  {
+   "id": "form-field-multiple-labels",
+   "impact": "moderate",
+   "tags": [
+    "cat.forms",
+    "wcag2a",
+    "wcag332",
+    "TTv5",
+    "TT5.c",
+    "EN-301-549",
+    "EN-9.3.3.2",
+    "RGAAv4",
+    "RGAA-11.2.1"
+   ],
+   "description": "Ensure form field does not have multiple label elements",
+   "help": "Form field must not have multiple label elements",
+   "helpUrl": "https://dequeuniversity.com/rules/axe/4.14/form-field-multiple-labels?application=axe-puppeteer",
+   "nodes": [
+    {
+     "any": [],
+     "all": [],
+     "none": [
+      {
+       "id": "multiple-label",
+       "data": null,
+       "relatedNodes": [
+        {
+         "html": "<label for=\"live-toggle\" class=\"text-sm font-medium text-slate-900 dark:text-slate-50\">Live Processing</label>",
+         "target": [
+          ".text-slate-900.dark\\:text-slate-50[for=\"live-toggle\"]"
+         ]
+        },
+        {
+         "html": "<label for=\"live-toggle\" class=\"toggle-label\" aria-hidden=\"true\"></label>",
+         "target": [
+          ".toggle-label"
+         ]
+        }
+       ],
+       "impact": "moderate",
+       "message": "Multiple label elements is not widely supported in assistive technologies. Ensure the first label contains all necessary information."
+      }
+     ],
+     "impact": "moderate",
+     "html": "<input type=\"checkbox\" id=\"live-toggle\" role=\"switch\" class=\"toggle-checkbox\">",
+     "target": [
+      "#live-toggle"
+     ],
+     "failureSummary": "Fix all of the following:\n  Multiple label elements is not widely supported in assistive technologies. Ensure the first label contains all necessary information."
+    }
+   ]
+  }
+ ],
+ "violations": []
+}

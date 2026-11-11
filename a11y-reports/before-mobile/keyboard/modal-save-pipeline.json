@@ -1,0 +1,158 @@
+{
+  "state": "modal-save-pipeline",
+  "tabStops": 25,
+  "noVisibleFocus": 0,
+  "focusEscapedDialog": 18,
+  "steps": [
+    {
+      "tag": "button",
+      "name": "A",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "",
+      "visibleFocus": true,
+      "insideDialog": true
+    },
+    {
+      "tag": "input",
+      "name": "e.g., Instagram-style filter",
+      "visibleFocus": true,
+      "insideDialog": true
+    },
+    {
+      "tag": "textarea",
+      "name": "Describe what this pipeline does...",
+      "visibleFocus": true,
+      "insideDialog": true
+    },
+    {
+      "tag": "select",
+      "name": "Select a category\nFilters\nAdjustments\nEf",
+      "visibleFocus": true,
+      "insideDialog": true
+    },
+    {
+      "tag": "input",
+      "name": "e.g., vintage, blur, black-white",
+      "visibleFocus": true,
+      "insideDialog": true
+    },
+    {
+      "tag": "input",
+      "name": "is_public",
+      "visibleFocus": true,
+      "insideDialog": true
+    },
+    {
+      "tag": "button",
+      "name": "Cancel",
+      "visibleFocus": true,
+      "insideDialog": true
+    },
+    {
+      "tag": "button",
+      "name": "",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "input",
+      "name": "Search operations... (Ctrl+K)",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "summary",
+      "name": "Basic Operations",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "summary",
+      "name": "Adjustments",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Brightness\nAdjust image brightness",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Contrast\nAdjust image contrast",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Saturation\nAdjust color saturation",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Exposure\nAdjust image exposure",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Hue Rotate\nRotate hue around the color w",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Detail Enhance\nEnhance fine detail (edge",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Temperature\nWarm/cool color temperature ",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "summary",
+      "name": "Filters",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Grayscale\nConvert to grayscale",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Sepia\nApply sepia tone effect",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Invert\nInvert image colors",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Solarize\nApply solarization effect",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Posterize\nReduce number of colors",
+      "visibleFocus": true,
+      "insideDialog": false
+    }
+  ]
+}
