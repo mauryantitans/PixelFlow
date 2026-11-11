@@ -65,6 +65,8 @@ def clear_auth_cookies(response: Response) -> None:
     response.delete_cookie(ACCESS_COOKIE, path="/", domain=domain)
     response.delete_cookie(REFRESH_COOKIE, path=REFRESH_COOKIE_PATH, domain=domain)
     response.delete_cookie(CSRF_COOKIE, path="/", domain=domain)
+    # Admin PIN grant (see utils/admin_pin.py) ends with the login session too.
+    response.delete_cookie("pf_admin_pin", path="/api/admin", domain=domain)
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify a password against its hash"""

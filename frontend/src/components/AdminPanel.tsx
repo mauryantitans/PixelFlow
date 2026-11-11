@@ -217,6 +217,19 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
     }
   };
 
+  // The server grants PIN access for 15 minutes (httpOnly cookie). When it
+  // lapses the data endpoints answer 403 "pin_required": ask for the PIN again.
+  const handlePinExpired = (error: any): boolean => {
+    if (error?.response?.status === 403 && error.response.data?.detail?.error === 'pin_required') {
+      setPinVerified(false);
+      setShowUserData(false);
+      setSelectedUser(null);
+      alert('Your PIN access has expired. Turn "View User Data" on again and re-enter the PIN.');
+      return true;
+    }
+    return false;
+  };
+
   const handleToggleUserData = () => {
     if (!showUserData) {
       // Turning ON - need PIN
@@ -251,6 +264,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
         detailed_sessions: sessionsResp.data.sessions || []
       }));
     } catch (error: any) {
+      if (handlePinExpired(error)) return;
       
       let errorMsg = 'Failed to load database details.';
       if (error.response?.status === 401) {
@@ -294,7 +308,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
       });
 
       setUserImages(response.data.images || []);
-    } catch (error) {
+    } catch (error: any) {
+      if (handlePinExpired(error)) return;
       console.error(`Failed to load images for user ${userId}:`, error);
       alert('Failed to load user images. Check console for details.');
     } finally {
@@ -310,7 +325,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isOpen, onClose }) => {
       });
 
       setUserPipelines(response.data.pipelines || []);
-    } catch (error) {
+    } catch (error: any) {
+      if (handlePinExpired(error)) return;
       console.error(`Failed to load pipelines for user ${userId}:`, error);
       alert('Failed to load user pipelines. Check console for details.');
     } finally {
@@ -407,6 +423,7 @@ Type DELETE to confirm.`)) {
       await loadData();
       await loadDetailedData();
     } catch (error: any) {
+      if (handlePinExpired(error)) return;
       console.error('Failed to delete user:', error);
       alert('Failed to delete user. Check console for details.');
     } finally {
@@ -435,6 +452,7 @@ Type DELETE to confirm.`)) {
       }
       await loadData();
     } catch (error: any) {
+      if (handlePinExpired(error)) return;
       console.error('Failed to delete image:', error);
       alert('Failed to delete image. Check console for details.');
     } finally {
@@ -463,6 +481,7 @@ Type DELETE to confirm.`)) {
       }
       await loadData();
     } catch (error: any) {
+      if (handlePinExpired(error)) return;
       console.error('Failed to delete pipeline:', error);
       alert('Failed to delete pipeline. Check console for details.');
     } finally {

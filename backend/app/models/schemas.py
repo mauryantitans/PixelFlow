@@ -126,4 +126,6 @@ class APIKeyWithToken(APIKeyResponse):
 
 # Admin PIN schemas
 class PinRequest(BaseModel):
-    pin: str = Field(..., min_length=4, max_length=6)
+    pin: str = Field(..., min_length=4, max_length=6, pattern=r"^\d{4,6}$")
+    # Required to change an existing PIN.
+    current_pin: Optional[str] = Field(None, min_length=4, max_length=6)

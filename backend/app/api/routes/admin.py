@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from datetime import datetime, timedelta, timezone
@@ -10,6 +10,14 @@ from app.models.schemas import PinRequest
 from app.utils.auth import get_current_active_admin, get_current_user
 from app.utils.cleanup_service import CleanupService
 from app.core.business_rules import SessionPolicy
+from app.utils.admin_pin import (
+    check_not_locked_out,
+    issue_pin_cookie,
+    pin_cookie_is_valid,
+    record_failure,
+    require_admin_pin,
+    reset_failures,
+)
 from typing import List, Dict, Any
 
 logger = logging.getLogger(__name__)
@@ -386,57 +394,74 @@ async def update_system_settings(
 @router.post("/pin/set")
 async def set_admin_pin(
     pin_request: PinRequest,
+    response: Response,
     current_user: User = Depends(get_current_active_admin),
     db: Session = Depends(get_db)
 ):
-    """Set or update admin PIN for database viewer"""
-    from ...utils.auth import get_password_hash
+    """Create the admin PIN, or change it (changing requires the current PIN).
+
+    Before, any admin could overwrite an existing PIN without knowing it,
+    which made the PIN pointless.
+    """
+    from ...utils.auth import get_password_hash, verify_password
     from ...utils.settings_manager import get_settings
-    
-    pin = pin_request.pin
-    
-    if not pin or len(pin) < 4:
-        raise HTTPException(status_code=400, detail="PIN must be at least 4 digits")
-    
+
     settings = get_settings(db, use_cache=False)
-    settings.admin_pin_hash = get_password_hash(pin)
+    if settings.admin_pin_hash:
+        check_not_locked_out(current_user.id)
+        if not pin_request.current_pin or not verify_password(pin_request.current_pin, settings.admin_pin_hash):
+            left = record_failure(current_user.id)
+            raise HTTPException(
+                status_code=401,
+                detail=f"Enter the current PIN to change it. {left} attempt(s) left.",
+            )
+
+    settings.admin_pin_hash = get_password_hash(pin_request.pin)
     db.commit()
-    
+    reset_failures(current_user.id)
+    issue_pin_cookie(response, current_user)
     logger.info(f"Admin PIN set by user {current_user.id}")
-    
     return {"success": True, "message": "Admin PIN set successfully"}
 
 
 @router.post("/pin/verify")
 async def verify_admin_pin(
     pin_request: PinRequest,
+    response: Response,
     current_user: User = Depends(get_current_active_admin),
     db: Session = Depends(get_db)
 ):
-    """Verify admin PIN"""
+    """Verify the admin PIN; on success the browser gets a 15-minute PIN cookie."""
     from ...utils.auth import verify_password
     from ...utils.settings_manager import get_settings
-    
-    pin = pin_request.pin
-    
+
     settings = get_settings(db, use_cache=False)
-    
     if not settings.admin_pin_hash:
         raise HTTPException(status_code=400, detail="No PIN set. Please set a PIN first.")
-    
-    if verify_password(pin, settings.admin_pin_hash):
-        return {"success": True, "message": "PIN verified"}
-    else:
-        raise HTTPException(status_code=401, detail="Invalid PIN")
+
+    check_not_locked_out(current_user.id)
+    if not verify_password(pin_request.pin, settings.admin_pin_hash):
+        left = record_failure(current_user.id)
+        raise HTTPException(status_code=401, detail=f"Invalid PIN. {left} attempt(s) left.")
+
+    reset_failures(current_user.id)
+    issue_pin_cookie(response, current_user)
+    return {"success": True, "message": "PIN verified"}
 
 
 @router.get("/database/overview")
 async def get_database_overview(
+    request: Request,
     include_user_data: bool = False,
     current_user: User = Depends(get_current_active_admin),
     db: Session = Depends(get_db)
 ):
     """Get complete database overview (admin only, requires PIN for user data)"""
+    if include_user_data and not pin_cookie_is_valid(request, current_user):
+        raise HTTPException(
+            status_code=403,
+            detail={"error": "pin_required", "message": "Enter the admin PIN to view user data."},
+        )
     
     # Basic counts (always allowed)
     overview = {
@@ -510,7 +535,7 @@ async def get_database_overview(
 async def get_all_users_data(
     skip: int = 0,
     limit: int = 50,
-    current_user: User = Depends(get_current_active_admin),
+    current_user: User = Depends(require_admin_pin),
     db: Session = Depends(get_db)
 ):
     """Get detailed user data (requires PIN verification)"""
@@ -557,7 +582,7 @@ async def get_all_users_data(
 async def get_all_images_data(
     skip: int = 0,
     limit: int = 50,
-    current_user: User = Depends(get_current_active_admin),
+    current_user: User = Depends(require_admin_pin),
     db: Session = Depends(get_db)
 ):
     """Get all uploaded images metadata (requires PIN)"""
@@ -587,7 +612,7 @@ async def get_user_images(
     user_id: int,
     skip: int = 0,
     limit: int = 50,
-    current_user: User = Depends(get_current_active_admin),
+    current_user: User = Depends(require_admin_pin),
     db: Session = Depends(get_db)
 ):
     """Get all images for a specific user with thumbnails"""
@@ -631,7 +656,7 @@ async def get_user_images(
 async def get_all_sessions_data(
     skip: int = 0,
     limit: int = 50,
-    current_user: User = Depends(get_current_active_admin),
+    current_user: User = Depends(require_admin_pin),
     db: Session = Depends(get_db)
 ):
     """Get all sessions data (requires PIN)"""
@@ -667,7 +692,7 @@ async def get_all_sessions_data(
 
 @router.get("/database/debug")
 async def debug_database_counts(
-    current_user: User = Depends(get_current_active_admin),
+    current_user: User = Depends(require_admin_pin),
     db: Session = Depends(get_db)
 ):
     """Debug endpoint to see all image counts broken down"""
@@ -854,7 +879,7 @@ async def get_user_pipelines(
     user_id: int,
     skip: int = 0,
     limit: int = 50,
-    current_user: User = Depends(get_current_active_admin),
+    current_user: User = Depends(require_admin_pin),
     db: Session = Depends(get_db)
 ):
     """Get all pipelines for a specific user"""
@@ -928,7 +953,7 @@ async def get_user_pipelines(
 async def delete_user(
     user_id: int,
     confirm: str,
-    current_user: User = Depends(get_current_active_admin),
+    current_user: User = Depends(require_admin_pin),
     db: Session = Depends(get_db)
 ):
     """Delete a user and ALL their data (images, pipelines, sessions)"""
@@ -1000,7 +1025,7 @@ async def delete_user(
 @router.delete("/database/images/{image_id}")
 async def delete_image(
     image_id: str,
-    current_user: User = Depends(get_current_active_admin),
+    current_user: User = Depends(require_admin_pin),
     db: Session = Depends(get_db)
 ):
     """Delete a specific image and its processed versions"""
@@ -1034,7 +1059,7 @@ async def delete_image(
 @router.delete("/database/pipelines/{pipeline_id}")
 async def delete_pipeline(
     pipeline_id: int,
-    current_user: User = Depends(get_current_active_admin),
+    current_user: User = Depends(require_admin_pin),
     db: Session = Depends(get_db)
 ):
     """Delete a specific pipeline"""
