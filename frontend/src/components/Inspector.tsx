@@ -6,6 +6,8 @@ import { ImageAnalytics } from './ImageAnalytics';
 import PreviewCanvas from './PreviewCanvas';
 import CompareSlider from './CompareSlider';
 import DiffView from './DiffView';
+import { usePicker } from '../contexts/PickerContext';
+import { usePipelineContext } from '../contexts/PipelineContext';
 
 type InspectorView = 'normal' | 'side-by-side' | 'slider' | 'diff';
 
@@ -14,13 +16,16 @@ interface InspectorProps {
   view: InspectorView;
   onViewChange: (view: InspectorView) => void;
   onBack: () => void;
+  /** Step to show (0-based) when the user presses a step's "Preview" button; -1 = final. */
+  selectedStepIndex?: number;
 }
 
 const Inspector: React.FC<InspectorProps> = ({
   result,
   view,
   onViewChange,
-  onBack
+  onBack,
+  selectedStepIndex
 }) => {
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(-1); // -1 = final result
@@ -31,6 +36,28 @@ const Inspector: React.FC<InspectorProps> = ({
   useEffect(() => {
     setCurrentStepIndex(-1);
   }, [result.id]);
+
+  // A pipeline step's "Preview this step" button selects that step here (it
+  // used to only highlight the button).
+  useEffect(() => {
+    if (typeof selectedStepIndex !== 'number') return;
+    setCurrentStepIndex(selectedStepIndex);
+    if (selectedStepIndex >= 0) onViewChange('normal');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedStepIndex]);
+
+  // While a point / region / colour is being picked for step k, show that
+  // step's INPUT image (the original for step 1). Picking on the final image
+  // gave wrong coordinates whenever a later step crops, flips or rotates.
+  const { activePicker } = usePicker();
+  const { pipeline } = usePipelineContext();
+  const pickStepIndex = activePicker ? pipeline.findIndex((st) => st.id === activePicker.stepId) : -1;
+  const pickInputUrl =
+    pickStepIndex < 0
+      ? null
+      : pickStepIndex === 0
+      ? result.originalUrl
+      : result.intermediateResults?.[pickStepIndex - 1] ?? null;
 
   // Update analytics image when step changes
   useEffect(() => {
@@ -281,9 +308,15 @@ const Inspector: React.FC<InspectorProps> = ({
           <div className="flex-1 min-h-0">
             {view === 'normal' && (
               <div className="w-full h-full flex flex-col items-center justify-center">
+                {pickInputUrl && (
+                  <p className="mb-2 text-sm font-medium text-blue-800 dark:text-blue-200" role="status">
+                    Picking on the input of step {pickStepIndex + 1}
+                    {pickStepIndex === 0 ? ' (the original image)' : ` (the result of step ${pickStepIndex})`}
+                  </p>
+                )}
                 <PreviewCanvas
-                  src={getCurrentImageUrl()}
-                  alt={getStepLabel()}
+                  src={pickInputUrl || getCurrentImageUrl()}
+                  alt={pickInputUrl ? `Input of step ${pickStepIndex + 1}` : getStepLabel()}
                   className="max-w-full max-h-full object-contain rounded-lg shadow-lg"
                 />
                 {hasIntermediates && (

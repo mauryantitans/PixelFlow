@@ -99,6 +99,22 @@ export function useStatus() {
 /**
  * Image management hook with database persistence
  */
+/** Browsers can't show TIFF; everything else we accept they can. */
+function isBrowserDisplayable(file?: File): boolean {
+  if (!file) return false;
+  const name = file.name.toLowerCase();
+  return !(file.type === 'image/tiff' || name.endsWith('.tif') || name.endsWith('.tiff'));
+}
+
+function readAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(typeof reader.result === 'string' ? reader.result : '');
+    reader.onerror = () => resolve('');
+    reader.readAsDataURL(file);
+  });
+}
+
 export function useImages() {
   const [images, setImages] = useState<ImageData[]>([]);
   const [loading, setLoading] = useState(false);
@@ -129,82 +145,88 @@ export function useImages() {
   }, [sessionId]);
   
   const addImages = useCallback(async (files: File[]) => {
+    // Check the files before sending anything (limits match the server).
+    if (files.length > 20) {
+      throw new Error(`You selected ${files.length} files. Upload at most 20 at a time.`);
+    }
+    const errors: string[] = [];
+    const valid: File[] = [];
+    files.forEach((file) => {
+      const check = ApiService.validateFile(file);
+      if (check.isValid) valid.push(file);
+      else errors.push(`${file.name}: ${check.error}`);
+    });
+
     setLoading(true);
     try {
-      const uploadPromises = files.map(file => ApiService.uploadImage(file, sessionId));
-      const responses = await Promise.allSettled(uploadPromises);
-      
+      const responses = await Promise.allSettled(valid.map((file) => ApiService.uploadImage(file, sessionId)));
+
       const newImages: ImageData[] = [];
-      const fileReadPromises: Promise<void>[] = [];
       let quotaError: any = null;
-      const errors: string[] = [];
-      
-      responses.forEach((response, index) => {
+      let limitError: any = null;
+      let sessionReset = false;
+
+      for (let index = 0; index < responses.length; index++) {
+        const response = responses[index];
+        const file = valid[index];
         if (response.status === 'fulfilled' && response.value.success && response.value.image) {
-          const imageData: ImageData = {
+          newImages.push({
             ...response.value.image,
             selected: true,
-            file: files[index],
+            file,
             thumbnailDataUrl: response.value.thumbnail,
-            dataUrl: '' // Initialize as empty, will be filled by FileReader
-          };
-          
-          // Create a promise for the FileReader
-          const fileReadPromise = new Promise<void>((resolve) => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-              if (e.target?.result) {
-                imageData.dataUrl = e.target.result as string;
-              }
-              resolve();
-            };
-            reader.onerror = () => resolve(); // Resolve anyway to not block
-            reader.readAsDataURL(files[index]);
+            dataUrl: '', // filled in below
           });
-          
-          fileReadPromises.push(fileReadPromise);
-          newImages.push(imageData);
         } else if (response.status === 'rejected') {
           const error = response.reason;
-          errors.push(`${files[index].name}: ${error.message || 'Upload failed'}`);
-
-          // The browser's session belongs to another account (shared computer):
-          // switch to a fresh session so the next upload works.
+          errors.push(`${file.name}: ${error.message || 'Upload failed'}`);
           if (
             error.code === 'session_owned_by_another_user' ||
             (error.code === 'sign_in_required' && !hasSignedInSession())
           ) {
-            SessionUtils.startNewSession();
-            const err: any = new Error('Your browser session belonged to a different account and was reset. Please upload again.');
-            throw err;
-          }
-          
-          // Check if it's a quota error (507) or image limit error (400)
-          if (error.response?.status === 507) {
-            // Storage quota exceeded
-            quotaError = error.response.data.detail;
+            sessionReset = true; // this browser's session belonged to another account
+          } else if (error.response?.status === 507) {
+            quotaError = error.response.data.detail; // storage quota exceeded
           } else if (error.response?.status === 400 && error.response?.data?.detail?.error === 'Image limit reached') {
-            // Image count limit reached
-            const err: any = new Error(error.response.data.detail.message);
-            err.response = error.response;
-            throw err;
+            limitError = error;
           }
         }
-      });
-      
-      if (errors.length > 0) {
-        throw new Error(`Failed to upload ${errors.length} image(s): ${errors.join('; ')}`);
       }
-      
-      // If quota exceeded, throw error to show popup
+
+      // Full-size preview: the file itself when the browser can show it,
+      // otherwise (e.g. TIFF) the server's re-encoded copy.
+      await Promise.all(
+        newImages.map(async (img) => {
+          img.dataUrl = isBrowserDisplayable(img.file)
+            ? await readAsDataUrl(img.file as File)
+            : await ApiService.getImageDataUrl(img.id).catch(() => img.thumbnailDataUrl || '');
+        })
+      );
+
+      // Show everything that did upload, even if some files failed (before,
+      // one bad file hid the successful ones until a reload).
+      if (newImages.length > 0) setImages((prev) => [...prev, ...newImages]);
+
+      if (sessionReset) {
+        SessionUtils.startNewSession();
+        throw new Error('Your browser session belonged to a different account and was reset. Please upload again.');
+      }
       if (quotaError) {
         const error: any = new Error(quotaError.message || 'Storage quota exceeded');
         error.quotaInfo = quotaError;
         throw error;
       }
-      
-      await Promise.all(fileReadPromises);
-      setImages(prev => [...prev, ...newImages]);
+      if (limitError) {
+        const err: any = new Error(limitError.response.data.detail.message);
+        err.response = limitError.response;
+        throw err;
+      }
+      if (errors.length > 0) {
+        const uploaded = newImages.length;
+        throw new Error(
+          `${uploaded} of ${files.length} image(s) uploaded. Not uploaded: ${errors.join('; ')}`
+        );
+      }
       return newImages;
     } catch (error) {
       console.error('Error uploading images:', error);
@@ -506,8 +528,13 @@ export function useLiveProcessing() {
   );
   
   const clearResults = useCallback(() => {
+    // Also drop any pending/in-flight request so a late response can't bring
+    // the old result back, and reset the timing badge.
+    clearTimeout(debounceTimerRef.current);
+    abortControllerRef.current?.abort();
     setResults([]);
     setStepErrors(null);
+    setTimingData({ total_time: 0, step_timings: [] });
     cacheRef.current = null;
   }, []);
 
@@ -546,20 +573,25 @@ export function useBatchProcessing() {
   const [timingData, setTimingData] = useState<{ total_time: number; step_timings: ProcessingTiming[] }>({ total_time: 0, step_timings: [] });
   const { sessionId } = useSession();
   const abortControllerRef = useRef<AbortController | null>(null);
-  const isCancelledRef = useRef(false);
+  // Each run gets an id. Stop or a new run makes older runs "stale": they stop
+  // at the next image and never touch state again. (Before, Stop followed by
+  // Apply Pipeline let both loops run and mixed their results.)
+  const runIdRef = useRef(0);
   
   const processBatch = useCallback(async (
     imageIds: string[], 
     pipeline: PipelineStep[],
     onProgress?: (current: number, total: number, result: ProcessedResult) => void
   ) => {
+    abortControllerRef.current?.abort();
+    const runId = ++runIdRef.current;
+    const isCurrent = () => runIdRef.current === runId;
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     setLoading(true);
     setResults([]);
     setTimingData({ total_time: 0, step_timings: [] });
-    isCancelledRef.current = false;
-    
-    // Create new abort controller
-    abortControllerRef.current = new AbortController();
     
     try {
       const allResults: ProcessedResult[] = [];
@@ -567,7 +599,7 @@ export function useBatchProcessing() {
       
       // Process images one by one
       for (let i = 0; i < imageIds.length; i++) {
-        if (isCancelledRef.current) break;
+        if (!isCurrent()) break;
         
         const imageId = imageIds[i];
         
@@ -576,7 +608,8 @@ export function useBatchProcessing() {
             image_id: imageId,
             pipeline: pipeline.map(step => ({ name: step.name, params: step.params })),
             session_id: sessionId
-          });
+          }, controller.signal);
+          if (!isCurrent()) break;
           
           if (response.success && response.results.length > 0) {
             const result: ProcessedResult = {
@@ -606,6 +639,8 @@ export function useBatchProcessing() {
         }
       }
       
+      if (!isCurrent()) return allResults;
+
       // Update final timing data
       setTimingData({
         total_time: allTimings.reduce((sum, t) => sum + t.duration, 0) / 1000,
@@ -617,16 +652,18 @@ export function useBatchProcessing() {
       console.error('Batch processing error:', error);
       throw error;
     } finally {
-      setLoading(false);
-      abortControllerRef.current = null;
+      // Only the current run may end the loading state.
+      if (isCurrent()) {
+        setLoading(false);
+        abortControllerRef.current = null;
+      }
     }
   }, [sessionId]);
   
   const cancelBatch = useCallback(() => {
-    isCancelledRef.current = true;
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
+    runIdRef.current += 1; // makes the running batch stale
+    abortControllerRef.current?.abort();
+    abortControllerRef.current = null;
     setLoading(false);
   }, []);
   

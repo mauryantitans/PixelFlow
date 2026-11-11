@@ -170,6 +170,17 @@ export class ApiService {
     }
   }
 
+  /** The stored (browser-displayable, re-encoded) image as a data URL. */
+  static async getImageDataUrl(imageId: string): Promise<string> {
+    const response = await api.get(`/images/image/${encodeURIComponent(imageId)}`, { responseType: 'blob' });
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ''));
+      reader.onerror = () => reject(new Error('Could not read image'));
+      reader.readAsDataURL(response.data);
+    });
+  }
+
   /** Delete one uploaded image (owner or same guest session). */
   static async deleteImage(imageId: string): Promise<void> {
     try {
@@ -277,12 +288,18 @@ export class ApiService {
   static validateFile(file: File): { isValid: boolean; error?: string } {
     const maxSize = 50 * 1024 * 1024; // 50MB
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/bmp', 'image/tiff'];
+    // Some systems report no MIME type for TIFF/BMP: fall back to the extension.
+    const allowedExt = /\.(jpe?g|png|bmp|tiff?)$/i;
+
+    if (file.size === 0) {
+      return { isValid: false, error: 'File is empty.' };
+    }
 
     if (file.size > maxSize) {
       return { isValid: false, error: 'File is too large. Maximum size is 50MB.' };
     }
 
-    if (!allowedTypes.includes(file.type)) {
+    if (!allowedTypes.includes(file.type) && !(file.type === '' && allowedExt.test(file.name))) {
       return { isValid: false, error: 'File type not supported. Please use JPEG, PNG, BMP, or TIFF.' };
     }
 

@@ -206,25 +206,6 @@ const App: React.FC = () => {
     }
   };
   
-  // Enhanced live processing with feedback
-  const handleLiveProcess = async () => {
-    if (selectedImages.length !== 1 || !liveProcessingEnabled) {
-      return;
-    }
-    
-    
-    try {
-      updateStatus('Processing live preview...', 'processing', true);
-      
-      await processLive(selectedImages[0].id, pipeline);
-      
-      updateStatus('Live preview updated', 'success');
-      
-    } catch (error: any) {
-      console.error('Live processing error:', error);
-      updateStatus(`Live processing failed: ${error.message}`, 'error');
-    }
-  };
 
   // Enhanced batch processing with real-time results and detailed feedback
   const handleBatchProcess = async () => {
@@ -295,7 +276,8 @@ const App: React.FC = () => {
   
   // Handle result selection in batch mode
   const handleResultSelect = (result: ProcessedResult) => {
-    const originalImage = selectedImages.find(img => img.id === result.id);
+    // Look in all images: the source may have been deselected since the batch ran.
+    const originalImage = images.find(img => img.id === result.id);
     const resultWithOriginal: ProcessedResult = {
       ...result,
       originalUrl: originalImage?.dataUrl || originalImage?.thumbnailDataUrl || ''
@@ -374,7 +356,13 @@ const App: React.FC = () => {
   // stable), so rapid edits coalesce. The status is set here so "Live preview
   // updated" only appears after the result is computed and the image decoded.
   useEffect(() => {
-    if (!liveProcessingEnabled || selectedImages.length !== 1 || pipeline.length === 0) {
+    if (!liveProcessingEnabled || selectedImages.length !== 1) {
+      return;
+    }
+    if (pipeline.length === 0) {
+      // Removing the last step (or Reset / Undo) must not leave the previous
+      // result on screen as the "Final Result": show the original again.
+      clearLiveResults();
       return;
     }
     let cancelled = false;
@@ -389,7 +377,7 @@ const App: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [pipeline, liveProcessingEnabled, selectedImages, processLive, updateStatus]);
+  }, [pipeline, liveProcessingEnabled, selectedImages, processLive, updateStatus, clearLiveResults]);
 
   // Update live processing toggle state when selection changes - FIXED
   useEffect(() => {
@@ -864,10 +852,8 @@ const App: React.FC = () => {
                       onParameterChange={handleParameterChange}
                       onPreview={() => {
                         if (liveProcessingEnabled) {
+                          // Show (or un-show) this step's image in the Inspector.
                           setViewingStep(ui.viewingStepIndex === index ? -1 : index);
-                          if (ui.viewingStepIndex !== index) {
-                            handleLiveProcess();
-                          }
                         } else {
                           updateStatus('Enable live processing to preview individual steps', 'info');
                         }
@@ -915,11 +901,12 @@ const App: React.FC = () => {
                 result={{
                   id: selectedImages[0]?.id || 'live',
                   originalUrl: selectedImages[0]?.dataUrl || selectedImages[0]?.thumbnailDataUrl || '',
-                  processedUrl: liveResults.length > 0 ? liveResults[liveResults.length - 1] : '',
+                  processedUrl: liveResults.length > 0 ? liveResults[liveResults.length - 1] : (selectedImages[0]?.dataUrl || selectedImages[0]?.thumbnailDataUrl || ''),
                   intermediateResults: liveResults,
                 }}
                 view={ui.inspectorView}
                 onViewChange={setInspectorView}
+                selectedStepIndex={ui.viewingStepIndex}
                 onBack={() => {
                   setLiveProcessingEnabled(false);
                   setLiveProcessing(false);

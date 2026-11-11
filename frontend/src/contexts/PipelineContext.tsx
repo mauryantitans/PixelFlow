@@ -1,4 +1,4 @@
-import React, { createContext, useContext, ReactNode, useState, useCallback } from 'react';
+import React, { createContext, useContext, ReactNode, useState, useCallback, useEffect } from 'react';
 import { PipelineStep } from '../types';
 
 interface PipelineContextType {
@@ -29,9 +29,35 @@ interface PipelineProviderProps {
   children: ReactNode;
 }
 
+// The pipeline being built survives a page reload (images already do). It is
+// kept in sessionStorage: per tab, gone when the tab closes, so it isn't left
+// behind for the next person on a shared computer.
+const STORAGE_KEY = 'pixelflow_pipeline';
+
+function loadStoredPipeline(): PipelineStep[] {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed)
+      ? parsed.filter((st) => st && typeof st.id === 'string' && typeof st.name === 'string')
+      : [];
+  } catch {
+    return [];
+  }
+}
+
 export const PipelineProvider: React.FC<PipelineProviderProps> = ({ children }) => {
-  const [pipeline, setPipelineState] = useState<PipelineStep[]>([]);
-  const [history, setHistory] = useState<PipelineStep[][]>([[]]);
+  const [initial] = useState<PipelineStep[]>(loadStoredPipeline);
+  const [pipeline, setPipelineState] = useState<PipelineStep[]>(initial);
+  const [history, setHistory] = useState<PipelineStep[][]>([initial]);
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(pipeline));
+    } catch {
+      /* storage full / unavailable: not critical */
+    }
+  }, [pipeline]);
   const [historyIndex, setHistoryIndex] = useState(0);
   
   const saveToHistory = useCallback((newPipeline: PipelineStep[]) => {

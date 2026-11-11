@@ -52,9 +52,17 @@ export const LoadPipelineModal: React.FC<LoadPipelineModalProps> = ({
     }
   };
 
-  const handleLoadPipeline = (pipeline: SavedPipeline, e: React.MouseEvent) => {
+  const handleLoadPipeline = async (pipeline: SavedPipeline, e: React.MouseEvent) => {
     e.stopPropagation();
-    onLoadPipeline(pipeline);
+    // Fetch it: gets the latest version and records a use for public pipelines
+    // (usage_count was never incremented because nothing called this endpoint).
+    let latest = pipeline;
+    try {
+      latest = await pipelineService.getPipeline(pipeline.id);
+    } catch {
+      /* fall back to the listed copy */
+    }
+    onLoadPipeline(latest);
     onClose();
   };
 
