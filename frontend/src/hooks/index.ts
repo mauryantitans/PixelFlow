@@ -17,7 +17,21 @@ import { SessionUtils, ThemeUtils } from '../utils';
  * Images will only be deleted on logout or manual cleanup
  */
 export function useSession() {
-  const [sessionId] = useState(() => SessionUtils.getSessionId());
+  const [sessionId, setSessionId] = useState(() => SessionUtils.getSessionId());
+  // The id changes when someone signs in/out (see SessionUtils.syncWithUser)
+  // or another tab switches it; follow along so uploads use the right one.
+  useEffect(() => {
+    const sync = () => setSessionId(SessionUtils.getSessionId());
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === 'pixelflow_session_id') sync();
+    };
+    window.addEventListener(SessionUtils.CHANGE_EVENT, sync);
+    window.addEventListener('storage', onStorage);
+    return () => {
+      window.removeEventListener(SessionUtils.CHANGE_EVENT, sync);
+      window.removeEventListener('storage', onStorage);
+    };
+  }, []);
 
   // Tab-close cleanup is intentionally disabled — images persist across reloads
   // because reload events and tab-close events are indistinguishable in the browser.
@@ -88,26 +102,25 @@ export function useImages() {
   const [images, setImages] = useState<ImageData[]>([]);
   const [loading, setLoading] = useState(false);
   const { sessionId } = useSession();
-  const [isInitialized, setIsInitialized] = useState(false);
-  
-  // Load images from database on mount
-  useEffect(() => {
-    const loadImagesFromDB = async () => {
-      if (!isInitialized) {
-        try {
-          const savedImages = await ApiService.getSessionImages(sessionId);
-          if (savedImages.length > 0) {
-            setImages(savedImages);
-          }
-        } catch {
-          // Continue with empty images if load fails
-        }
-        setIsInitialized(true);
-      }
-    };
 
-    loadImagesFromDB();
-  }, [sessionId, isInitialized]);
+  // Load the session's images on mount and whenever the session changes
+  // (e.g. after signing in/out), discarding the previous session's images.
+  useEffect(() => {
+    let cancelled = false;
+    setImages([]);
+    ApiService.getSessionImages(sessionId)
+      .then((savedImages) => {
+        if (!cancelled) setImages(savedImages);
+      })
+      .catch((error: any) => {
+        // 403: this browser's session belongs to a different account; start
+        // a fresh one instead of silently showing nothing and failing uploads.
+        if (!cancelled && error?.status === 403) SessionUtils.startNewSession();
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [sessionId]);
   
   const addImages = useCallback(async (files: File[]) => {
     setLoading(true);
@@ -148,6 +161,14 @@ export function useImages() {
         } else if (response.status === 'rejected') {
           const error = response.reason;
           errors.push(`${files[index].name}: ${error.message || 'Upload failed'}`);
+
+          // The browser's session belongs to another account (shared computer):
+          // switch to a fresh session so the next upload works.
+          if (error.code === 'session_owned_by_another_user') {
+            SessionUtils.startNewSession();
+            const err: any = new Error('Your browser session belonged to a different account and was reset. Please upload again.');
+            throw err;
+          }
           
           // Check if it's a quota error (507) or image limit error (400)
           if (error.response?.status === 507) {

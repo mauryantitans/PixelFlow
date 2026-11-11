@@ -648,7 +648,7 @@ Type DELETE to confirm.`)) {
             <div className="space-y-6">
               <div className="bg-slate-50 dark:bg-zinc-800/50 rounded-lg p-3 mb-4">
                 <p className="text-sm text-slate-700 dark:text-slate-300">
-                  <strong>Current Behavior:</strong> Images persist until manually deleted or quota exceeded. Sessions stay active for 5 minutes after last heartbeat.
+                  <strong>How it works:</strong> limits apply per session and per account. Data older than the retention periods (Retention tab) is removed by the automatic cleanup when it is on.
                 </p>
               </div>
 
@@ -666,7 +666,7 @@ Type DELETE to confirm.`)) {
                       min="1"
                       max="100"
                       value={editedSettings.user_limits.free_user_max_pipelines}
-                      onChange={(e) => handleSettingChange('user_limits', 'free_user_max_pipelines', parseInt(e.target.value))}
+                      onChange={(e) => handleSettingChange('user_limits', 'free_user_max_pipelines', e.target.value === '' ? null : Number(e.target.value))}
                       className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-500 dark:border-zinc-500 rounded-md text-slate-900 dark:text-slate-50"
                     />
                     <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
@@ -690,7 +690,7 @@ Type DELETE to confirm.`)) {
                       min="10"
                       max="1000"
                       value={editedSettings.user_limits.guest_storage_quota_mb}
-                      onChange={(e) => handleSettingChange('user_limits', 'guest_storage_quota_mb', parseInt(e.target.value))}
+                      onChange={(e) => handleSettingChange('user_limits', 'guest_storage_quota_mb', e.target.value === '' ? null : Number(e.target.value))}
                       className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-500 dark:border-zinc-500 rounded-md text-slate-900 dark:text-slate-50"
                     />
                     <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">Current: {editedSettings.user_limits.guest_storage_quota_mb}MB</p>
@@ -705,7 +705,7 @@ Type DELETE to confirm.`)) {
                       min="100"
                       max="10000"
                       value={editedSettings.user_limits.free_user_storage_quota_mb}
-                      onChange={(e) => handleSettingChange('user_limits', 'free_user_storage_quota_mb', parseInt(e.target.value))}
+                      onChange={(e) => handleSettingChange('user_limits', 'free_user_storage_quota_mb', e.target.value === '' ? null : Number(e.target.value))}
                       className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-500 dark:border-zinc-500 rounded-md text-slate-900 dark:text-slate-50"
                     />
                     <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">Current: {editedSettings.user_limits.free_user_storage_quota_mb}MB</p>
@@ -727,7 +727,7 @@ Type DELETE to confirm.`)) {
                       min="10"
                       max="500"
                       value={editedSettings.user_limits.guest_max_images_per_session}
-                      onChange={(e) => handleSettingChange('user_limits', 'guest_max_images_per_session', parseInt(e.target.value))}
+                      onChange={(e) => handleSettingChange('user_limits', 'guest_max_images_per_session', e.target.value === '' ? null : Number(e.target.value))}
                       className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-500 dark:border-zinc-500 rounded-md text-slate-900 dark:text-slate-50"
                     />
                   </div>
@@ -741,7 +741,7 @@ Type DELETE to confirm.`)) {
                       min="50"
                       max="1000"
                       value={editedSettings.user_limits.free_user_max_images_per_session}
-                      onChange={(e) => handleSettingChange('user_limits', 'free_user_max_images_per_session', parseInt(e.target.value))}
+                      onChange={(e) => handleSettingChange('user_limits', 'free_user_max_images_per_session', e.target.value === '' ? null : Number(e.target.value))}
                       className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-500 dark:border-zinc-500 rounded-md text-slate-900 dark:text-slate-50"
                     />
                   </div>
@@ -755,7 +755,7 @@ Type DELETE to confirm.`)) {
                       min="5"
                       max="100"
                       value={editedSettings.user_limits.max_images_per_upload}
-                      onChange={(e) => handleSettingChange('user_limits', 'max_images_per_upload', parseInt(e.target.value))}
+                      onChange={(e) => handleSettingChange('user_limits', 'max_images_per_upload', e.target.value === '' ? null : Number(e.target.value))}
                       className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-500 dark:border-zinc-500 rounded-md text-slate-900 dark:text-slate-50"
                     />
                   </div>
@@ -789,7 +789,7 @@ Type DELETE to confirm.`)) {
                       min="50"
                       max="95"
                       value={editedSettings.cleanup.warn_at_percentage}
-                      onChange={(e) => handleSettingChange('cleanup', 'warn_at_percentage', parseInt(e.target.value))}
+                      onChange={(e) => handleSettingChange('cleanup', 'warn_at_percentage', e.target.value === '' ? null : Number(e.target.value))}
                       className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-500 dark:border-zinc-500 rounded-md text-slate-900 dark:text-slate-50"
                     />
                     <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">Warn users when storage reaches this %</p>
@@ -814,16 +814,18 @@ Type DELETE to confirm.`)) {
                   <div className="flex justify-between items-center">
                     <div>
                       <p className="font-medium text-slate-900 dark:text-slate-50">Active Window</p>
-                      <p className="text-sm text-slate-600 dark:text-slate-400">Sessions with heartbeat in last 5 minutes</p>
+                      <p className="text-sm text-slate-600 dark:text-slate-400">Sessions with activity (upload, workspace opened, processing) in the last 15 minutes</p>
                     </div>
-                    <span className="text-lg font-bold text-blue-600 dark:text-blue-400">5 min</span>
+                    <span className="text-lg font-bold text-blue-600 dark:text-blue-400">15 min</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <div>
                       <p className="font-medium text-slate-900 dark:text-slate-50">Session Retention</p>
-                      <p className="text-sm text-slate-600 dark:text-slate-400">How long to keep sessions in database</p>
+                      <p className="text-sm text-slate-600 dark:text-slate-400">Without activity (set on the Retention tab)</p>
                     </div>
-                    <span className="text-lg font-bold text-purple-600 dark:text-purple-400">30 days</span>
+                    <span className="text-lg font-bold text-purple-600 dark:text-purple-400">
+                      {settings?.session?.guest_session_lifetime_hours} h / {settings?.session?.user_session_lifetime_days} d
+                    </span>
                   </div>
                 </div>
               </div>
@@ -880,8 +882,8 @@ Type DELETE to confirm.`)) {
                   <LucideReact.Activity aria-hidden="true" className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
                   <div>
                     <p className="text-sm text-blue-800 dark:text-blue-300">
-                      <strong>Active Sessions</strong> = Tabs with heartbeat in last 5 minutes<br />
-                      Green "Live" indicator shows heartbeat is active. Sessions persist for 30 days.
+                      <strong>Active Sessions</strong> = sessions with activity in the last 15 minutes<br />
+                      A session ends after the lifetime set on the Retention tab without activity.
                     </p>
                   </div>
                 </div>
@@ -1013,10 +1015,81 @@ Type DELETE to confirm.`)) {
             <div className="space-y-6">
               <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4">
                 <p className="text-sm text-purple-800 dark:text-purple-300">
-                  📅 <strong>Real-World Retention Policy</strong><br />
-                  Guest images: 30 days • User images: 90 days • Processed images: 7-30 days<br />
-                  Background cleanup jobs handle old data automatically.
+                  <strong>Current policy</strong> (saved values)<br />
+                  Uploads: guests {settings?.retention?.guest_upload_retention_hours} h, users {settings?.retention?.free_user_upload_retention_days} days
+                  {' • '}Processed results: guests {settings?.retention?.guest_processed_retention_hours} h, users {settings?.retention?.free_user_processed_retention_hours} h
+                  {' • '}Sessions end after {settings?.session?.guest_session_lifetime_hours} h (guests) / {settings?.session?.user_session_lifetime_days} days (users) without activity.<br />
+                  {settings?.cleanup?.enable_auto_cleanup
+                    ? 'Automatic cleanup is ON: the server deletes expired data every 15 minutes.'
+                    : 'Automatic cleanup is OFF: nothing is deleted unless you run cleanup manually.'}
                 </p>
+              </div>
+
+              <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 border border-slate-300 dark:border-zinc-700">
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-2">Automatic cleanup</h3>
+                <label className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    checked={!!editedSettings.cleanup?.enable_auto_cleanup}
+                    onChange={(e) => handleSettingChange('cleanup', 'enable_auto_cleanup', e.target.checked)}
+                    className="mt-1 h-4 w-4"
+                  />
+                  <span className="text-sm text-slate-700 dark:text-slate-300">
+                    Delete expired sessions and images past the retention periods below, every 15 minutes.
+                    When off, data is kept until it is deleted by hand.
+                  </span>
+                </label>
+              </div>
+
+              <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 border border-slate-300 dark:border-zinc-700">
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50 mb-2">Session lifetime</h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
+                  A session ends this long after its last activity (uploading, opening the workspace, processing). Each activity extends it.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label htmlFor="admin-session-guest" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                      Guests (hours)
+                    </label>
+                    <input
+                      id="admin-session-guest"
+                      type="number"
+                      min="1"
+                      max="8760"
+                      value={Number.isFinite(editedSettings.session?.guest_session_lifetime_hours) ? editedSettings.session.guest_session_lifetime_hours : ''}
+                      onChange={(e) => handleSettingChange('session', 'guest_session_lifetime_hours', e.target.value === '' ? null : Number(e.target.value))}
+                      className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-500 dark:border-zinc-500 rounded-md text-slate-900 dark:text-slate-50"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="admin-session-user" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                      Users (days)
+                    </label>
+                    <input
+                      id="admin-session-user"
+                      type="number"
+                      min="1"
+                      max="3650"
+                      value={Number.isFinite(editedSettings.session?.user_session_lifetime_days) ? editedSettings.session.user_session_lifetime_days : ''}
+                      onChange={(e) => handleSettingChange('session', 'user_session_lifetime_days', e.target.value === '' ? null : Number(e.target.value))}
+                      className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-500 dark:border-zinc-500 rounded-md text-slate-900 dark:text-slate-50"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="admin-session-grace" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                      Grace period (hours)
+                    </label>
+                    <input
+                      id="admin-session-grace"
+                      type="number"
+                      min="0"
+                      max="720"
+                      value={Number.isFinite(editedSettings.session?.session_grace_period_hours) ? editedSettings.session.session_grace_period_hours : ''}
+                      onChange={(e) => handleSettingChange('session', 'session_grace_period_hours', e.target.value === '' ? null : Number(e.target.value))}
+                      className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-500 dark:border-zinc-500 rounded-md text-slate-900 dark:text-slate-50"
+                    />
+                  </div>
+                </div>
               </div>
 
               <div className="bg-white dark:bg-zinc-800 rounded-lg p-4 border border-slate-300 dark:border-zinc-700">
@@ -1033,7 +1106,7 @@ Type DELETE to confirm.`)) {
                       min="1"
                       max="168"
                       value={editedSettings.retention.guest_upload_retention_hours}
-                      onChange={(e) => handleSettingChange('retention', 'guest_upload_retention_hours', parseInt(e.target.value))}
+                      onChange={(e) => handleSettingChange('retention', 'guest_upload_retention_hours', e.target.value === '' ? null : Number(e.target.value))}
                       className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-500 dark:border-zinc-500 rounded-md text-slate-900 dark:text-slate-50"
                     />
                   </div>
@@ -1047,7 +1120,7 @@ Type DELETE to confirm.`)) {
                       min="1"
                       max="365"
                       value={editedSettings.retention.free_user_upload_retention_days}
-                      onChange={(e) => handleSettingChange('retention', 'free_user_upload_retention_days', parseInt(e.target.value))}
+                      onChange={(e) => handleSettingChange('retention', 'free_user_upload_retention_days', e.target.value === '' ? null : Number(e.target.value))}
                       className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-500 dark:border-zinc-500 rounded-md text-slate-900 dark:text-slate-50"
                     />
                   </div>
@@ -1068,7 +1141,7 @@ Type DELETE to confirm.`)) {
                       min="1"
                       max="168"
                       value={editedSettings.retention.guest_processed_retention_hours}
-                      onChange={(e) => handleSettingChange('retention', 'guest_processed_retention_hours', parseInt(e.target.value))}
+                      onChange={(e) => handleSettingChange('retention', 'guest_processed_retention_hours', e.target.value === '' ? null : Number(e.target.value))}
                       className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-500 dark:border-zinc-500 rounded-md text-slate-900 dark:text-slate-50"
                     />
                   </div>
@@ -1082,7 +1155,7 @@ Type DELETE to confirm.`)) {
                       min="1"
                       max="168"
                       value={editedSettings.retention.free_user_processed_retention_hours}
-                      onChange={(e) => handleSettingChange('retention', 'free_user_processed_retention_hours', parseInt(e.target.value))}
+                      onChange={(e) => handleSettingChange('retention', 'free_user_processed_retention_hours', e.target.value === '' ? null : Number(e.target.value))}
                       className="w-full px-3 py-2 bg-white dark:bg-zinc-700 border border-slate-500 dark:border-zinc-500 rounded-md text-slate-900 dark:text-slate-50"
                     />
                   </div>
@@ -1100,7 +1173,7 @@ Type DELETE to confirm.`)) {
                   <div>
                     <p className="font-medium text-red-800 dark:text-red-300 mb-1">Sensitive Data Area - PIN Protected</p>
                     <p className="text-sm text-red-700 dark:text-red-400">
-                      View user emails, sessions, and images. Sessions are kept for 30 days and show as "active" if heartbeat received in last 5 minutes.
+                      View user emails, sessions, and images. A session shows as "active" if it had activity in the last 15 minutes.
                     </p>
                   </div>
                 </div>

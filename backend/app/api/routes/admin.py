@@ -9,6 +9,7 @@ from app.models.db_models import User, LoginAttempt, SavedPipeline, ProcessingHi
 from app.models.schemas import PinRequest
 from app.utils.auth import get_current_active_admin, get_current_user
 from app.utils.cleanup_service import CleanupService
+from app.core.business_rules import SessionPolicy
 from typing import List, Dict, Any
 
 logger = logging.getLogger(__name__)
@@ -261,10 +262,15 @@ async def get_storage_overview(
     # Count sessions
     total_sessions = db.query(func.count(DBSession.id)).scalar()
     
-    # Active sessions = sessions with heartbeat in last 5 minutes (real-world standard)
-    active_cutoff = datetime.now(timezone.utc) - timedelta(minutes=5)
+    # Active sessions = sessions with recorded activity (upload, opening the
+    # workspace, processing) within SessionPolicy.ACTIVE_SESSION_WINDOW.
+    now = datetime.now(timezone.utc)
+    active_cutoff = now - SessionPolicy.ACTIVE_SESSION_WINDOW
     active_sessions = db.query(func.count(DBSession.id)).filter(
         DBSession.last_active > active_cutoff
+    ).scalar()
+    expired_sessions = db.query(func.count(DBSession.id)).filter(
+        DBSession.expires_at < now
     ).scalar()
     
     
@@ -291,7 +297,8 @@ async def get_storage_overview(
         "sessions": {
             "total": total_sessions,
             "active": active_sessions,
-            "expired": total_sessions - active_sessions
+            "expired": expired_sessions,
+            "idle": total_sessions - active_sessions - expired_sessions
         },
         "limits": {
             "max_pipelines_per_user": settings_row.free_user_max_pipelines,
@@ -366,6 +373,8 @@ async def update_system_settings(
             "message": "Settings updated successfully",
             "updated_fields": list(updates.keys())
         }
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
     except Exception as e:
         logger.error(f"Failed to update settings: {e}")
         raise HTTPException(
@@ -440,7 +449,7 @@ async def get_database_overview(
         "sessions": {
             "total": db.query(func.count(DBSession.id)).scalar(),
             "active": db.query(func.count(DBSession.id)).filter(
-                DBSession.last_active > datetime.now(timezone.utc) - timedelta(minutes=5)
+                DBSession.last_active > datetime.now(timezone.utc) - SessionPolicy.ACTIVE_SESSION_WINDOW
             ).scalar()
         },
         "images": {

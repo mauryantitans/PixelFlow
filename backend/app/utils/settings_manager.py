@@ -57,6 +57,55 @@ def get_settings(db: Session, use_cache: bool = True) -> SystemSettings:
     return settings
 
 
+# Validation rules for admin-editable settings: (kind, minimum, maximum).
+# Every number is a whole number; 0 is only allowed where it means "none".
+SETTING_RULES = {
+    'free_user_max_pipelines': ('int', 1, 1000),
+    'guest_storage_quota_mb': ('int', 1, 100_000),
+    'free_user_storage_quota_mb': ('int', 1, 100_000),
+    'guest_max_images_per_session': ('int', 1, 10_000),
+    'free_user_max_images_per_session': ('int', 1, 10_000),
+    'max_images_per_upload': ('int', 1, 100),
+    'guest_upload_retention_hours': ('int', 1, 24 * 365),
+    'free_user_upload_retention_days': ('int', 1, 3650),
+    'guest_processed_retention_hours': ('int', 1, 24 * 365),
+    'free_user_processed_retention_hours': ('int', 1, 24 * 365),
+    'guest_session_lifetime_hours': ('int', 1, 24 * 365),
+    'user_session_lifetime_days': ('int', 1, 3650),
+    'session_grace_period_hours': ('int', 0, 24 * 30),
+    'warn_at_percentage': ('int', 1, 100),
+    'enable_auto_cleanup': ('bool', None, None),
+    'cleanup_on_logout': ('bool', None, None),
+    'cleanup_on_tab_close': ('bool', None, None),
+    'delete_oldest_on_quota': ('bool', None, None),
+}
+
+
+def validate_setting(field: str, value):
+    """Return the normalised value or raise ValueError with a readable message.
+
+    Stops bad values (e.g. an emptied input that arrives as null/NaN, negative
+    numbers, strings) from being stored and later crashing cleanup or quota
+    checks.
+    """
+    kind, lo, hi = SETTING_RULES[field]
+    if kind == 'bool':
+        if not isinstance(value, bool):
+            raise ValueError(f"{field} must be true or false")
+        return value
+    if isinstance(value, bool) or value is None:
+        raise ValueError(f"{field} must be a whole number")
+    if isinstance(value, float):
+        if value != value or not value.is_integer():  # NaN or fractional
+            raise ValueError(f"{field} must be a whole number")
+        value = int(value)
+    if not isinstance(value, int):
+        raise ValueError(f"{field} must be a whole number")
+    if not lo <= value <= hi:
+        raise ValueError(f"{field} must be between {lo} and {hi}")
+    return value
+
+
 def update_settings(db: Session, updates: dict, user_id: int) -> SystemSettings:
     """
     Update system settings
@@ -88,10 +137,15 @@ def update_settings(db: Session, updates: dict, user_id: int) -> SystemSettings:
         'warn_at_percentage'
     }
     
+    # Validate everything first so a bad value doesn't leave a half-applied update.
+    clean = {}
     for field, value in updates.items():
         if field in allowed_fields and hasattr(settings, field):
-            setattr(settings, field, value)
-            logger.info(f"Setting updated: {field} = {value} by user {user_id}")
+            clean[field] = validate_setting(field, value)
+
+    for field, value in clean.items():
+        setattr(settings, field, value)
+        logger.info(f"Setting updated: {field} = {value} by user {user_id}")
     
     settings.updated_by = user_id
     

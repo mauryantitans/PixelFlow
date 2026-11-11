@@ -7,7 +7,7 @@ import logging
 import uuid
 import io
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
@@ -15,8 +15,9 @@ from PIL import Image as PILImage
 
 from ...models import ProcessRequest, LiveProcessRequest, ProcessResponse, LiveProcessResponse
 from ...core.database import get_db
-from ...models.db_models import UploadedImage
-from ...utils.session_manager import session_manager
+from ...models.db_models import UploadedImage, User
+from ...utils.auth import get_current_user_optional
+from ...utils.session_db import SessionOwnershipError, touch_session
 from ...utils.image_processing import ImageProcessor
 from ...processing.registry import registry
 
@@ -40,11 +41,19 @@ def _flatten_to_rgb(img: PILImage.Image) -> PILImage.Image:
     return img
 
 
-def load_image_from_db(image_id: str, db: Session) -> PILImage.Image:
-    """Load an uploaded image from the database as an RGB PIL image."""
+def load_image_from_db(image_id: str, db: Session, current_user: Optional[User] = None) -> PILImage.Image:
+    """Load an uploaded image from the database as an RGB PIL image.
+
+    Same ownership rule as GET /images/image/{id}: a user-owned image can only
+    be processed by its owner or an admin (processing with an empty pipeline
+    returns the original, so without this check any image id was readable).
+    """
     uploaded_img = db.query(UploadedImage).filter(UploadedImage.id == image_id).first()
     if not uploaded_img:
         raise HTTPException(status_code=404, detail=f"Image {image_id} not found in database")
+    if uploaded_img.user_id is not None:
+        if current_user is None or (current_user.id != uploaded_img.user_id and not current_user.is_admin):
+            raise HTTPException(status_code=403, detail="Not authorized to process this image")
 
     # Stored originals may be RGBA (transparent PNGs are preserved on upload), but
     # the processing operations expect 3-channel RGB, so flatten alpha onto white.
@@ -102,8 +111,23 @@ async def process_single_image_pipeline(
         raise
 
 
+def _record_activity(db: Session, session_id: str, current_user: Optional[User]) -> None:
+    """Processing counts as session activity (sliding expiry); never fails the request."""
+    try:
+        touch_session(db, session_id, current_user.id if current_user else None)
+    except SessionOwnershipError:
+        pass  # image ownership is checked per image; don't block on the session
+    except Exception:
+        db.rollback()
+        logger.exception("Could not record session activity")
+
+
 @router.post("/process", response_model=ProcessResponse)
-async def process_images(request: ProcessRequest, db: Session = Depends(get_db)):
+async def process_images(
+    request: ProcessRequest,
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional),
+):
     """Process multiple images through the pipeline (batch mode)"""
     try:
         if not request.image_ids:
@@ -113,6 +137,7 @@ async def process_images(request: ProcessRequest, db: Session = Depends(get_db))
             raise HTTPException(status_code=400, detail="No pipeline operations provided")
         
         logger.info(f"Batch processing {len(request.image_ids)} images with {len(request.pipeline)} operations")
+        _record_activity(db, request.session_id, current_user)
         
         processed_results = []
         all_intermediate_results = []
@@ -120,11 +145,12 @@ async def process_images(request: ProcessRequest, db: Session = Depends(get_db))
         all_step_errors = []
         total_batch_time = 0.0
         
+        first_client_error: Optional[HTTPException] = None
         # Process each image
         for image_id in request.image_ids:
             try:
                 # Load image from database or filesystem
-                image = load_image_from_db(image_id, db)
+                image = load_image_from_db(image_id, db, current_user)
                 
                 # Process the image
                 result = await process_single_image_pipeline(
@@ -148,11 +174,18 @@ async def process_images(request: ProcessRequest, db: Session = Depends(get_db))
                 # Per-image step errors (aligned with processed_images order)
                 all_step_errors.append(result.get("step_errors"))
 
+            except HTTPException as e:
+                # e.g. 403 (not your image) / 404 (deleted): report it if nothing succeeds
+                first_client_error = first_client_error or e
+                logger.warning(f"Skipped image {image_id}: {e.detail}")
+                continue
             except Exception as e:
                 logger.error(f"Failed to process image {image_id}: {e}")
                 continue
-        
+
         if not processed_results:
+            if first_client_error is not None:
+                raise first_client_error
             raise HTTPException(status_code=500, detail="Failed to process any images")
         
         logger.info(f"Successfully processed {len(processed_results)} images in {total_batch_time:.3f}s")
@@ -175,12 +208,17 @@ async def process_images(request: ProcessRequest, db: Session = Depends(get_db))
 
 
 @router.post("/process-live", response_model=LiveProcessResponse)
-async def process_live(request: LiveProcessRequest, db: Session = Depends(get_db)):
+async def process_live(
+    request: LiveProcessRequest,
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional),
+):
     """Process a single image through pipeline with all intermediate steps (live mode)"""
+    _record_activity(db, request.session_id, current_user)
     try:
         if not request.pipeline:
             # If no pipeline, return original image
-            image = load_image_from_db(request.image_id, db)
+            image = load_image_from_db(request.image_id, db, current_user)
             original_base64 = ImageProcessor.image_to_base64(image)
             
             return LiveProcessResponse(
@@ -194,7 +232,7 @@ async def process_live(request: LiveProcessRequest, db: Session = Depends(get_db
         logger.info(f"Live processing image {request.image_id} with {len(request.pipeline)} operations")
         
         # Load image from database or filesystem
-        image = load_image_from_db(request.image_id, db)
+        image = load_image_from_db(request.image_id, db, current_user)
         
         # Process with intermediate results and timing (prefix-cached)
         result = await process_single_image_pipeline(
@@ -269,5 +307,4 @@ async def health_check():
     return JSONResponse(content={
         "success": True,
         "message": "Processing service is healthy",
-        "active_sessions": len(session_manager.active_sessions)
     })

@@ -21,7 +21,13 @@ from ...models import ImageData, UploadResponse
 from ...core.config import settings
 from ...core.database import get_db
 from ...models.db_models import Session as DBSession, UploadedImage, ProcessedImage, SystemSettings, User
-from ...utils.session_db import create_or_update_session, get_session_images, cleanup_expired_sessions
+from ...utils.session_db import (
+    SessionOwnershipError,
+    cleanup_expired_sessions,
+    create_or_update_session,
+    get_session_images,
+    touch_session,
+)
 from ...utils.quota_manager import check_storage_quota
 from ...utils.settings_manager import get_settings
 from ...utils.image_processing import ImageProcessor
@@ -83,6 +89,20 @@ def process_image_bytes(content: bytes):
     return img_bytes, thumbnail_bytes, width, height, image_format, mime_type
 
 
+def _record_upload_session(db: Session, session_id: str, user_id, device_info, ip_address):
+    """Create/extend the upload's session, refusing sessions owned by someone else."""
+    try:
+        return create_or_update_session(db, session_id, user_id, device_info, ip_address)
+    except SessionOwnershipError:
+        raise HTTPException(
+            status_code=409,
+            detail={
+                "error": "session_owned_by_another_user",
+                "message": "This browser session belongs to a different account. Start a new session and try again.",
+            },
+        )
+
+
 @router.post("/upload", response_model=UploadResponse)
 async def upload_image(
     request: Request,
@@ -123,8 +143,8 @@ async def upload_image(
         ip_address = request.client.host if request.client else None
         device_info = request.headers.get("user-agent")
         
-        # Create or update session
-        create_or_update_session(db, session_id, user_id, device_info, ip_address)
+        # Create or update session (409 if it belongs to another user)
+        _record_upload_session(db, session_id, user_id, device_info, ip_address)
         
         # Get settings from database
         db_settings = db.query(SystemSettings).first()
@@ -281,7 +301,7 @@ async def upload_multiple_images(
 
     ip_address = request.client.host if request.client else None
     device_info = request.headers.get("user-agent")
-    create_or_update_session(db, session_id, user_id, device_info, ip_address)
+    _record_upload_session(db, session_id, user_id, device_info, ip_address)
 
     # Cumulative baselines for the batch.
     existing_count = db.query(func.count(UploadedImage.id)).filter(
@@ -396,6 +416,10 @@ async def get_session_images_list(
             if session_obj.user_id is not None:
                 if current_user is None or (current_user.id != session_obj.user_id and not current_user.is_admin):
                     raise HTTPException(status_code=403, detail="Not authorized to view this session")
+            # Opening the workspace counts as activity (keeps the session alive),
+            # except when an admin looks at someone else's session.
+            if session_obj.user_id is None or (current_user and current_user.id == session_obj.user_id):
+                touch_session(db, session_id, current_user.id if current_user else None)
 
         images = get_session_images(db, session_id)
 
@@ -508,7 +532,8 @@ async def delete_image(
 @router.post("/cleanup-session")
 async def cleanup_session(
     request: Request,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional),
 ):
     """Clean up a session and all its images - handles both JSON and beacon requests"""
     try:
@@ -527,7 +552,13 @@ async def cleanup_session(
         logger.info(f"Cleanup session request for: {session_id}")
         
         session = db.query(DBSession).filter(DBSession.id == session_id).first()
-        
+
+        # A signed-in user's session (and their images) may only be deleted by
+        # that user or an admin; knowing the session id is not enough.
+        if session and session.user_id is not None:
+            if current_user is None or (current_user.id != session.user_id and not current_user.is_admin):
+                raise HTTPException(status_code=403, detail="Not authorized to delete this session")
+
         if session:
             # Count images before deleting
             image_count = db.query(func.count(UploadedImage.id)).filter(
@@ -562,61 +593,30 @@ async def session_heartbeat(
     db: Session = Depends(get_db),
     current_user: Optional[User] = Depends(get_current_user_optional)
 ):
-    """Heartbeat endpoint to keep session alive and track active sessions"""
+    """Deprecated: kept so older frontends keep working.
+
+    The frontend now checks connectivity with GET /api/health, and session
+    activity is recorded by real actions (uploads, listing images, processing).
+    This endpoint only extends an *existing* session (throttled) and never
+    creates one, so it can no longer fill the sessions table.
+    """
+    session_id = body.get('session_id')
+    if not session_id:
+        raise HTTPException(status_code=400, detail="session_id required")
     try:
-        session_id = body.get('session_id')
-        
-        if not session_id:
-            raise HTTPException(status_code=400, detail="session_id required")
-        
-        session = db.query(DBSession).filter(DBSession.id == session_id).first()
-        was_created = False
-        
-        if session:
-            # Update last active timestamp (timezone-aware)
-            session.last_active = datetime.now(timezone.utc)
-            
-            # Update user_id if user is now logged in and session doesn't have it
-            if current_user and session.user_id is None:
-                session.user_id = current_user.id
-                logger.info(f"Heartbeat: Linked session {session_id} to user {current_user.id}")
-            
-            db.commit()
-            logger.debug(f"Heartbeat: Updated session {session_id}")
-        else:
-            # Session doesn't exist - CREATE IT!
-            current_time = datetime.now(timezone.utc)
-            expires_at = current_time + timedelta(hours=24)
-            
-            session = DBSession(
-                id=session_id,
-                user_id=current_user.id if current_user else None,
-                device_info=None,
-                ip_address=None,
-                last_active=current_time,
-                expires_at=expires_at
-            )
-            db.add(session)
-            db.commit()
-            db.refresh(session)
-            was_created = True
-            
-            logger.info(f"Heartbeat: Created new session {session_id} (user_id: {current_user.id if current_user else None})")
-        
-        return JSONResponse(content={
-            "success": True,
-            "message": "Heartbeat received",
-            "session_id": session_id,
-            "last_active": session.last_active.isoformat(),
-            "created": was_created
-        })
-    except Exception as e:
-        logger.error(f"Error processing heartbeat: {e}")
-        # Don't raise exception - heartbeat failures should be silent
-        return JSONResponse(content={
-            "success": False,
-            "message": str(e)
-        })
+        session = touch_session(db, session_id, current_user.id if current_user else None)
+    except SessionOwnershipError:
+        raise HTTPException(status_code=409, detail="Session belongs to a different account")
+    except Exception:
+        db.rollback()
+        logger.exception("Error processing heartbeat")
+        raise HTTPException(status_code=500, detail="Heartbeat failed")
+    return {
+        "success": True,
+        "session_id": session_id,
+        "exists": session is not None,
+        "last_active": session.last_active.isoformat() if session else None,
+    }
 
 
 @router.get("/cleanup-expired")

@@ -1,3 +1,12 @@
+"""
+DEPRECATED - not used by the app any more.
+
+This tracked sessions in memory and deleted per-session folders from the old
+filesystem image storage, which was removed when images moved into the
+database. Its periodic task never cleaned the database. Database cleanup now
+runs from app/utils/cleanup_scheduler.py. Kept only so nothing that imports it
+breaks; safe to delete.
+"""
 import asyncio
 import shutil
 import signal

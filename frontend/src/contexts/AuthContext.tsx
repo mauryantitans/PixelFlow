@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { User, AuthContextType, RegisterRequest } from '../types';
 import { authService } from '../services/auth';
 import { getCookie } from '../services/api';
+import { SessionUtils } from '../utils';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -20,10 +21,7 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [sessionId] = useState(() => {
-    // Get session ID from localStorage
-    return localStorage.getItem('pixelflow_session_id') || '';
-  });
+
 
   // Check if the auth cookie is valid on mount (no token in JS to inspect).
   useEffect(() => {
@@ -72,9 +70,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const logout = async () => {
-    await authService.logout(sessionId);
+    await authService.logout(SessionUtils.getSessionId());
     setUser(null);
   };
+
+  // Keep the browser's image session in step with who is signed in (no
+  // sharing between accounts on one browser). Waits until the initial auth
+  // check is done so a page load doesn't look like a sign-out.
+  useEffect(() => {
+    if (loading) return;
+    SessionUtils.syncWithUser(user ? user.id : null);
+  }, [user, loading]);
 
   const value: AuthContextType = {
     user,

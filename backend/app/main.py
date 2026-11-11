@@ -10,7 +10,7 @@ from .core.config import settings
 from .core.database import init_db
 from .core.security_config import CORSSettings
 from .api import api_router
-from .utils.session_manager import session_manager
+from .utils.cleanup_scheduler import start_cleanup_scheduler, stop_cleanup_scheduler
 from .middleware import RateLimitMiddleware, SecurityHeadersMiddleware, CSRFMiddleware
 
 # Configure logging
@@ -44,11 +44,9 @@ async def lifespan(app: FastAPI):
         logger.error(f"Failed to initialize database: {e}")
         raise
     
-    # Clean up any leftover files from previous runs
-    session_manager.cleanup_all_files()
-    
-    # Start background cleanup task
-    await session_manager.start_cleanup_task()
+    # Start the periodic database cleanup (expired sessions, retention,
+    # orphans, expired refresh tokens; honours the admin auto-cleanup switch)
+    start_cleanup_scheduler()
     
     logger.info("PixelFlow backend started successfully")
     
@@ -58,10 +56,7 @@ async def lifespan(app: FastAPI):
     logger.info("Shutting down PixelFlow backend...")
     
     # Stop background tasks
-    await session_manager.stop_cleanup_task()
-    
-    # Clean up all files
-    session_manager.cleanup_all_files()
+    await stop_cleanup_scheduler()
     
     logger.info("PixelFlow backend shutdown complete")
 

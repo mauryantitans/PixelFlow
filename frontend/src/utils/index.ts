@@ -5,13 +5,41 @@ import { MasonryItem, ZoomState } from '../types';
  */
 export class SessionUtils {
   private static readonly SESSION_KEY = 'pixelflow_session_id';
-  
+  // Who the current browser session belongs to: 'guest' or a user id.
+  private static readonly OWNER_KEY = 'pixelflow_session_owner';
+  // Last session id of each account used in this browser, so signing back in
+  // restores that account's images. Safe to keep: the server only serves a
+  // user's session to that user.
+  private static readonly USER_SESSIONS_KEY = 'pixelflow_user_sessions';
+  /** Fired on window when the session id changes (useSession listens). */
+  static readonly CHANGE_EVENT = 'pixelflow:session-changed';
+
+  private static read(key: string): string | null {
+    try {
+      return localStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  }
+
+  private static write(key: string, value: string | null): void {
+    try {
+      if (value === null) localStorage.removeItem(key);
+      else localStorage.setItem(key, value);
+    } catch {
+      /* storage unavailable (private mode): keep working in memory */
+    }
+  }
+
+  private static memoryId: string | null = null;
+
   static getSessionId(): string {
-    let sessionId = localStorage.getItem(this.SESSION_KEY);
+    let sessionId = this.read(this.SESSION_KEY) || this.memoryId;
     if (!sessionId) {
       sessionId = this.generateSessionId();
-      localStorage.setItem(this.SESSION_KEY, sessionId);
+      this.write(this.SESSION_KEY, sessionId);
     }
+    this.memoryId = sessionId;
     return sessionId;
   }
   
@@ -24,9 +52,70 @@ export class SessionUtils {
     crypto.getRandomValues(bytes);
     return `session_${Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')}`;
   }
-  
+
+  private static setSessionId(id: string): void {
+    this.memoryId = id;
+    this.write(this.SESSION_KEY, id);
+    window.dispatchEvent(new Event(this.CHANGE_EVENT));
+  }
+
+  /**
+   * Switch to a brand-new session id, e.g. when the server says the current
+   * one belongs to a different account. The recorded owner is kept unless one
+   * is given (signing out passes 'guest').
+   */
+  static startNewSession(owner?: string): string {
+    const id = this.generateSessionId();
+    if (owner) this.write(this.OWNER_KEY, owner);
+    this.setSessionId(id);
+    return id;
+  }
+
+  /**
+   * Keep the browser session in step with who is signed in, so images never
+   * leak between people sharing a browser:
+   *  - signing out: the account's session is remembered and a fresh guest
+   *    session starts;
+   *  - signing in: the account's previous session in this browser is restored;
+   *    a guest session (no previous one) is kept, so guest work carries over;
+   *  - switching accounts: never reuses the other account's session.
+   */
+  static syncWithUser(userId: number | null): void {
+    const owner = this.read(this.OWNER_KEY) || 'guest';
+    const next = userId === null ? 'guest' : String(userId);
+    if (owner === next) return;
+
+    let map: Record<string, string> = {};
+    try {
+      map = JSON.parse(this.read(this.USER_SESSIONS_KEY) || '{}');
+    } catch {
+      map = {};
+    }
+    const current = this.getSessionId();
+    if (owner !== 'guest') map[owner] = current;
+
+    if (next === 'guest') {
+      this.write(this.USER_SESSIONS_KEY, JSON.stringify(map));
+      this.startNewSession('guest');
+      return;
+    }
+
+    this.write(this.OWNER_KEY, next);
+    if (owner === 'guest' && !map[next]) {
+      // Guest work becomes the account's (the server links it on next activity).
+      map[next] = current;
+      this.write(this.USER_SESSIONS_KEY, JSON.stringify(map));
+      return;
+    }
+    const restored = map[next] || this.generateSessionId();
+    map[next] = restored;
+    this.write(this.USER_SESSIONS_KEY, JSON.stringify(map));
+    if (restored !== current) this.setSessionId(restored);
+  }
+
   static clearSession(): void {
-    localStorage.removeItem(this.SESSION_KEY);
+    this.memoryId = null;
+    this.write(this.SESSION_KEY, null);
   }
 }
 

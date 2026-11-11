@@ -106,7 +106,9 @@ class SessionPolicy:
     USER_SESSION_LIFETIME = timedelta(days=30)    # Keep for 30 days
     
     # Active session definition (for admin panel display)
-    ACTIVE_SESSION_WINDOW = timedelta(minutes=5)  # Active = heartbeat in last 5 minutes
+    # Active = any recorded activity (upload, opening the workspace, processing)
+    # in this window. There is no heartbeat any more, so it is wider than 5 min.
+    ACTIVE_SESSION_WINDOW = timedelta(minutes=15)
     
     # How often to run cleanup job
     CLEANUP_INTERVAL = timedelta(hours=24)  # Run daily
