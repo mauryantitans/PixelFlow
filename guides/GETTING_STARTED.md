@@ -73,7 +73,9 @@ Some good first operations:
 ### Header
 - **Connection badge:** shows whether the backend is reachable.
 - **Load / Save:** your saved pipelines (requires signing in).
-- Theme toggle (light/dark) and account menu.
+- **Sun/moon:** switch between light and dark mode.
+- **Palette (Appearance):** choose a theme (Classic, Spectrum, Verdant, Cobalt, Fjord, Orchid, Safelight) and the mode. Your choice is saved in this browser.
+- Account menu.
 
 ### Operations sidebar
 - **Search** at the top (Ctrl+K).

@@ -114,7 +114,8 @@ See [CHANGELOG.md](CHANGELOG.md) for details and earlier releases (1.2.0: schema
 - **Pipeline Saving**: Save, load, and manage your processing pipelines
 - **Performance Analytics**: Millisecond-precision timing for every operation
 - **Undo/Redo System**: Complete operation history (Ctrl+Z/Ctrl+Y)
-- **Accessible, responsive interface**: WCAG 2.1 AA, dark/light themes, works down to 320px wide
+- **Seven themes, light and dark**: pick Classic, Spectrum, Verdant, Cobalt, Fjord, Orchid or Safelight from the palette icon in the header; every theme keeps WCAG 2.1 AA contrast
+- **Accessible, responsive interface**: WCAG 2.1 AA, works down to 320px wide
 - **Tested + CI**: pytest suite, GitHub Actions (ruff/mypy/pytest), and pre-commit hooks
 
 ### Developer Tools

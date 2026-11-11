@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### 🎨 Themes and brand
+- **Appearance picker** in the header (palette icon): seven themes, each in light and dark
+  mode, applied instantly and remembered in the browser.
+  - **Classic**: the original look, unchanged.
+  - **Spectrum**: monochrome, with red/green/blue only in the mark and charts.
+  - **Verdant**: white / near-black with a calm green accent.
+  - **Cobalt**: cool greys and deep cobalt.
+  - **Fjord**: soft blue-grey and teal, low glare.
+  - **Orchid**: mauve greys and violet.
+  - **Safelight**: warm charcoal and darkroom amber.
+- Each theme has its own typefaces (e.g. Geist, Manrope, IBM Plex, Figtree, DM Sans), loaded
+  only when chosen; timings and values use the theme's monospace face.
+- **Contrast is preserved by construction:** every theme shade has the same luminance as the
+  Tailwind shade it replaces (`frontend/scripts/gen-themes.py`), so all WCAG AA results carry
+  over. Each theme was re-audited (Lighthouse + axe, desktop and 320px).
+- Themes other than Classic use a neutral operations sidebar and a single accent colour
+  (colourful chrome next to the preview skews colour judgement).
+- **New mark:** three overlapping R/G/B pixels on a dark tile, used in the header, landing
+  page, sign-in/register, favicon and app icons (SVG + PNG, maskable).
+- Landing page: emoji in "Perfect for" replaced by icons.
+
 ## [1.3.0] - 2026-11-11
 
 Accessibility (WCAG 2.1 AA), a production-outage fix, and a pass over every
