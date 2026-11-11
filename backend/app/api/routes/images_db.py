@@ -429,6 +429,7 @@ async def upload_multiple_images(
 async def get_session_images_list(
     session_id: str,
     include_data: bool = False,
+    thumbnails_only: bool = False,
     db: Session = Depends(get_db),
     current_user: Optional[User] = Depends(get_current_user_optional)
 ):
@@ -461,9 +462,13 @@ async def get_session_images_list(
             }
             
             if include_data:
-                # Include base64 encoded image and thumbnail
+                # Include base64 encoded image and thumbnail. With
+                # thumbnails_only the full images are left out (the client
+                # fetches them one by one from /images/image/{id}); sending
+                # every full image in one JSON body reached tens of MB.
                 image_data["thumbnail"] = bytes_to_base64_dataurl(img.thumbnail_data, img.mime_type)
-                image_data["image"] = bytes_to_base64_dataurl(img.image_data, img.mime_type)
+                if not thumbnails_only:
+                    image_data["image"] = bytes_to_base64_dataurl(img.image_data, img.mime_type)
             
             result.append(image_data)
         

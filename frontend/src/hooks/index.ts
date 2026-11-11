@@ -126,8 +126,22 @@ export function useImages() {
     let cancelled = false;
     setImages([]);
     ApiService.getSessionImages(sessionId)
-      .then((savedImages) => {
-        if (!cancelled) setImages(savedImages);
+      .then(async (savedImages) => {
+        if (cancelled) return;
+        setImages(savedImages);
+        // Then load the full-size images one at a time (thumbnails are used
+        // until each arrives).
+        for (const img of savedImages) {
+          if (cancelled) return;
+          if (img.dataUrl) continue;
+          try {
+            const dataUrl = await ApiService.getImageDataUrl(img.id);
+            if (cancelled) return;
+            setImages((prev) => prev.map((p) => (p.id === img.id && !p.dataUrl ? { ...p, dataUrl } : p)));
+          } catch {
+            /* keep the thumbnail */
+          }
+        }
       })
       .catch((error: any) => {
         // The session belongs to an account this browser isn't signed in as

@@ -141,7 +141,9 @@ export class ApiService {
    */
   static async getSessionImages(sessionId: string): Promise<ImageData[]> {
     try {
-      const response = await api.get(`/images/session/${sessionId}/images?include_data=true`);
+      // Thumbnails only: full images are fetched afterwards, one at a time
+      // (useImages), instead of all of them base64-encoded in one response.
+      const response = await api.get(`/images/session/${sessionId}/images?include_data=true&thumbnails_only=true`);
       
       if (response.data.success) {
         return response.data.images.map((img: any) => ({
@@ -153,7 +155,7 @@ export class ApiService {
           width: img.width,
           height: img.height,
           format: img.format,
-          dataUrl: img.image,  // Full image as base64 data URL
+          dataUrl: img.image || '',  // filled in by useImages after the list loads
           thumbnailDataUrl: img.thumbnail,  // Thumbnail as base64 data URL
           selected: false  // Default to not selected
         }));
