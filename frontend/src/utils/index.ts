@@ -1,4 +1,4 @@
-import { MasonryItem, MasonryOptions, ZoomState } from '../types';
+import { MasonryItem, ZoomState } from '../types';
 
 /**
  * Session Management Utilities
