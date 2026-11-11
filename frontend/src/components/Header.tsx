@@ -10,6 +10,8 @@ import { LoadPipelineModal } from './LoadPipelineModal';
 import { AdminPanel } from './AdminPanel';
 import { SavedPipeline } from '../types';
 import { announce } from '../utils/announce';
+import BrandMark from './BrandMark';
+import AppearanceMenu from './AppearanceMenu';
 
 export const Header: React.FC = () => {
   const { user, logout, isAuthenticated } = useAuth();
@@ -114,11 +116,7 @@ export const Header: React.FC = () => {
               to="/"
               className="flex items-center space-x-3 hover:opacity-80 transition-opacity rounded-md"
             >
-              <img 
-                src="/PixelFlow_Icon.png" 
-                alt="" 
-                className="w-10 h-10 rounded-lg"
-              />
+              <BrandMark size={40} />
               <div className="flex flex-col">
                 <span className="text-xl font-bold text-slate-900 dark:text-slate-50 leading-tight">PixelFlow</span>
                 <span className="text-xs text-slate-600 dark:text-slate-400 leading-tight">Image Processing Pipeline Builder</span>
@@ -189,6 +187,8 @@ export const Header: React.FC = () => {
             >
               {theme === 'dark' ? <Sun aria-hidden="true" className="w-5 h-5" /> : <Moon aria-hidden="true" className="w-5 h-5" />}
             </button>
+
+            <AppearanceMenu />
 
             {/* Vertical Divider */}
             {(isAuthenticated || isOnApp) && (

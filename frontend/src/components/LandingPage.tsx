@@ -2,10 +2,11 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Image as ImageIcon, Layers, Lock, Github, ArrowRight, CheckCircle,
-  Upload, Settings, Download, Eye, Sparkles, Clock
+  Upload, Settings, Download, Eye, Sparkles, Clock, Palette, Microscope, Code2
 } from 'lucide-react';
 import { Header } from './Header';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import BrandMark from './BrandMark';
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -22,11 +23,7 @@ export const LandingPage: React.FC = () => {
         <div className="text-center mb-16">
           {/* Icon Display */}
           <div className="flex justify-center mb-8">
-            <img 
-              src="/PixelFlow_Icon.png" 
-              alt="" 
-              className="w-24 h-24 rounded-2xl shadow-lg"
-            />
+            <BrandMark size={96} className="shadow-lg rounded-[22px]" />
           </div>
           
           <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 dark:text-slate-50 mb-6">
@@ -83,7 +80,7 @@ export const LandingPage: React.FC = () => {
           
           <div className="grid md:grid-cols-3 gap-12 max-w-5xl mx-auto">
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="feature-icon w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Upload aria-hidden="true" className="w-8 h-8 text-blue-600 dark:text-blue-400" />
               </div>
               <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-50 mb-2">1. Upload Images</h3>
@@ -93,7 +90,7 @@ export const LandingPage: React.FC = () => {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="feature-icon w-16 h-16 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Settings aria-hidden="true" className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
               </div>
               <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-50 mb-2">2. Build Pipeline</h3>
@@ -103,7 +100,7 @@ export const LandingPage: React.FC = () => {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="feature-icon w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Download aria-hidden="true" className="w-8 h-8 text-purple-600 dark:text-purple-400" />
               </div>
               <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-50 mb-2">3. Export Results</h3>
@@ -124,7 +121,7 @@ export const LandingPage: React.FC = () => {
         <div className="grid md:grid-cols-3 gap-8">
           {/* Feature 1 */}
           <div className="bg-white dark:bg-zinc-900 p-8 rounded-xl border-2 border-slate-300 dark:border-zinc-800 hover:shadow-lg dark:hover:shadow-black/40 transition-all">
-            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mb-4">
+            <div className="feature-icon w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mb-4">
               <Clock aria-hidden="true" className="w-6 h-6 text-blue-600 dark:text-blue-400" />
             </div>
             <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-50 mb-3">Live Processing</h3>
@@ -135,7 +132,7 @@ export const LandingPage: React.FC = () => {
 
           {/* Feature 2 */}
           <div className="bg-white dark:bg-zinc-900 p-8 rounded-xl border-2 border-slate-300 dark:border-zinc-800 hover:shadow-lg dark:hover:shadow-black/40 transition-all">
-            <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center mb-4">
+            <div className="feature-icon w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center mb-4">
               <Sparkles aria-hidden="true" className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
             </div>
             <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-50 mb-3">77 Operations</h3>
@@ -146,7 +143,7 @@ export const LandingPage: React.FC = () => {
 
           {/* Feature 3 */}
           <div className="bg-white dark:bg-zinc-900 p-8 rounded-xl border-2 border-slate-300 dark:border-zinc-800 hover:shadow-lg dark:hover:shadow-black/40 transition-all">
-            <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mb-4">
+            <div className="feature-icon w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mb-4">
               <Layers aria-hidden="true" className="w-6 h-6 text-purple-600 dark:text-purple-400" />
             </div>
             <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-50 mb-3">Visual Pipeline Builder</h3>
@@ -157,7 +154,7 @@ export const LandingPage: React.FC = () => {
 
           {/* Feature 4 */}
           <div className="bg-white dark:bg-zinc-900 p-8 rounded-xl border-2 border-slate-300 dark:border-zinc-800 hover:shadow-lg dark:hover:shadow-black/40 transition-all">
-            <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mb-4">
+            <div className="feature-icon w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mb-4">
               <Lock aria-hidden="true" className="w-6 h-6 text-green-700 dark:text-green-400" />
             </div>
             <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-50 mb-3">Save & Share</h3>
@@ -168,7 +165,7 @@ export const LandingPage: React.FC = () => {
 
           {/* Feature 5 */}
           <div className="bg-white dark:bg-zinc-900 p-8 rounded-xl border-2 border-slate-300 dark:border-zinc-800 hover:shadow-lg dark:hover:shadow-black/40 transition-all">
-            <div className="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center mb-4">
+            <div className="feature-icon w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center mb-4">
               <ImageIcon aria-hidden="true" className="w-6 h-6 text-amber-700 dark:text-yellow-400" />
             </div>
             <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-50 mb-3">Batch Processing</h3>
@@ -179,7 +176,7 @@ export const LandingPage: React.FC = () => {
 
           {/* Feature 6 */}
           <div className="bg-white dark:bg-zinc-900 p-8 rounded-xl border-2 border-slate-300 dark:border-zinc-800 hover:shadow-lg dark:hover:shadow-black/40 transition-all">
-            <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center mb-4">
+            <div className="feature-icon w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center mb-4">
               <Eye aria-hidden="true" className="w-6 h-6 text-red-600 dark:text-red-400" />
             </div>
             <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-50 mb-3">Advanced Analytics</h3>
@@ -202,17 +199,17 @@ export const LandingPage: React.FC = () => {
           
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl border-2 border-slate-300 dark:border-zinc-800 shadow-sm hover:shadow-md dark:hover:shadow-black/40 transition-all">
-              <h3 className="font-semibold text-slate-900 dark:text-slate-50 mb-2"><span aria-hidden="true">🎨 </span>Designers</h3>
+              <h3 className="flex items-center gap-2 font-semibold text-slate-900 dark:text-slate-50 mb-2"><Palette aria-hidden="true" className="w-4 h-4 text-blue-600 dark:text-blue-400" />Designers</h3>
               <p className="text-sm text-slate-600 dark:text-slate-300">Quick image adjustments and creative effects for your design projects</p>
             </div>
 
             <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl border-2 border-slate-300 dark:border-zinc-800 shadow-sm hover:shadow-md dark:hover:shadow-black/40 transition-all">
-              <h3 className="font-semibold text-slate-900 dark:text-slate-50 mb-2"><span aria-hidden="true">🔬 </span>Researchers</h3>
+              <h3 className="flex items-center gap-2 font-semibold text-slate-900 dark:text-slate-50 mb-2"><Microscope aria-hidden="true" className="w-4 h-4 text-blue-600 dark:text-blue-400" />Researchers</h3>
               <p className="text-sm text-slate-600 dark:text-slate-300">Image analysis, preprocessing, and scientific visualization workflows</p>
             </div>
 
             <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl border-2 border-slate-300 dark:border-zinc-800 shadow-sm hover:shadow-md dark:hover:shadow-black/40 transition-all">
-              <h3 className="font-semibold text-slate-900 dark:text-slate-50 mb-2"><span aria-hidden="true">💻 </span>Developers</h3>
+              <h3 className="flex items-center gap-2 font-semibold text-slate-900 dark:text-slate-50 mb-2"><Code2 aria-hidden="true" className="w-4 h-4 text-blue-600 dark:text-blue-400" />Developers</h3>
               <p className="text-sm text-slate-600 dark:text-slate-300">Prototype computer vision pipelines visually before coding</p>
             </div>
           </div>
@@ -254,11 +251,7 @@ export const LandingPage: React.FC = () => {
             {/* About */}
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <img 
-                  src="/PixelFlow_Icon.png" 
-                  alt="" 
-                  className="w-6 h-6 rounded"
-                />
+                <BrandMark size={24} />
                 <span className="font-bold text-slate-900 dark:text-slate-50">PixelFlow</span>
               </div>
               <p className="text-sm text-slate-600 dark:text-slate-400">
