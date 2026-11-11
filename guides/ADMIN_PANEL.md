@@ -87,9 +87,10 @@ Manual cleanup tools and statistics.
 
 ### **Current Behavior**
 
-**What Gets Cleaned:**
-- Expired sessions (> 30 days old)
-- Orphaned images (no valid session/user)
+**What Gets Cleaned** (automatically every 15 minutes while auto-cleanup is on, or now with the button):
+- Sessions whose lifetime and grace period have passed since their last activity
+- Uploads and processed images older than the Retention tab's periods
+- Orphaned images (no valid session/user) and expired refresh tokens
 
 **What Doesn't Get Cleaned:**
 - Active user images
@@ -99,7 +100,7 @@ Manual cleanup tools and statistics.
 ### **Cleanup Statistics**
 
 **Expired Sessions**
-- Shows count of sessions older than retention period
+- Count of sessions past their lifetime plus the grace period
 - Safe to delete
 
 **Orphaned Images**
@@ -110,9 +111,9 @@ Manual cleanup tools and statistics.
 ### **"Run Cleanup Now" Button**
 
 **What it does:**
-- Deletes expired sessions
-- Removes orphaned images
-- Follows retention policies
+- Runs the same job as the background scheduler, immediately
+- Deletes expired sessions, old uploads/results, orphaned images
+- Follows the Retention tab's settings
 - Safe maintenance operation
 
 **When to use:**
@@ -138,7 +139,7 @@ View real-time storage and session statistics.
 - Total disk space used by images (in MB)
 
 **Sessions**
-- Active sessions (heartbeat in last 5 minutes)
+- Active sessions (activity in the last 15 minutes: upload, opening the workspace, processing)
 
 ### **Breakdown**
 
@@ -189,13 +190,13 @@ Configure how long data is kept before auto-cleanup.
 - Default: 24 hours
 - Results for authenticated users
 
-### **Real-World Retention**
+### **Automatic Cleanup and Sessions**
 
-Standard policies:
-- Guest images: 24-48 hours
-- User images: 30-90 days
-- Processed images: 1-7 days
-- Sessions: 30 days
+- **Automatic cleanup** (on by default): the server runs the cleanup job every 15 minutes. Turn it off to keep everything until you run cleanup by hand.
+- **Guest session lifetime** (default 24 h) and **user session lifetime** (default 7 days): how long a session lives after its *last activity*. Activity slides the expiry forward.
+- **Grace period** (default 2 h): extra time after expiry before the session is deleted.
+
+Values are validated on save; an out-of-range value is rejected with a message and nothing is changed.
 
 **Adjust based on:**
 - Available storage
@@ -212,13 +213,16 @@ View and manage users, their images, and pipelines.
 
 First time accessing:
 1. Toggle **"View User Data"** ON
-2. **Create 4-6 digit PIN**
-3. Remember this PIN - you'll need it every time
+2. **Create a 4-6 digit PIN**
 
 Subsequent times:
 1. Toggle **"View User Data"** ON
 2. **Enter your PIN**
-3. Access granted
+
+The server checks the PIN, not the browser. A correct PIN gives this browser 15 minutes of
+access to user data (an httpOnly cookie bound to your admin account); after that you are asked
+again. Changing an existing PIN requires the current one. Five wrong PINs lock PIN entry for
+15 minutes.
 
 ### **Users Overview**
 
@@ -286,26 +290,24 @@ When viewing a specific user:
 
 ### **Active Sessions**
 
-**Definition**: Sessions with heartbeat in last **5 minutes**
-
-**Why 5 minutes?**
-- Heartbeat pings every 30 seconds
-- 5 minute window allows for network delays
-- Standard in real-world applications
+A session is **active** if it had activity in the last **15 minutes**: an upload, opening the
+workspace, or processing an image. There is no heartbeat; the header's connection badge only
+checks `GET /api/health` and never touches sessions.
 
 **Session Status:**
-- 🟢 **Active**: Last heartbeat < 5 min ago
-- 🔴 **Inactive**: No heartbeat in > 5 min
-- ⏰ **Expired**: Older than retention period (30 days)
+- 🟢 **Active**: activity in the last 15 min
+- 💤 **Idle**: not active, but not yet expired
+- ⏰ **Expired**: past its lifetime since the last activity (deleted after the grace period)
 
 ### **Session Lifecycle**
 
 ```
-Create Session → Active (heartbeat) → Inactive (5 min) → Expired (30 days) → Cleaned Up
-     ↓              ↓                      ↓                  ↓                  ↓
-  User opens    User active          User closed tab      Auto-cleanup      Deleted
-  website       in tab               or idle
+First upload → Active → Idle (15 min) → Expired (lifetime after last activity) → Deleted (after grace)
 ```
+
+A session belongs to whoever is signed in when it is created. Another account can't use it
+(409), and a signed-out owner is asked to sign in again (401). Signing out starts a fresh guest
+session; signing back in restores the account's session in that browser.
 
 ---
 
@@ -370,8 +372,8 @@ Counts update automatically after:
 
 **PIN Requirements:**
 - 4-6 digits
-- Stored as hashed value (secure)
-- Required every time you open Database tab
+- Stored as a hash
+- Enforced by the server on every user-data endpoint; the grant lasts 15 minutes
 
 ### **Admin-Only Access**
 
