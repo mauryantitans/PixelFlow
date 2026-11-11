@@ -1,0 +1,158 @@
+{
+  "state": "modal-gallery",
+  "tabStops": 25,
+  "noVisibleFocus": 0,
+  "focusEscapedDialog": 25,
+  "steps": [
+    {
+      "tag": "button",
+      "name": "Apply Pipeline",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "input",
+      "name": "",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Undo",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Reset",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Method details",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "input",
+      "name": "",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Remove step",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Preview this step",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Method details",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "select",
+      "name": "Low\nMedium\nHigh",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Remove step",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Preview this step",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Method details",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "input",
+      "name": "",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "input",
+      "name": "",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Remove step",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Preview this step",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Method details",
+      "visibleFocus": true,
+      "insideDialog": false
+    },
+    {
+      "tag": "button",
+      "name": "Pick on image",
+      "visibleFocus": true,
+      "insideDialog": false
+    }
+  ]
+}

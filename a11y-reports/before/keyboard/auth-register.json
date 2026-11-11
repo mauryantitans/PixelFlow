@@ -1,0 +1,50 @@
+{
+  "state": "auth-register",
+  "tabStops": 7,
+  "noVisibleFocus": 0,
+  "focusEscapedDialog": null,
+  "steps": [
+    {
+      "tag": "input",
+      "name": "you@example.com",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "input",
+      "name": "username",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "input",
+      "name": "John Doe",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "input",
+      "name": "••••••••",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "input",
+      "name": "••••••••",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Create Account",
+      "visibleFocus": true,
+      "insideDialog": null
+    },
+    {
+      "tag": "button",
+      "name": "Sign in",
+      "visibleFocus": true,
+      "insideDialog": null
+    }
+  ]
+}
