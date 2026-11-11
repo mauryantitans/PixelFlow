@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { GoogleSignIn } from './GoogleSignIn';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 
 interface RegisterProps {
   onSwitchToLogin?: () => void;
@@ -10,6 +11,7 @@ interface RegisterProps {
 export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
   const { register } = useAuth();
   const navigate = useNavigate();
+  useDocumentTitle('Create account');
   const [formData, setFormData] = useState({
     email: '',
     username: '',
@@ -59,7 +61,7 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 px-4 py-8">
+    <main id="main-content" className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 px-4 py-8">
       <div className="max-w-md w-full bg-white dark:bg-zinc-900 rounded-lg shadow-xl dark:shadow-black/50 border-2 border-slate-300 dark:border-zinc-800 p-8">
         <div className="text-center mb-8">
           {/* Custom Icon */}
@@ -206,6 +208,6 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
           </div>
         )}
       </div>
-    </div>
+    </main>
   );
 };

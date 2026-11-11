@@ -18,8 +18,10 @@ import Inspector from './components/Inspector';
 import GalleryModal from './components/GalleryModal';
 import './index.css';
 import MethodDetailsModal from './components/MethodDetailsModal';
+import { useDocumentTitle } from './hooks/useDocumentTitle';
 
 const App: React.FC = () => {
+  useDocumentTitle('Workspace');
   const { status, updateStatus } = useStatus();
   const {
     images,
@@ -485,15 +487,16 @@ const App: React.FC = () => {
   }, [lightboxState.isOpen]);
 
   return (
-    <div className="flex bg-slate-50 dark:bg-zinc-950 min-h-screen">
+    <main id="main-content" tabIndex={-1} className="flex bg-slate-50 dark:bg-zinc-950 min-h-screen focus:outline-none">
+      <h1 className="sr-only">PixelFlow image processing workspace</h1>
       {/* Operations Sidebar */}
-      <aside className={`h-screen sticky top-0 bg-white dark:bg-zinc-900 p-4 flex flex-col border-r-2 border-slate-300 dark:border-zinc-800 flex-shrink-0 transition-all duration-300 relative ${
+      <section aria-label="Operations" className={`h-screen sticky top-0 bg-white dark:bg-zinc-900 p-4 flex flex-col border-r-2 border-slate-300 dark:border-zinc-800 flex-shrink-0 transition-all duration-300 relative ${
         ui.sidebarCollapsed ? 'w-16' : 'w-80'
       }`}>
         
         <div className="flex items-center justify-between mb-4">
           {!ui.sidebarCollapsed && (
-            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-50">Operations</h2>
+            <h2 id="operations-heading" className="text-xl font-bold text-slate-900 dark:text-slate-50">Operations</h2>
           )}
           <button
             onClick={toggleSidebar}
@@ -604,12 +607,12 @@ const App: React.FC = () => {
             </div>
           </div>
         )}
-      </aside>
+      </section>
       
       {/* Main Content */}
-      <main className="flex-1 flex flex-col min-h-screen">
-        {/* Header */}
-        <header className="flex items-center justify-between p-4 border-b-2 border-slate-300 dark:border-zinc-800 bg-white dark:bg-zinc-900 sticky top-0 z-40">
+      <div className="flex-1 flex flex-col min-h-screen">
+        {/* Toolbar */}
+        <div className="flex items-center justify-between p-4 border-b-2 border-slate-300 dark:border-zinc-800 bg-white dark:bg-zinc-900 sticky top-0 z-40">
           <div className="flex items-center gap-4">
             <label htmlFor="upload-image" className="btn-primary cursor-pointer">
               Upload Image(s)
@@ -690,17 +693,17 @@ const App: React.FC = () => {
               )}
             </div>
           </div>
-        </header>
+        </div>
         
         {/* Content Area */}
         <div className="flex-1 p-6 flex flex-col gap-6">
           {/* Pipeline Section */}
-          <div className="bg-white dark:bg-zinc-900 rounded-lg p-4 border-2 border-slate-300 dark:border-zinc-800">
+          <section aria-labelledby="pipeline-heading" className="bg-white dark:bg-zinc-900 rounded-lg p-4 border-2 border-slate-300 dark:border-zinc-800">
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center gap-4">
-                <h3 className="text-lg font-bold text-slate-900 dark:text-slate-50">
+                <h2 id="pipeline-heading" className="text-lg font-bold text-slate-900 dark:text-slate-50">
                   Pipeline ({pipeline.length} steps)
-                </h3>
+                </h2>
                 {/* Timing Display */}
                 {((liveProcessingEnabled && liveTimingData.total_time > 0) || (!liveProcessingEnabled && batchTimingData.total_time > 0)) && (
                   <div className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
@@ -794,10 +797,10 @@ const App: React.FC = () => {
                 })
               )}
             </div>
-          </div>
+          </section>
           
           {/* Results Section - IMPROVED */}
-          <div className="flex-1 bg-white dark:bg-zinc-900 rounded-lg border-2 border-slate-300 dark:border-zinc-800 flex flex-col">
+          <section aria-label="Results" className="flex-1 bg-white dark:bg-zinc-900 rounded-lg border-2 border-slate-300 dark:border-zinc-800 flex flex-col">
             {ui.currentView === 'grid' && (
               <ResultsGridComponent
                 results={batchResults}
@@ -841,9 +844,9 @@ const App: React.FC = () => {
                 }}
               />
             )}
-          </div>
+          </section>
         </div>
-      </main>
+      </div>
       
       {/* Gallery Modal */}
       <GalleryModal
@@ -948,9 +951,9 @@ const App: React.FC = () => {
                 </div>
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-bold text-slate-900 dark:text-slate-50 mb-2">
+                <h2 id="quota-dialog-title" className="text-lg font-bold text-slate-900 dark:text-slate-50 mb-2">
                   {quotaPopup.type === 'quota' ? 'Storage Quota Exceeded' : 'Image Limit Reached'}
-                </h3>
+                </h2>
                 <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">
                   {quotaPopup.message}
                 </p>
@@ -1027,7 +1030,7 @@ const App: React.FC = () => {
           </div>
         </div>
       )}
-    </div>
+    </main>
   );
 };
 

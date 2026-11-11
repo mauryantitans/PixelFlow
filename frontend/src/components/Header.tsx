@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { usePipelineContext } from '../contexts/PipelineContext';
 import { useTheme, useSessionHeartbeat } from '../hooks';
@@ -75,13 +75,13 @@ export const Header: React.FC = () => {
 
   return (
     <>
-      <div className="bg-white dark:bg-zinc-900 border-b border-slate-300 dark:border-zinc-800 px-6 py-3 relative z-50">
+      <header className="bg-white dark:bg-zinc-900 border-b border-slate-300 dark:border-zinc-800 px-6 py-3 relative z-50">
         <div className="flex items-center justify-between">
           {/* Logo and Title */}
           <div className="flex items-center space-x-6">
-            <button 
-              onClick={() => navigate('/')}
-              className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
+            <Link
+              to="/"
+              className="flex items-center space-x-3 hover:opacity-80 transition-opacity rounded-md"
             >
               <img 
                 src="/PixelFlow_Icon.png" 
@@ -89,15 +89,16 @@ export const Header: React.FC = () => {
                 className="w-10 h-10 rounded-lg"
               />
               <div className="flex flex-col">
-                <h1 className="text-xl font-bold text-slate-900 dark:text-slate-50 leading-tight">PixelFlow</h1>
+                <span className="text-xl font-bold text-slate-900 dark:text-slate-50 leading-tight">PixelFlow</span>
                 <span className="text-xs text-slate-500 dark:text-slate-400 leading-tight">Image Processing Pipeline Builder</span>
               </div>
-            </button>
+            </Link>
 
             {/* Navigation Links */}
-            <nav className="hidden md:flex items-center space-x-1">
-              <button
-                onClick={() => navigate('/')}
+            <nav aria-label="Main" className="hidden md:flex items-center space-x-1">
+              <Link
+                to="/"
+                aria-current={!isOnApp ? 'page' : undefined}
                 className={`flex items-center space-x-1.5 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                   !isOnApp
                     ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
@@ -106,10 +107,11 @@ export const Header: React.FC = () => {
               >
                 <Home size={16} />
                 <span>Home</span>
-              </button>
+              </Link>
 
-              <button
-                onClick={() => navigate('/app')}
+              <Link
+                to="/app"
+                aria-current={isOnApp ? 'page' : undefined}
                 className={`flex items-center space-x-1.5 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                   isOnApp
                     ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
@@ -118,7 +120,7 @@ export const Header: React.FC = () => {
               >
                 <Zap size={16} />
                 <span>App</span>
-              </button>
+              </Link>
 
               <a
                 href="https://github.com/Mauryantitans/PixelFlow/blob/React_FastAPI/README.md"
@@ -302,7 +304,7 @@ export const Header: React.FC = () => {
             {notification.message}
           </div>
         )}
-      </div>
+      </header>
 
       {/* Modals */}
       {isAuthenticated && (

@@ -128,9 +128,9 @@ const ResultsGridComponent: React.FC<ResultsGridProps> = ({
     <>
       <div className="flex-1 flex flex-col">
         <div className="p-4 border-b border-gray-200 dark:border-zinc-700 flex items-center justify-between">
-          <h3 className="text-lg font-bold text-zinc-900 dark:text-white">
+          <h2 className="text-lg font-bold text-zinc-900 dark:text-white">
             Results ({results.length})
-          </h3>
+          </h2>
           
           <div className="flex items-center gap-2">
             <button

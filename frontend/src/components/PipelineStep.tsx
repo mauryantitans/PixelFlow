@@ -66,9 +66,9 @@ const PipelineStepComponent: React.FC<PipelineStepProps> = ({
       <div className="flex-grow">
         <div className="flex justify-between items-center mb-2">
           <div className="flex items-center gap-2">
-            <h4 className="font-semibold text-zinc-900 dark:text-white">
+            <h3 className="font-semibold text-zinc-900 dark:text-white">
               {op?.label ?? step.name}
-            </h4>
+            </h3>
               {/* Info Button */}
                 <button
                   onClick={onShowDetails}

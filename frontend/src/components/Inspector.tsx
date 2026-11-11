@@ -141,7 +141,7 @@ const Inspector: React.FC<InspectorProps> = ({
             <button onClick={onBack} className="btn-sm" title="Back to results grid">
               <LucideReact.ArrowLeft className="w-5 h-5" />
             </button>
-            <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Inspector</h3>
+            <h2 className="text-lg font-bold text-zinc-900 dark:text-white">Inspector</h2>
           </div>
           
           {/* Step Navigation - Center (normal view only) */}
@@ -283,9 +283,9 @@ const Inspector: React.FC<InspectorProps> = ({
               <div className="w-full h-full grid grid-cols-2 gap-4">
                 {[stageA, stageB].map((idx, k) => (
                   <div key={k} className="flex flex-col min-h-0">
-                    <h4 className="text-sm font-bold text-zinc-900 dark:text-white mb-2 text-center">
+                    <h3 className="text-sm font-bold text-zinc-900 dark:text-white mb-2 text-center">
                       {stages[idx]?.label}
-                    </h4>
+                    </h3>
                     <div className="flex-1 flex items-center justify-center bg-gray-50 dark:bg-zinc-800/50 rounded-lg p-2">
                       <img
                         src={getStageUrl(idx)}

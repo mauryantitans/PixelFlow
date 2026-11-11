@@ -1418,9 +1418,9 @@ Type DELETE to confirm.`)) {
               <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Lock className="w-8 h-8 text-purple-600 dark:text-purple-400" />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 dark:text-slate-50 mb-2">
+              <h2 id="admin-pin-title" className="text-xl font-bold text-slate-900 dark:text-slate-50 mb-2">
                 {hasPinSet ? 'Enter Your Admin PIN' : 'Create Your Admin PIN'}
-              </h3>
+              </h2>
               <p className="text-sm text-slate-600 dark:text-slate-400">
                 {hasPinSet 
                   ? 'Enter the 4-6 digit PIN you created earlier to access sensitive user data'
