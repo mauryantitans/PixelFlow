@@ -35,6 +35,7 @@ PixelFlow is a visual image-processing pipeline builder: a React/TypeScript fron
 ### Browser checks (need the stack running; puppeteer-core installed outside the repo, path in `TOOLS`)
 - `node scripts/e2e/session-flow.js` — sign-in, token expiry, shared-browser sessions (env vars in the file header).
 - `node scripts/e2e/workflows.js` — uploads, live preview, batch Stop/Apply, picking, reload.
+- `node scripts/e2e/appearance.js` — theme picker: keyboard, saving, reload, typeface, axe on the open panel, 320px.
 - `node a11y-reports/scripts/audit.js` (+ `VIEWPORT=320x640`, `UI_THEME=<theme id>`) and `keyboard-checks.js` — accessibility audit; see [a11y-reports/REPORT.md](a11y-reports/REPORT.md).
 
 ## Architecture
