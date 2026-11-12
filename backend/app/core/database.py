@@ -61,6 +61,27 @@ def _connection_hint(error: Exception) -> str:
     return "Check that DATABASE_URL points at a running database."
 
 
+def run_migrations(bind=None) -> None:
+    """Bring the schema to the latest Alembic revision (idempotent).
+
+    Runs on every startup, so Render (whose start command doesn't run Alembic)
+    and Docker behave the same. The baseline adopts databases that were created
+    by create_all() before migrations existed.
+    """
+    from pathlib import Path
+
+    from alembic import command
+    from alembic.config import Config
+
+    backend_dir = Path(__file__).resolve().parents[2]
+    cfg = Config(str(backend_dir / "alembic.ini"))
+    cfg.set_main_option("script_location", str(backend_dir / "alembic"))
+    cfg.attributes["skip_logging_config"] = True
+    with (bind or engine).begin() as connection:
+        cfg.attributes["connection"] = connection
+        command.upgrade(cfg, "head")
+
+
 def init_db(retries: int | None = None, base_delay: float | None = None):
     """
     Initialize database tables.
@@ -77,9 +98,9 @@ def init_db(retries: int | None = None, base_delay: float | None = None):
 
     for attempt in range(1, retries + 1):
         try:
-            logger.info("Creating database tables...")
-            Base.metadata.create_all(bind=engine)
-            logger.info("Database tables created successfully!")
+            logger.info("Applying database migrations...")
+            run_migrations()
+            logger.info("Database schema is up to date.")
             return
         except OperationalError as e:
             if attempt < retries:

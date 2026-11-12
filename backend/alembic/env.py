@@ -12,8 +12,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from app.core.config import settings
 from app.core.database import Base
 
-# Import all models to ensure they're registered with Base
-from app.models.db_models import User, SavedPipeline, ProcessingHistory, APIKey, SharedPipeline, RefreshToken
+# Import every model so all tables are registered with Base
+import app.models.db_models  # noqa: F401,E402
 
 # This is the Alembic Config object
 config = context.config
@@ -21,8 +21,9 @@ config = context.config
 # Set the SQLAlchemy URL from settings
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
 
-# Interpret the config file for Python logging
-if config.config_file_name is not None:
+# Interpret the config file for Python logging, except when the app runs the
+# migrations itself at startup (that would reset the app's own loggers).
+if config.config_file_name is not None and not config.attributes.get("skip_logging_config"):
     fileConfig(config.config_file_name)
 
 # Add model's MetaData for 'autogenerate' support
@@ -56,20 +57,29 @@ def run_migrations_online() -> None:
     In this scenario we need to create an Engine
     and associate a connection with the context.
     """
+    def run(connection) -> None:
+        context.configure(
+            connection=connection,
+            target_metadata=target_metadata,
+            # SQLite can't ALTER most things; batch mode recreates the table.
+            render_as_batch=connection.dialect.name == "sqlite",
+        )
+        with context.begin_transaction():
+            context.run_migrations()
+
+    # The app passes its own connection when it migrates at startup.
+    existing = config.attributes.get("connection")
+    if existing is not None:
+        run(existing)
+        return
+
     connectable = engine_from_config(
         config.get_section(config.config_ini_section),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
-
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, 
-            target_metadata=target_metadata
-        )
-
-        with context.begin_transaction():
-            context.run_migrations()
+        run(connection)
 
 if context.is_offline_mode():
     run_migrations_offline()

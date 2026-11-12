@@ -22,7 +22,7 @@ PixelFlow is a visual image-processing pipeline builder: a React/TypeScript fron
   - `mypy` (scoped via `pyproject.toml` to `app/processing` + `app/utils/datetime_utils.py`)
   - `pytest` — full suite (pytest `pythonpath` is set in `pyproject.toml`); `pytest tests/test_executor.py -k coerce` runs a single test/expr; `pytest -q` for quiet
 - Database utility scripts live in `backend/database/`: `list_users.py`, `reset_password.py`, `backup_database.py`, `restore_database.py`, `cleanup_database.py`, `migrate_to_postgres.py`, `verify_business_rules.py`
-- Migrations: `alembic upgrade head` / `alembic revision --autogenerate -m "..."` (config in `backend/alembic.ini`, env in `backend/alembic/env.py`). Note: `init_db()` also runs `Base.metadata.create_all` on startup, so the schema can exist without migrations.
+- Migrations: the app runs `alembic upgrade head` itself on every startup (`core/database.run_migrations`, called by `init_db`), so Render and Docker behave the same. `alembic/versions/0001_baseline.py` creates any missing tables and adopts databases built earlier by `create_all`. New migrations must be idempotent (use `app/core/migration_helpers.py`: `add_column_if_missing` etc.) because fresh databases already get current columns from the baseline. Create one with `alembic revision -m "..."` (config `backend/alembic.ini`, env `backend/alembic/env.py`); `tests/test_migrations.py` checks fresh, adopted and repeated runs.
 - API docs while running: http://localhost:8000/docs ; health: `/health`
 
 ### Frontend (from `frontend/`)

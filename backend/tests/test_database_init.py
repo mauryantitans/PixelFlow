@@ -21,12 +21,12 @@ def _dns_error():
 def test_init_db_retries_then_succeeds(monkeypatch):
     calls = {"n": 0}
 
-    def flaky_create_all(bind=None):
+    def flaky_migrations(bind=None):
         calls["n"] += 1
         if calls["n"] < 3:
             raise _dns_error()
 
-    monkeypatch.setattr(database.Base.metadata, "create_all", flaky_create_all)
+    monkeypatch.setattr(database, "run_migrations", flaky_migrations)
     monkeypatch.setattr(database.time, "sleep", lambda s: None)
 
     database.init_db(retries=5, base_delay=0)
@@ -37,7 +37,7 @@ def test_init_db_gives_up_with_actionable_message(monkeypatch, caplog):
     def always_fail(bind=None):
         raise _dns_error()
 
-    monkeypatch.setattr(database.Base.metadata, "create_all", always_fail)
+    monkeypatch.setattr(database, "run_migrations", always_fail)
     monkeypatch.setattr(database.time, "sleep", lambda s: None)
     monkeypatch.setattr(
         database.settings,
