@@ -23,6 +23,7 @@ from ...utils.auth import (
     create_access_token, create_refresh_token, store_refresh_token, set_auth_cookies,
 )
 from ...utils.security import log_login_attempt
+from ...utils.datetime_utils import utcnow
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -151,6 +152,11 @@ async def google_callback(
                 )
                 db.add(user)
         
+        # Google has verified the address (checked above).
+        if not user.email_verified:
+            user.email_verified = True
+            user.email_verified_at = utcnow()
+
         # Save changes
         db.commit()
         db.refresh(user)
@@ -175,7 +181,10 @@ async def google_callback(
                 "username": user.username,
                 "full_name": user.full_name,
                 "profile_picture": user.profile_picture,
-                "is_admin": user.is_admin
+                "is_admin": user.is_admin,
+                "is_active": user.is_active,
+                "email_verified": bool(user.email_verified),
+                "created_at": user.created_at.isoformat() if user.created_at else None,
             }
         }
         

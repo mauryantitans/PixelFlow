@@ -11,8 +11,8 @@ here; see [CHANGELOG.md](CHANGELOG.md) for what changed and when.
 
 | Limitation | Notes |
 |---|---|
-| No email verification | Any well-formed email can register. |
-| No password reset | A forgotten password needs an admin. A server-side script exists: `backend/database/reset_password.py`. |
+| Emails need an SMTP provider | Password-reset and verification emails go out only with `EMAIL_BACKEND=smtp` and `SMTP_*` set ([variables](deployment/ENVIRONMENT_VARIABLES.md)); the default only logs them. Verification is a reminder, not a gate: unverified accounts can use everything. |
+| A password reset doesn't end open sessions at once | It revokes every refresh token, but an access token already issued stays valid until it expires (at most 30 minutes). |
 | Google sign-in is off until configured | Needs `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` (backend) and `REACT_APP_GOOGLE_CLIENT_ID` (frontend). See [guides/GOOGLE_OAUTH_SETUP.md](guides/GOOGLE_OAUTH_SETUP.md). The button is hidden otherwise. |
 | Basic user management | Admins can view, deactivate and delete users and their data, but can't change roles or edit profiles from the panel. |
 | Admin PIN grant is per browser | A correct PIN unlocks user data for 15 minutes in that browser only (server-enforced). 5 wrong PINs lock that admin out for 15 minutes. |
@@ -73,8 +73,6 @@ is available for an external uptime monitor.
 
 ## Suggested next steps
 
-1. Password reset and email verification.
-2. A job queue for heavy processing (object storage for images is now optional).
-3. Error tracking and uptime monitoring; automated database backups.
-4. Accessibility regression checks in CI (the audit scripts in `a11y-reports/scripts/`).
-5. Alembic migrations for schema changes.
+1. A job queue for heavy processing (object storage for images is now optional).
+2. Error tracking and uptime monitoring; automated database backups.
+3. Accessibility regression checks in CI (the audit scripts in `a11y-reports/scripts/`).

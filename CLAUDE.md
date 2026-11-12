@@ -92,6 +92,8 @@ JWT access + refresh tokens (`python-jose`, bcrypt via `passlib`) are delivered 
 - **Token refresh**: the access cookie lasts 30 min and the browser stops sending it afterwards, and image/processing routes accept guests, so the frontend refreshes **proactively** (`services/tokenRefresh.ts`: before a request, if `pf_csrf` exists and the tokens are 20+ min old) with a 401 refresh-and-retry fallback on both axios clients. A rejected refresh fires `pixelflow:auth-expired` → signed out.
 - Cookie attributes are env-driven: `COOKIE_SECURE` (default on in prod), `COOKIE_SAMESITE` (default `lax`), `COOKIE_DOMAIN`. **In production the frontend must be same-origin with the API** (a Vercel rewrite proxies `/api/*` → the Render backend; set `REACT_APP_API_URL=/api`) so cookies are first-party — see `frontend/vercel.json` and `deployment/DEPLOYMENT_GUIDE.md`.
 
+**Password reset / email verification** (`/auth/forgot-password`, `/reset-password`, `/verify-email`, `/resend-verification`): no token table — `utils/account_tokens.py` signs JWTs with a `purpose` and a fingerprint (HMAC of the password hash for reset, of the email for verify) so links are single-use; `utils/email.py` sends via `EMAIL_BACKEND` `console` (logs, default) or `smtp`, never raising, from FastAPI `BackgroundTasks`; links point at `FRONTEND_URL`. Forgot/reset/verify are CSRF-exempt; verification only drives the frontend's `VerifyEmailBanner`, it gates nothing.
+
 Optional Google OAuth (`authlib`) gated on `GOOGLE_CLIENT_ID`/`SECRET`. First admin is auto-created on startup from `ADMIN_EMAIL`/`ADMIN_PASSWORD` if no admin exists. The admin panel's user-data views are protected by an **admin PIN enforced server-side** (`utils/admin_pin.py`).
 
 ## Configuration notes

@@ -1,7 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Request, Response, Form
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status, Request, Response, Form
 from sqlalchemy.orm import Session
 from typing import Optional
 import logging
+import threading
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -10,7 +12,8 @@ from ...core.config import settings
 from ...models.db_models import User
 from ...models.schemas import (
     UserCreate, UserResponse, UserUpdate,
-    LoginRequest
+    LoginRequest,
+    ForgotPasswordRequest, ResetPasswordRequest, VerifyEmailRequest,
 )
 from ...utils.auth import (
     get_password_hash, authenticate_user,
@@ -23,11 +26,81 @@ from ...utils.auth import (
 from ...utils.security import (
     check_login_attempts, log_login_attempt, clear_login_attempts
 )
+from ...utils import email as email_utils
+from ...utils.account_tokens import (
+    PASSWORD_RESET, VERIFY_EMAIL, AccountTokenError,
+    create_account_token, resolve_account_token, lifetime_minutes,
+)
+from ...utils.datetime_utils import utcnow
 
 router = APIRouter()
 
+
+# ---------------------------------------------------------------------------
+# Email helpers (password reset / verification)
+# ---------------------------------------------------------------------------
+
+# One email of each kind per address per cooldown, so the endpoints can't be
+# used to flood someone's inbox (the per-IP auth rate limit still applies on
+# top). In memory, like the rate limiter.
+EMAIL_COOLDOWN_SECONDS = 60
+_email_last_sent: dict[tuple[str, str], float] = {}
+_email_lock = threading.Lock()
+
+
+def _email_allowed(kind: str, address: str) -> bool:
+    """True (and records the send) unless this kind of email went to this
+    address within the cooldown."""
+    key = (kind, address.strip().lower())
+    now = time.monotonic()
+    with _email_lock:
+        last = _email_last_sent.get(key)
+        if last is not None and now - last < EMAIL_COOLDOWN_SECONDS:
+            return False
+        _email_last_sent[key] = now
+        # Keep the dict small.
+        if len(_email_last_sent) > 10_000:
+            cutoff = now - EMAIL_COOLDOWN_SECONDS
+            for k in [k for k, t in _email_last_sent.items() if t < cutoff]:
+                del _email_last_sent[k]
+    return True
+
+
+def _queue_verification_email(background_tasks: BackgroundTasks, user: User) -> None:
+    token = create_account_token(user, VERIFY_EMAIL)
+    background_tasks.add_task(
+        email_utils.send_verification_email,
+        user.email,
+        email_utils.display_name(user),
+        token,
+        lifetime_minutes(VERIFY_EMAIL) // 60,
+    )
+
+
+def _token_error(e: AccountTokenError, what: str) -> HTTPException:
+    if e.reason == "expired":
+        detail = f"This {what} link has expired. Request a new one."
+        code = "token_expired"
+    else:
+        detail = f"This {what} link is invalid or has already been used. Request a new one."
+        code = "token_invalid"
+    return HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail={"message": detail, "code": code},
+    )
+
+
+FORGOT_PASSWORD_MESSAGE = (
+    "If an account exists for that email address, we've sent it a message with "
+    "instructions to reset the password. Check your inbox (and spam folder)."
+)
+
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-async def register_user(user: UserCreate, db: Session = Depends(get_db)):
+async def register_user(
+    user: UserCreate,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+):
     """Register a new user"""
     # Check if user already exists
     db_user = db.query(User).filter(User.email == user.email).first()
@@ -56,7 +129,11 @@ async def register_user(user: UserCreate, db: Session = Depends(get_db)):
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
-    
+
+    # Ask the new user to confirm their address (doesn't block anything).
+    _email_allowed(VERIFY_EMAIL, db_user.email)
+    _queue_verification_email(background_tasks, db_user)
+
     return db_user
 
 @router.post("/login", response_model=UserResponse)
@@ -154,11 +231,13 @@ async def get_current_user_info(current_user: User = Depends(get_current_user)):
 @router.put("/me", response_model=UserResponse)
 async def update_current_user(
     user_update: UserUpdate,
+    background_tasks: BackgroundTasks,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """Update current user information"""
     # Check if email is being changed and is already taken
+    email_changed = False
     if user_update.email and user_update.email != current_user.email:
         existing_user = db.query(User).filter(User.email == user_update.email).first()
         if existing_user:
@@ -167,6 +246,10 @@ async def update_current_user(
                 detail="Email already registered"
             )
         current_user.email = user_update.email
+        # A new address has to be verified again.
+        current_user.email_verified = False
+        current_user.email_verified_at = None
+        email_changed = True
     
     # Check if username is being changed and is already taken
     if user_update.username and user_update.username != current_user.username:
@@ -187,7 +270,11 @@ async def update_current_user(
     
     db.commit()
     db.refresh(current_user)
-    
+
+    if email_changed:
+        _email_allowed(VERIFY_EMAIL, current_user.email)
+        _queue_verification_email(background_tasks, current_user)
+
     return current_user
 
 @router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)
@@ -306,5 +393,126 @@ async def logout(
         "cleaned_up": items_deleted,
         "pipelines_kept": True
     }
+
+# ---------------------------------------------------------------------------
+# Password reset and email verification
+# ---------------------------------------------------------------------------
+
+
+@router.post("/forgot-password")
+async def forgot_password(
+    data: ForgotPasswordRequest,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+):
+    """Email a password-reset link. The response is the same whether or not the
+    account exists (no account enumeration); accounts that only sign in with
+    Google get an email pointing them at Google sign-in instead."""
+    email = data.email.strip()
+    user = db.query(User).filter(User.email == email).first()
+    if user is None or not user.is_active:
+        logger.info("Password reset requested for an unknown or inactive account")
+    elif not _email_allowed(PASSWORD_RESET, user.email):
+        logger.info("Password reset email for user %s throttled", user.id)
+    elif not user.hashed_password:
+        background_tasks.add_task(
+            email_utils.send_oauth_only_reset_email,
+            user.email,
+            email_utils.display_name(user),
+        )
+    else:
+        token = create_account_token(user, PASSWORD_RESET)
+        background_tasks.add_task(
+            email_utils.send_password_reset_email,
+            user.email,
+            email_utils.display_name(user),
+            token,
+            lifetime_minutes(PASSWORD_RESET),
+        )
+    return {"success": True, "message": FORGOT_PASSWORD_MESSAGE}
+
+
+@router.post("/reset-password")
+async def reset_password(
+    data: ResetPasswordRequest,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+):
+    """Set a new password from a reset link. Signs the account out everywhere
+    (all refresh tokens are revoked) and lifts any login lockout; the user then
+    signs in with the new password."""
+    try:
+        user = resolve_account_token(db, data.token, PASSWORD_RESET)
+    except AccountTokenError as e:
+        raise _token_error(e, "password reset") from None
+
+    user.hashed_password = get_password_hash(data.new_password)
+    # The reset link arrived by email, which proves the address.
+    if not user.email_verified:
+        user.email_verified = True
+        user.email_verified_at = utcnow()
+    db.commit()
+
+    revoked = revoke_user_refresh_tokens(db, user.id)
+    clear_login_attempts(db, user.email)
+    logger.info("Password reset for user %s; revoked %s refresh token(s)", user.id, revoked)
+
+    background_tasks.add_task(
+        email_utils.send_password_changed_email,
+        user.email,
+        email_utils.display_name(user),
+    )
+    return {
+        "success": True,
+        "message": "Your password has been reset. Sign in with your new password.",
+    }
+
+
+@router.post("/verify-email")
+async def verify_email(data: VerifyEmailRequest, db: Session = Depends(get_db)):
+    """Mark the address in a verification link as verified."""
+    try:
+        user = resolve_account_token(db, data.token, VERIFY_EMAIL)
+    except AccountTokenError as e:
+        raise _token_error(e, "verification") from None
+
+    already = bool(user.email_verified)
+    if not already:
+        user.email_verified = True
+        user.email_verified_at = utcnow()
+        db.commit()
+    return {
+        "success": True,
+        "already_verified": already,
+        "email": user.email,
+        "message": "Your email address was already verified."
+        if already
+        else "Your email address is verified.",
+    }
+
+
+@router.post("/resend-verification")
+async def resend_verification(
+    background_tasks: BackgroundTasks,
+    current_user: User = Depends(get_current_user),
+):
+    """Send the signed-in user a fresh verification link."""
+    if current_user.email_verified:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": "Your email address is already verified.", "code": "already_verified"},
+        )
+    if not _email_allowed(VERIFY_EMAIL, current_user.email):
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail={
+                "message": "A verification email was sent less than a minute ago. "
+                "Check your inbox, or try again in a minute.",
+                "code": "email_throttled",
+            },
+        )
+    _queue_verification_email(background_tasks, current_user)
+    return {"success": True, "message": f"Verification email sent to {current_user.email}."}
+
 
 # Debug endpoints have been intentionally removed for production security.

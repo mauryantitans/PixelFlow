@@ -72,6 +72,9 @@ def create_first_admin_if_needed(db: Session) -> bool:
             is_active=True,
             is_admin=True,
             oauth_provider=None,
+            # The address comes from the deployer's own ADMIN_EMAIL setting.
+            email_verified=True,
+            email_verified_at=datetime.now(timezone.utc),
             created_at=datetime.now(timezone.utc)
         )
         

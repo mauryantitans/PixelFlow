@@ -21,7 +21,8 @@ Sign-in sets **httpOnly cookies**; tokens never appear in response bodies.
 
 **CSRF.** Cookie-authenticated `POST`/`PUT`/`PATCH`/`DELETE` requests under `/api` must send
 `X-CSRF-Token` equal to the `pf_csrf` cookie. Exempt: register, login, OAuth, and the
-session-id-keyed `heartbeat` / `cleanup-session`.
+session-id-keyed `heartbeat` / `cleanup-session`. Also exempt: forgot-password, reset-password
+and verify-email, which act only through the email address or the token in the body.
 
 **Non-browser clients** can send `Authorization: Bearer <token>` instead of cookies (no CSRF
 header needed then), e.g. a token from `create_access_token` in tests.
@@ -37,6 +38,10 @@ The web app refreshes proactively after 20 minutes and retries once on a 401.
 | `POST /auth/logout` | Clears cookies, revokes refresh tokens. |
 | `GET /auth/me` · `PUT /auth/me` · `DELETE /auth/me` | Current user; update profile; delete account. |
 | `GET /auth/google/status` · `GET /auth/google/login` · `POST /auth/google/callback` | Google sign-in, only when configured. |
+| `POST /auth/forgot-password` | `{email}` → always the same 200 `{success, message}`, whether or not the account exists. Emails a reset link (Google-only accounts get a "use Google sign-in" email instead); at most one per address per minute. |
+| `POST /auth/reset-password` | `{token, new_password}` → 200. The token comes from the emailed link, is valid 1 hour and works once. Applies the password policy (422), revokes all the user's refresh tokens and clears the login lockout; the user then signs in. 400 `{detail: {message, code}}` with `code` `token_expired` or `token_invalid`. |
+| `POST /auth/verify-email` | `{token}` → `{success, email, already_verified, message}`. Link valid 48 hours, bound to the current address. 400 as above. |
+| `POST /auth/resend-verification` | Signed in. Emails a new verification link. 400 `already_verified`; 429 `email_throttled` within a minute of the last one. |
 
 ---
 

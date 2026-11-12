@@ -321,7 +321,16 @@ export interface User {
   is_active: boolean;
   is_admin: boolean;
   profile_picture?: string;  // OAuth profile picture URL
+  email_verified?: boolean;  // false until the emailed link is opened (Google sign-ins are verified)
   created_at: string;
+}
+
+/** Response of the password-reset / email-verification endpoints. */
+export interface AuthMessageResponse {
+  success: boolean;
+  message: string;
+  email?: string;
+  already_verified?: boolean;
 }
 
 export interface LoginRequest {

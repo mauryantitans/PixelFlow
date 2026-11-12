@@ -5,7 +5,7 @@ Adds ``storage_key`` to uploaded_images and processed_images and makes
 Idempotent (fresh databases already get both from the baseline).
 
 Revision ID: 0003_object_storage
-Revises: 0001_baseline
+Revises: 0002_email_verification
 Create Date: 2026-11-12
 """
 
@@ -20,7 +20,7 @@ from app.core.migration_helpers import (
 )
 
 revision = "0003_object_storage"
-down_revision = "0001_baseline"
+down_revision = "0002_email_verification"
 branch_labels = None
 depends_on = None
 
