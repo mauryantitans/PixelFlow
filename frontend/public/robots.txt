@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /app
+Disallow: /p/
+Disallow: /reset-password
+Disallow: /verify-email
+
+Sitemap: https://pixel-flow-woad.vercel.app/sitemap.xml
