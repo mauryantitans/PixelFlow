@@ -1,4 +1,4 @@
-"""Baseline: the schema as it stood when migrations were introduced (1.3.0).
+"""Baseline: the schema as it stood when migrations were introduced (1.2.0).
 
 Creates any missing tables and never touches existing ones, so it is safe on a
 fresh database and on production databases created earlier by create_all().

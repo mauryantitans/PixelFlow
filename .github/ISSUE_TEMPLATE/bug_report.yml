@@ -108,7 +108,7 @@ body:
     attributes:
       label: PixelFlow version or commit
       description: Shown at the backend's `/` and `/health` endpoints; or the commit you run locally.
-      placeholder: 1.4.0
+      placeholder: 1.2.0
   - type: textarea
     id: screenshots
     attributes:

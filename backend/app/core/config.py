@@ -49,7 +49,7 @@ def storage_config_errors(
 class Settings:
     # App settings
     APP_NAME: str = os.environ.get("APP_NAME", "PixelFlow")
-    VERSION: str = os.environ.get("VERSION", "1.4.0")
+    VERSION: str = os.environ.get("VERSION", "1.2.0")
     DEBUG: bool = os.environ.get("DEBUG", "False").lower() == "true"
 
     # File storage settings

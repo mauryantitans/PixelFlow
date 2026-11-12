@@ -160,5 +160,5 @@ HTTPS is required: in production, auth cookies are `Secure` (`COOKIE_SECURE` def
 ### Rollback
 
 - Render / Railway / Fly.io: redeploy a previous release from the dashboard or CLI.
-- Docker: tag images per release (e.g. `pixelflow-backend:1.3.0`), then point compose at the previous tag and run `docker compose up -d`.
+- Docker: tag images per release (e.g. `pixelflow-backend:1.2.0`), then point compose at the previous tag and run `docker compose up -d`.
 - Source: check out the last good tag or commit, rebuild and redeploy. Back up the database before running migrations.

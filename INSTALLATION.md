@@ -1,6 +1,6 @@
 # PixelFlow Installation Guide
 
-How to run PixelFlow (v1.3.0) on your own machine, create the first admin, and fix common local problems.
+How to run PixelFlow (v1.2.0) on your own machine, create the first admin, and fix common local problems.
 For production see [deployment/DEPLOYMENT_GUIDE.md](deployment/DEPLOYMENT_GUIDE.md).
 
 ---

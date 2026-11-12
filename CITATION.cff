@@ -14,7 +14,7 @@ abstract: >-
   filters and shared by link.
 authors:
   - alias: Mauryantitans
-version: 1.4.0
+version: 1.2.0
 date-released: 2026-11-12
 license: Apache-2.0
 repository-code: "https://github.com/Mauryantitans/PixelFlow"

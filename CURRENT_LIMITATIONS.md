@@ -1,6 +1,6 @@
 # Current limitations
 
-**Version:** 1.4.0 · **Last updated:** November 2026
+**Version:** 1.2.0 · **Last updated:** November 2026
 
 What PixelFlow does *not* do yet, or does with known trade-offs. Fixed items are not kept
 here; see [CHANGELOG.md](CHANGELOG.md) for what changed and when.

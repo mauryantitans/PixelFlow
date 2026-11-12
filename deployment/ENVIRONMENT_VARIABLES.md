@@ -33,7 +33,7 @@ Environment Variables. They are compiled in at build time, so redeploy after cha
 | `DB_CLEANUP_INTERVAL_SECONDS` | `900` | How often the built-in cleanup job runs. Whether it deletes anything is the admin's Auto-cleanup switch (Admin → Retention). |
 | `DB_CLEANUP_INITIAL_DELAY_SECONDS` | `120` | Delay before the first run after startup. |
 | `HOST`, `PORT` | `0.0.0.0`, `8000` | Render sets `PORT` itself. |
-| `APP_NAME`, `VERSION` | `PixelFlow`, `1.4.0` | Shown at `/` and in logs. |
+| `APP_NAME`, `VERSION` | `PixelFlow`, `1.2.0` | Shown at `/` and in logs. |
 
 ### Image storage (optional)
 

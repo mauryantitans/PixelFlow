@@ -1,6 +1,6 @@
 # PixelFlow Deployment Guide
 
-The canonical guide for deploying PixelFlow (v1.3.0): **backend + PostgreSQL on Render**, **frontend on Vercel**. Free tiers are enough for personal and demo use.
+The canonical guide for deploying PixelFlow (v1.2.0): **backend + PostgreSQL on Render**, **frontend on Vercel**. Free tiers are enough for personal and demo use.
 
 - Environment variables: [ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md) (full reference)
 - Go-live review: [PRODUCTION_CHECKLIST.md](PRODUCTION_CHECKLIST.md)

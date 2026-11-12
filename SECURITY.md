@@ -6,8 +6,8 @@ Security fixes go into the latest release line only.
 
 | Version | Supported |
 |---|---|
-| 1.4.x | Yes |
-| < 1.4 | No. Please upgrade. |
+| 1.2.x | Yes |
+| < 1.2 | No. Please upgrade. |
 
 ## Reporting a vulnerability
 
