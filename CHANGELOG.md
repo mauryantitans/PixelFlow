@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 🔑 Password reset and email verification
+- **Forgot password?** on the sign-in form emails a one-time reset link (valid 1 hour). The
+  reply never says whether an account exists; Google-only accounts are told by email to use
+  Google sign-in. Resetting signs the account out everywhere and lifts any login lockout.
+- **Email verification:** sign-up sends a link (valid 48 hours); signed-in unverified users see
+  a dismissible banner with **Resend email**. Nothing is blocked. Google sign-ins count as
+  verified, and changing the address asks for verification again.
+- Tokens are signed and single-use without a new table (`utils/account_tokens.py`); new
+  `users.email_verified` / `email_verified_at` columns (migration `0002_email_verification`).
+- Email goes through `EMAIL_BACKEND=console` (logs the message; the default) or `smtp`
+  (`SMTP_*`, `EMAIL_FROM`); links use `FRONTEND_URL`. See
+  [deployment/ENVIRONMENT_VARIABLES.md](deployment/ENVIRONMENT_VARIABLES.md).
+
 ### 🎨 Themes and brand
 - **Appearance picker** in the header (palette icon): seven themes, each in light and dark
   mode, applied instantly and remembered in the browser.

@@ -39,6 +39,17 @@ Token lifetimes (access 30 min, refresh 7 days), rate limits and upload limits a
 `backend/app/core/security_config.py`, not environment variables. Quotas, retention periods
 and session lifetimes are edited in the admin panel (stored in the `system_settings` table).
 
+### Email (password reset and verification)
+
+| Variable | Default | Notes |
+|---|---|---|
+| `EMAIL_BACKEND` | `console` | `console` only writes each email (link included) to the log, so local dev needs no provider. Set `smtp` in production, or reset and verification emails never arrive. |
+| `SMTP_HOST`, `SMTP_PORT` | —, `587` | Your provider's SMTP server. Port `465` uses implicit TLS. |
+| `SMTP_USERNAME`, `SMTP_PASSWORD` | — | SMTP credentials (often an API key). Leave the username empty for servers without authentication. |
+| `SMTP_STARTTLS` | `True` | STARTTLS on ports other than 465. |
+| `EMAIL_FROM` | `PixelFlow <no-reply@localhost>` | Sender; use an address on a domain your provider is allowed to send for. |
+| `FRONTEND_URL` | `http://localhost:3000` | Base of the links in emails. They open the frontend, so in production this is the Vercel URL (e.g. `https://your-app.vercel.app`), not the Render one. |
+
 ## Frontend
 
 | Variable | Value | Notes |
