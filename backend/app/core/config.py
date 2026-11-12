@@ -12,6 +12,40 @@ load_dotenv(dotenv_path=env_path)
 
 _DEFAULT_SECRET = "your-secret-key-change-in-production"
 
+STORAGE_BACKENDS = ("database", "s3")
+
+
+def _normalize_prefix(prefix: str) -> str:
+    """Object-key prefix without a leading slash and with one trailing slash ('' allowed)."""
+    prefix = prefix.strip().lstrip("/")
+    return f"{prefix.rstrip('/')}/" if prefix else ""
+
+
+def storage_config_errors(
+    backend: str,
+    bucket: str = "",
+    access_key_id: str = "",
+    secret_access_key: str = "",
+    endpoint_url: str = "",
+) -> list[str]:
+    """Problems with the image-storage settings (empty when they are usable)."""
+    if backend not in STORAGE_BACKENDS:
+        return [f"STORAGE_BACKEND must be one of {', '.join(STORAGE_BACKENDS)} (got {backend!r})."]
+    if backend != "s3":
+        return []
+    errors: list[str] = []
+    if not bucket:
+        errors.append("S3_BUCKET is required when STORAGE_BACKEND=s3.")
+    if bool(access_key_id) != bool(secret_access_key):
+        errors.append(
+            "Set both S3_ACCESS_KEY_ID and S3_SECRET_ACCESS_KEY (or neither, to use the "
+            "AWS default credential chain)."
+        )
+    if endpoint_url and not endpoint_url.startswith(("http://", "https://")):
+        errors.append("S3_ENDPOINT_URL must start with https:// (or http:// for local MinIO).")
+    return errors
+
+
 class Settings:
     # App settings
     APP_NAME: str = os.environ.get("APP_NAME", "PixelFlow")
@@ -19,12 +53,24 @@ class Settings:
     DEBUG: bool = os.environ.get("DEBUG", "False").lower() == "true"
 
     # File storage settings
-    # NOTE: images are always stored in the database; UPLOAD_DIR/PROCESSED_DIR remain
-    # for the session_manager's local scratch dirs only.
+    # NOTE: image bytes live in the database or in object storage (STORAGE_BACKEND
+    # below); UPLOAD_DIR/PROCESSED_DIR remain for the session_manager's local
+    # scratch dirs only.
     BASE_DIR: Path = Path(__file__).parent.parent.parent
     UPLOAD_DIR: Path = BASE_DIR / "uploads"
     PROCESSED_DIR: Path = BASE_DIR / "processed"
     
+    # Image storage. "database" (default) keeps image bytes in the database rows;
+    # "s3" puts them in a private S3-compatible bucket (AWS S3, Cloudflare R2,
+    # MinIO) and keeps only the object key (and the small thumbnail) in the row.
+    STORAGE_BACKEND: str = os.environ.get("STORAGE_BACKEND", "database").strip().lower() or "database"
+    S3_BUCKET: str = os.environ.get("S3_BUCKET", "").strip()
+    S3_REGION: str = os.environ.get("S3_REGION", "").strip()  # "auto" for Cloudflare R2
+    S3_ENDPOINT_URL: str = os.environ.get("S3_ENDPOINT_URL", "").strip()  # R2 / MinIO
+    S3_ACCESS_KEY_ID: str = os.environ.get("S3_ACCESS_KEY_ID", "").strip()
+    S3_SECRET_ACCESS_KEY: str = os.environ.get("S3_SECRET_ACCESS_KEY", "").strip()
+    S3_PREFIX: str = _normalize_prefix(os.environ.get("S3_PREFIX", "pixelflow/"))
+
     # Session settings
     SESSION_TIMEOUT: int = 30 * 60  # 30 minutes in seconds
     CLEANUP_INTERVAL: int = 5 * 60  # 5 minutes in seconds
@@ -104,6 +150,21 @@ class Settings:
             _logger.critical(
                 "FATAL: SECRET_KEY is still the default insecure value. "
                 "Set SECRET_KEY environment variable before running in production."
+            )
+            sys.exit(1)
+
+        storage_errors = storage_config_errors(
+            self.STORAGE_BACKEND,
+            self.S3_BUCKET,
+            self.S3_ACCESS_KEY_ID,
+            self.S3_SECRET_ACCESS_KEY,
+            self.S3_ENDPOINT_URL,
+        )
+        if storage_errors:
+            _logger.critical(
+                "FATAL: image storage is misconfigured: %s "
+                "See deployment/ENVIRONMENT_VARIABLES.md (STORAGE_BACKEND, S3_*).",
+                " ".join(storage_errors),
             )
             sys.exit(1)
 
