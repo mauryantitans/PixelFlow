@@ -89,6 +89,21 @@ class Settings:
     GOOGLE_CLIENT_SECRET: str = os.environ.get("GOOGLE_CLIENT_SECRET", "")
     GOOGLE_REDIRECT_URI: str = os.environ.get("GOOGLE_REDIRECT_URI", "http://localhost:3000/auth/google/callback")
 
+    # Email (password reset + email verification), see app/utils/email.py.
+    # EMAIL_BACKEND: "console" (default) logs each message, link included, at
+    # INFO so local dev needs no provider; "smtp" sends through SMTP_*.
+    EMAIL_BACKEND: str = os.environ.get("EMAIL_BACKEND", "console").strip().lower()
+    SMTP_HOST: str = os.environ.get("SMTP_HOST", "")
+    _smtp_port_env = os.environ.get("SMTP_PORT", "587").strip()
+    SMTP_PORT: int = int(_smtp_port_env) if _smtp_port_env else 587
+    SMTP_USERNAME: str = os.environ.get("SMTP_USERNAME", "")
+    SMTP_PASSWORD: str = os.environ.get("SMTP_PASSWORD", "")
+    SMTP_STARTTLS: bool = os.environ.get("SMTP_STARTTLS", "True").lower() == "true"
+    EMAIL_FROM: str = os.environ.get("EMAIL_FROM", "PixelFlow <no-reply@localhost>")
+    # Where links in emails point. Links open the frontend (the Vercel URL in
+    # production), which then calls the API.
+    FRONTEND_URL: str = os.environ.get("FRONTEND_URL", "http://localhost:3000").rstrip("/")
+
     def __init__(self):
         # Create directories if they don't exist
         self.UPLOAD_DIR.mkdir(exist_ok=True)
@@ -111,6 +126,23 @@ class Settings:
             _logger.warning(
                 "ALLOWED_ORIGINS is not set. CORS will allow all localhost origins. "
                 "Set ALLOWED_ORIGINS to your production frontend URL."
+            )
+
+        if self.EMAIL_BACKEND not in ("console", "smtp"):
+            _logger.warning(
+                "EMAIL_BACKEND=%r is not 'console' or 'smtp'; using 'console'.",
+                self.EMAIL_BACKEND,
+            )
+            self.EMAIL_BACKEND = "console"
+        if is_production and self.EMAIL_BACKEND == "console":
+            _logger.warning(
+                "EMAIL_BACKEND is 'console': password-reset and verification emails "
+                "are only written to the log. Set EMAIL_BACKEND=smtp and SMTP_* to send them."
+            )
+        if is_production and self.FRONTEND_URL == "http://localhost:3000":
+            _logger.warning(
+                "FRONTEND_URL is not set; links in emails point at http://localhost:3000. "
+                "Set FRONTEND_URL to your frontend's public URL."
             )
 
         if self.DATABASE_URL == "postgresql://postgres:postgres@localhost:5432/pixelflow" and is_production:

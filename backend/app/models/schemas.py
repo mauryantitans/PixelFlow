@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator
 from typing import Optional, List
 from datetime import datetime
 
@@ -21,6 +21,7 @@ class UserResponse(UserBase):
     id: int
     is_active: bool
     is_admin: bool
+    email_verified: bool = False
     created_at: datetime
     
     class Config:
@@ -38,6 +39,27 @@ class TokenData(BaseModel):
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
+
+# Password reset / email verification
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+class ResetPasswordRequest(BaseModel):
+    token: str = Field(..., min_length=1, max_length=4096)
+    new_password: str
+
+    @field_validator("new_password")
+    @classmethod
+    def _password_policy(cls, value: str) -> str:
+        from ..utils.security import password_policy_error
+
+        problem = password_policy_error(value)
+        if problem:
+            raise ValueError(problem)
+        return value
+
+class VerifyEmailRequest(BaseModel):
+    token: str = Field(..., min_length=1, max_length=4096)
 
 # Pipeline schemas
 class PipelineBase(BaseModel):

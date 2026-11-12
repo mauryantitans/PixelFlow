@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
 from app.models.db_models import LoginAttempt
-from app.core.security_config import LoginSecurity, SecurityLogging
+from app.core.security_config import LoginSecurity, PasswordPolicy, SecurityLogging
 from typing import Optional
 import logging
 
@@ -95,3 +95,23 @@ def clear_login_attempts(db: Session, email: str):
         LoginAttempt.success == False
     ).delete()
     db.commit()
+
+
+def password_policy_error(password: str) -> Optional[str]:
+    """Why ``password`` breaks the password policy (security_config.PasswordPolicy),
+    or None if it is acceptable. Used where a password is set from a reset link."""
+    if len(password) < PasswordPolicy.MIN_LENGTH:
+        return f"Password must be at least {PasswordPolicy.MIN_LENGTH} characters long"
+    if len(password) > PasswordPolicy.MAX_LENGTH:
+        return f"Password must be at most {PasswordPolicy.MAX_LENGTH} characters long"
+    if PasswordPolicy.REQUIRE_UPPERCASE and not any(c.isupper() for c in password):
+        return "Password must contain an uppercase letter"
+    if PasswordPolicy.REQUIRE_LOWERCASE and not any(c.islower() for c in password):
+        return "Password must contain a lowercase letter"
+    if PasswordPolicy.REQUIRE_DIGIT and not any(c.isdigit() for c in password):
+        return "Password must contain a digit"
+    if PasswordPolicy.REQUIRE_SPECIAL and not any(
+        c in PasswordPolicy.SPECIAL_CHARACTERS for c in password
+    ):
+        return "Password must contain a special character"
+    return None

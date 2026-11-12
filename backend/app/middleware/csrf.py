@@ -27,6 +27,9 @@ UNSAFE_METHODS = {"POST", "PUT", "DELETE", "PATCH"}
 
 # Endpoints exempt from CSRF:
 #  * login/register/oauth — establish the session before any CSRF cookie exists.
+#  * forgot-password/reset-password/verify-email — reached from an emailed link,
+#    possibly in a browser with no session; they act only through the address or
+#    the signed single-use token in the body, never through the auth cookie.
 #  * heartbeat/cleanup-session — keyed by a client-supplied session_id (not the
 #    authenticated identity) and reached via fetch/sendBeacon which can't set
 #    custom headers; forging them can't act on the user's account.
@@ -35,6 +38,9 @@ EXEMPT_PATHS = {
     "/api/auth/register",
     "/api/auth/google/login",
     "/api/auth/google/callback",
+    "/api/auth/forgot-password",
+    "/api/auth/reset-password",
+    "/api/auth/verify-email",
     "/api/images/heartbeat",
     "/api/images/cleanup-session",
 }

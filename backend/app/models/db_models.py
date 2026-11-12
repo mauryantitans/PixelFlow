@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey, Text, JSON, Float, LargeBinary
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql import func
+from sqlalchemy.sql import false, func
 from datetime import datetime
 from ..core.database import Base
 
@@ -34,6 +34,10 @@ class User(Base):
     oauth_provider = Column(String, nullable=True)  # 'google', 'github', etc.
     oauth_id = Column(String, nullable=True, index=True)  # OAuth provider's user ID
     profile_picture = Column(String, nullable=True)  # URL to profile picture
+
+    # Email verification (see utils/account_tokens.py). Google sign-ins are verified.
+    email_verified = Column(Boolean, nullable=False, default=False, server_default=false())
+    email_verified_at = Column(DateTime(timezone=True), nullable=True)
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
