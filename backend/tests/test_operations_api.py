@@ -10,7 +10,7 @@ def test_operations_returns_full_schema(client):
     body = client.get("/api/processing/operations").json()
     assert body["success"] is True
     assert body["version"] == "2"
-    assert [c["name"] for c in body["categories"]] == ["Basic", "OpenCV", "Scikit-Image"]
+    assert [c["name"] for c in body["categories"]] == ["Basic", "OpenCV", "Scikit-Image", "Custom"]
 
     ops = {
         op["id"]: op
@@ -28,8 +28,10 @@ def test_operations_keeps_legacy_list_for_compat(client):
     body = client.get("/api/processing/operations").json()
     assert "Gaussian Blur" in body["operations"]
     assert "Flood Fill" in body["operations"]
-    assert body["total_count"] == 77
-    assert len(body["operations"]) == 77
+    # 77 built-in + Custom Kernel; the hidden Custom Filter step isn't listed
+    assert body["total_count"] == 78
+    assert len(body["operations"]) == 78
+    assert "Custom Filter" not in body["operations"]
 
 
 def test_process_live_unknown_image_returns_404(client):

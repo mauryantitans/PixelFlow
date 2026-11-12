@@ -12,7 +12,7 @@ def test_slugify():
 def test_all_builtins_registered():
     ops = registry.all()
     # 53 built-ins + 2 interactive + 10 extras (batch 1) + 12 extras2 (batch 2)
-    assert len(ops) == 77
+    assert len(ops) == 79  # 77 built-in + Custom Kernel + Custom Filter
 
 
 def test_resolve_by_id_label_and_alias():
@@ -30,7 +30,7 @@ def test_schema_shape_and_grouping():
     schema = registry.to_schema()
     assert schema["version"] == "2"
     names = [c["name"] for c in schema["categories"]]
-    assert names == ["Basic", "OpenCV", "Scikit-Image"]
+    assert names == ["Basic", "OpenCV", "Scikit-Image", "Custom"]
     # every operation exposes typed params
     for cat in schema["categories"]:
         for sub in cat["subcategories"]:

@@ -85,6 +85,10 @@ def execute_step(image: Image.Image, step: dict[str, Any]) -> tuple[Image.Image,
     name = step.get("name")
     raw_params = step.get("params") or {}
 
+    # A step switched off in the UI passes the image through untouched.
+    if step.get("enabled") is False:
+        return image, None
+
     spec = registry.resolve(name)
     if spec is None:
         logger.warning("Unknown operation: %r", name)

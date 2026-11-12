@@ -67,7 +67,11 @@ cache = _LRUImageCache()
 
 def _step_signature(step: dict) -> str:
     return json.dumps(
-        {"name": step.get("name"), "params": step.get("params", {})},
+        {
+            "name": step.get("name"),
+            "params": step.get("params", {}),
+            "enabled": step.get("enabled", True) is not False,
+        },
         sort_keys=True,
         default=str,
     )

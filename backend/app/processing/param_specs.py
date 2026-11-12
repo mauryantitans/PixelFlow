@@ -295,3 +295,104 @@ class RectParam(ParamSpec):
 
     def to_pixels(self, value, width: int, height: int):
         return coords.denormalize_rect(value[0], value[1], value[2], value[3], width, height)
+
+
+@dataclass
+class TextParam(ParamSpec):
+    """A short free-text value (e.g. a custom filter's display name)."""
+
+    max_length: int = 80
+    kind: str = field(default="text", init=False)
+
+    def schema(self) -> dict[str, Any]:
+        return {**super().schema(), "max_length": self.max_length}
+
+    def coerce(self, value: Any) -> str:
+        if value is None:
+            return ""
+        if not isinstance(value, str):
+            raise ParamError(self.name, f"expected text, got {value!r}")
+        return value.strip()[: self.max_length]
+
+
+@dataclass
+class MatrixParam(ParamSpec):
+    """A square, odd-sized matrix of numbers (convolution kernels).
+
+    ``presets`` are offered by the UI as starting points; each is
+    ``{"label": str, "value": list[list[float]]}``.
+    """
+
+    min_size: int = 3
+    max_size: int = 9
+    value_min: float = -255.0
+    value_max: float = 255.0
+    presets: list[dict[str, Any]] = field(default_factory=list)
+    kind: str = field(default="matrix", init=False)
+
+    def schema(self) -> dict[str, Any]:
+        return {
+            **super().schema(),
+            "min_size": self.min_size,
+            "max_size": self.max_size,
+            "value_min": self.value_min,
+            "value_max": self.value_max,
+            "presets": self.presets,
+        }
+
+    def coerce(self, value: Any) -> list[list[float]]:
+        if not isinstance(value, list) or not value or not all(isinstance(r, list) for r in value):
+            raise ParamError(self.name, "expected a matrix (a list of rows)")
+        size = len(value)
+        if any(len(r) != size for r in value):
+            raise ParamError(self.name, "the matrix must be square")
+        if size % 2 == 0 or not (self.min_size <= size <= self.max_size):
+            raise ParamError(
+                self.name, f"size must be odd, between {self.min_size} and {self.max_size}"
+            )
+        out: list[list[float]] = []
+        for row in value:
+            cells: list[float] = []
+            for v in row:
+                if isinstance(v, bool) or not isinstance(v, (int, float)) or v != v:
+                    raise ParamError(self.name, f"cells must be numbers, got {v!r}")
+                if not (self.value_min <= v <= self.value_max):
+                    raise ParamError(
+                        self.name,
+                        f"cells must be between {self.value_min:g} and {self.value_max:g}",
+                    )
+                cells.append(float(v))
+            out.append(cells)
+        return out
+
+
+@dataclass
+class StepsParam(ParamSpec):
+    """An embedded list of pipeline steps (the body of a custom filter)."""
+
+    max_steps: int = 30
+    kind: str = field(default="steps", init=False)
+
+    def schema(self) -> dict[str, Any]:
+        return {**super().schema(), "max_steps": self.max_steps}
+
+    def coerce(self, value: Any) -> list[dict[str, Any]]:
+        if not isinstance(value, list):
+            raise ParamError(self.name, "expected a list of steps")
+        if len(value) > self.max_steps:
+            raise ParamError(self.name, f"at most {self.max_steps} steps")
+        steps: list[dict[str, Any]] = []
+        for i, step in enumerate(value, start=1):
+            if not isinstance(step, dict) or not isinstance(step.get("name"), str):
+                raise ParamError(self.name, f"step {i} must have a name")
+            params = step.get("params") or {}
+            if not isinstance(params, dict):
+                raise ParamError(self.name, f"step {i}: params must be an object")
+            steps.append(
+                {
+                    "name": step["name"],
+                    "params": params,
+                    "enabled": step.get("enabled", True) is not False,
+                }
+            )
+        return steps

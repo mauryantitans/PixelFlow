@@ -27,6 +27,7 @@ ParamValue = Union[int, float, str, bool, None, List[Any], Dict[str, Any]]
 class PipelineStep(BaseModel):
     name: str  # operation id or legacy display label (resolved via aliases)
     params: Dict[str, ParamValue] = Field(default_factory=dict)
+    enabled: bool = True  # False = skipped (passes the image through)
 
 class ProcessingTiming(BaseModel):
     step_name: str

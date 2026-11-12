@@ -34,4 +34,5 @@ def test_every_builtin_runs_with_defaults():
 
 
 def test_registry_has_expected_count():
-    assert len(registry.all()) == 77
+    # 77 built-in operations + Custom Kernel + the (hidden) Custom Filter step
+    assert len(registry.all()) == 79

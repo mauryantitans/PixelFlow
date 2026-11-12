@@ -1109,7 +1109,8 @@ class ImageProcessor:
 
                 step_start_time = time.perf_counter()
                 processed_image, step_error = execute_step(
-                    current_image, {"name": operation_name, "params": params}
+                    current_image,
+                    {"name": operation_name, "params": params, "enabled": step.get("enabled", True)},
                 )
                 step_duration = time.perf_counter() - step_start_time
 

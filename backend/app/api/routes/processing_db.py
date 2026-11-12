@@ -292,6 +292,7 @@ async def get_available_operations():
             for cat in schema["categories"]
             for sub in cat["subcategories"]
             for op in sub["operations"]
+            if not op.get("hidden")
         ]
 
         return JSONResponse(content={

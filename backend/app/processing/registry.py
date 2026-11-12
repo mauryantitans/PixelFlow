@@ -34,6 +34,9 @@ class OperationSpec:
     description: str = ""
     params: list[ParamSpec] = field(default_factory=list)
     aliases: list[str] = field(default_factory=list)
+    #: Resolvable and executable, but not listed in the palette (e.g. the
+    #: "Custom Filter" step, which is added from a saved filter, not clicked).
+    hidden: bool = False
 
     @property
     def interactive(self) -> bool:
@@ -48,6 +51,7 @@ class OperationSpec:
             "subcategory": self.subcategory,
             "description": self.description,
             "interactive": self.interactive,
+            "hidden": self.hidden,
             "params": [p.schema() for p in self.params],
         }
 
@@ -122,6 +126,7 @@ def ensure_registered() -> None:
         _bootstrapped = True
         from .operations import (  # noqa: F401  (register on import)
             _builtins,
+            custom,
             extras,
             extras2,
             interactive,
