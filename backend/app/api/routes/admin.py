@@ -9,6 +9,8 @@ from app.models.db_models import User, LoginAttempt, SavedPipeline, ProcessingHi
 from app.models.schemas import PinRequest
 from app.utils.auth import get_current_active_admin, get_current_user
 from app.utils.cleanup_service import CleanupService
+from app.storage.images import delete_image_objects, object_keys
+from app.core.config import settings as app_settings
 from app.core.business_rules import SessionPolicy
 from app.utils.admin_pin import (
     check_not_locked_out,
@@ -488,7 +490,8 @@ async def get_database_overview(
             "public": db.query(func.count(SavedPipeline.id)).filter(SavedPipeline.is_public == True).scalar()
         },
         "storage": {
-            "total_mb": round((db.query(func.sum(UploadedImage.size_bytes)).scalar() or 0) / (1024 * 1024), 2)
+            "total_mb": round((db.query(func.sum(UploadedImage.size_bytes)).scalar() or 0) / (1024 * 1024), 2),
+            "backend": app_settings.STORAGE_BACKEND,  # where image bytes live
         }
     }
     
@@ -821,6 +824,11 @@ async def delete_all_images(
     logger.warning(f"Uploaded images to delete: {uploaded_count}")
     logger.warning(f"Processed images to delete: {processed_count}")
     
+    # Bulk deletes bypass the ORM hook: queue their stored objects explicitly
+    # (removed after the commit; never blocks it).
+    delete_image_objects(object_keys(db, ProcessedImage), db=db)
+    delete_image_objects(object_keys(db, UploadedImage), db=db)
+
     # Delete processed images first (foreign key constraint)
     db.query(ProcessedImage).delete()
     
@@ -991,7 +999,8 @@ async def delete_user(
     for img in processed_images:
         db.delete(img)
     
-    # Delete user's uploaded images
+    # Delete user's uploaded images (bulk delete: queue their stored objects explicitly)
+    delete_image_objects(object_keys(db, UploadedImage, UploadedImage.user_id == user_id), db=db)
     db.query(UploadedImage).filter(UploadedImage.user_id == user_id).delete()
     
     # Delete user's pipelines (and their share links first: bulk deletes skip ORM cascades)
@@ -1047,6 +1056,9 @@ async def delete_image(
         ProcessedImage.original_image_id == image_id
     ).scalar()
     
+    delete_image_objects(
+        object_keys(db, ProcessedImage, ProcessedImage.original_image_id == image_id), db=db
+    )
     db.query(ProcessedImage).filter(ProcessedImage.original_image_id == image_id).delete()
     
     # Delete the uploaded image

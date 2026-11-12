@@ -1,7 +1,8 @@
 """
 Database-backed image storage routes for PixelFlow
 
-Stores images in PostgreSQL database instead of filesystem.
+Image metadata and thumbnails live in the database; the full image bytes live
+in the row or in object storage, depending on STORAGE_BACKEND (app.storage).
 """
 
 import uuid
@@ -32,9 +33,18 @@ from ...utils.quota_manager import check_storage_quota
 from ...utils.settings_manager import get_settings
 from ...utils.image_processing import ImageProcessor
 from ...utils.auth import get_current_user_optional, get_current_active_admin
+from ...storage import ObjectNotFound, StorageError
+from ...storage.images import delete_image_objects, read_image_bytes, save_image_bytes
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
+
+
+def _storage_http_error(e: StorageError) -> HTTPException:
+    """404 when the object is gone, 503 when the image store can't be reached/used."""
+    if isinstance(e, ObjectNotFound):
+        return HTTPException(status_code=404, detail="Image data is missing from storage")
+    return HTTPException(status_code=503, detail=f"Image storage is unavailable: {e}")
 
 
 def image_to_base64(image: PILImage.Image, format: str = 'JPEG') -> str:
@@ -251,13 +261,12 @@ async def upload_image(
             logger.error(f"Error processing image: {e}")
             raise HTTPException(status_code=400, detail=f"Unable to process image: {str(e)}")
         
-        # Store in database
+        # Store the row (bytes in the row or in object storage, see app.storage)
         uploaded_image = UploadedImage(
             id=image_id,
             session_id=session_id,
             user_id=user_id,  # Associate with authenticated user
             filename=file.filename or "image.jpg",
-            image_data=img_bytes,
             thumbnail_data=thumbnail_bytes,
             width=width,
             height=height,
@@ -265,9 +274,19 @@ async def upload_image(
             size_bytes=len(img_bytes),
             mime_type=mime_type
         )
+        try:
+            save_image_bytes(uploaded_image, img_bytes, mime_type)
+        except StorageError as e:
+            logger.error(f"Could not store image {image_id}: {e}")
+            raise _storage_http_error(e)
 
         db.add(uploaded_image)
-        db.commit()
+        try:
+            db.commit()
+        except Exception:
+            db.rollback()
+            delete_image_objects([uploaded_image])  # don't leave an unreferenced object
+            raise
         db.refresh(uploaded_image)
 
         # Create thumbnail base64 for immediate display
@@ -341,6 +360,7 @@ async def upload_multiple_images(
 
     uploaded_images: List[dict] = []
     failed_uploads: List[dict] = []
+    new_rows: List[UploadedImage] = []
 
     for file in files:
         try:
@@ -375,19 +395,21 @@ async def upload_multiple_images(
             )
 
             image_id = str(uuid.uuid4())
-            db.add(UploadedImage(
+            row = UploadedImage(
                 id=image_id,
                 session_id=session_id,
                 user_id=user_id,
                 filename=file.filename or "image",
-                image_data=img_bytes,
                 thumbnail_data=thumbnail_bytes,
                 width=width,
                 height=height,
                 format=image_format,
                 size_bytes=len(img_bytes),
                 mime_type=mime_type,
-            ))
+            )
+            save_image_bytes(row, img_bytes, mime_type)
+            db.add(row)
+            new_rows.append(row)
 
             accepted += 1
             accepted_bytes += len(img_bytes)
@@ -412,6 +434,7 @@ async def upload_multiple_images(
         db.commit()
     except Exception as e:
         db.rollback()
+        delete_image_objects(new_rows)  # don't leave unreferenced objects
         logger.error(f"Batch upload commit failed: {e}")
         raise HTTPException(status_code=500, detail="Failed to save uploaded images")
 
@@ -468,7 +491,7 @@ async def get_session_images_list(
                 # every full image in one JSON body reached tens of MB.
                 image_data["thumbnail"] = bytes_to_base64_dataurl(img.thumbnail_data, img.mime_type)
                 if not thumbnails_only:
-                    image_data["image"] = bytes_to_base64_dataurl(img.image_data, img.mime_type)
+                    image_data["image"] = bytes_to_base64_dataurl(read_image_bytes(img), img.mime_type)
             
             result.append(image_data)
         
@@ -480,6 +503,9 @@ async def get_session_images_list(
         
     except HTTPException:
         raise
+    except StorageError as e:
+        logger.error(f"Error reading session images from storage: {e}")
+        raise _storage_http_error(e)
     except Exception as e:
         logger.error(f"Error getting session images: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -511,10 +537,13 @@ async def get_image(
         if thumbnail and img.thumbnail_data:
             return Response(content=img.thumbnail_data, media_type=img.mime_type)
         else:
-            return Response(content=img.image_data, media_type=img.mime_type)
+            return Response(content=read_image_bytes(img), media_type=img.mime_type)
 
     except HTTPException:
         raise
+    except StorageError as e:
+        logger.error(f"Error reading image {image_id} from storage: {e}")
+        raise _storage_http_error(e)
     except Exception as e:
         logger.error(f"Error retrieving image {image_id}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -538,6 +567,8 @@ async def delete_image(
         # meaning the request must be from the same guest session (no token needed).
         _require_owner(img.user_id, current_user, "delete this image")
 
+        # Its stored objects (and its processed versions') are removed after the
+        # commit by the hook in app.storage.images.
         db.delete(img)
         db.commit()
 
@@ -590,7 +621,7 @@ async def cleanup_session(
                 UploadedImage.session_id == session_id
             ).scalar()
             
-            db.delete(session)  # Cascades to delete images
+            db.delete(session)  # Cascades to images (their objects go after commit)
             db.commit()
             logger.info(f"Session cleaned up: {session_id} - Deleted session and {image_count} images")
             return JSONResponse(content={

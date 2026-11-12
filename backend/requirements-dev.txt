@@ -6,3 +6,4 @@ pytest-cov==5.0.0
 httpx==0.28.1          # FastAPI TestClient transport
 ruff==0.6.9
 mypy==1.11.2
+moto[s3]==5.0.16      # in-process S3 for the object-storage tests

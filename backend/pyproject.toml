@@ -31,7 +31,7 @@ ignore = [
 python_version = "3.11"
 # Incremental adoption: type-check the new, fully-typed processing package and
 # the datetime helper first. Expand `files` as modules are annotated.
-files = ["app/processing", "app/utils/datetime_utils.py"]
+files = ["app/processing", "app/storage", "app/utils/datetime_utils.py"]
 # Process imported (legacy) modules for type info but don't report their errors;
 # expand `files` as those modules are annotated.
 follow_imports = "silent"

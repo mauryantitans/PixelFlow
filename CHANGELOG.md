@@ -43,6 +43,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   page, sign-in/register, favicon and app icons (SVG + PNG, maskable).
 - Landing page: emoji in "Perfect for" replaced by icons.
 
+### 🗄️ Optional object storage for images
+- `STORAGE_BACKEND=s3` keeps image bytes in a private S3-compatible bucket (AWS S3, Cloudflare
+  R2, MinIO) instead of the database, which keeps only metadata, the object key and the
+  thumbnail. The database stays the default. Settings: `S3_BUCKET`, `S3_ENDPOINT_URL`,
+  `S3_REGION`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_PREFIX`; incomplete settings stop
+  startup with a clear message. Existing images stay readable after the switch; every delete
+  (user, admin, cleanup) also removes the objects. Migration `0003_object_storage` adds
+  `storage_key` and makes `image_data` nullable.
+
 ## [1.3.0] - 2026-11-11
 
 Accessibility (WCAG 2.1 AA), a production-outage fix, and a pass over every

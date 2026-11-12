@@ -20,6 +20,8 @@ from ...utils.auth import get_current_user_optional
 from ...utils.session_db import SessionOwnershipError, touch_session
 from ...utils.image_processing import ImageProcessor
 from ...processing.registry import registry
+from ...storage import ObjectNotFound, StorageError
+from ...storage.images import read_image_bytes
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -42,7 +44,7 @@ def _flatten_to_rgb(img: PILImage.Image) -> PILImage.Image:
 
 
 def load_image_from_db(image_id: str, db: Session, current_user: Optional[User] = None) -> PILImage.Image:
-    """Load an uploaded image from the database as an RGB PIL image.
+    """Load an uploaded image (bytes from the row or object storage) as an RGB PIL image.
 
     Same ownership rule as GET /images/image/{id}: a user-owned image can only
     be processed by its owner or an admin (processing with an empty pipeline
@@ -64,7 +66,14 @@ def load_image_from_db(image_id: str, db: Session, current_user: Optional[User] 
 
     # Stored originals may be RGBA (transparent PNGs are preserved on upload), but
     # the processing operations expect 3-channel RGB, so flatten alpha onto white.
-    img = PILImage.open(io.BytesIO(uploaded_img.image_data))
+    try:
+        data = read_image_bytes(uploaded_img)
+    except ObjectNotFound:
+        raise HTTPException(status_code=404, detail=f"Image {image_id} data is missing from storage")
+    except StorageError as e:
+        logger.error(f"Could not read image {image_id} from storage: {e}")
+        raise HTTPException(status_code=503, detail=f"Image storage is unavailable: {e}")
+    img = PILImage.open(io.BytesIO(data))
     return _flatten_to_rgb(img)
 
 

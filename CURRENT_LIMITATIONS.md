@@ -24,7 +24,7 @@ here; see [CHANGELOG.md](CHANGELOG.md) for what changed and when.
 | Upload formats: JPEG, PNG, BMP, TIFF (≤ 50 MB, ≤ 20 per upload) | Results download as PNG/JPEG. There is no output-format or quality choice, and EXIF metadata is not kept. |
 | No drag-and-drop upload | Images are added with the file picker (keyboard accessible). |
 | Processing is synchronous | Large images and heavy operations (e.g. Non-Local Means) can take seconds per image. Batch mode processes one image at a time. There is no background job queue. |
-| Images are stored in Postgres | Simple, but it fills a small database quickly. Object storage (S3/R2) would scale better. |
+| Images are stored in Postgres by default | Simple, but it fills a small database quickly. Optional S3-compatible object storage (AWS S3, Cloudflare R2, MinIO) keeps image bytes out of the database (`STORAGE_BACKEND=s3`, see [deployment/DEPLOYMENT_GUIDE.md](deployment/DEPLOYMENT_GUIDE.md#object-storage-optional)); images uploaded before the switch stay in the database. |
 | Uploaded images' alt text is their file name | The app can't know what a photo shows; users can't add a description yet. |
 
 ## Sessions and data retention
@@ -74,7 +74,7 @@ is available for an external uptime monitor.
 ## Suggested next steps
 
 1. Password reset and email verification.
-2. Object storage for images, plus a job queue for heavy processing.
+2. A job queue for heavy processing (object storage for images is now optional).
 3. Error tracking and uptime monitoring; automated database backups.
 4. Accessibility regression checks in CI (the audit scripts in `a11y-reports/scripts/`).
 5. Alembic migrations for schema changes.
