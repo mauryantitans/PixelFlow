@@ -61,7 +61,8 @@ def load_image_from_db(image_id: str, db: Session, current_user: Optional[User] 
                 detail={"error": "sign_in_required", "message": "Your sign-in has expired. Please sign in again."},
                 headers={"WWW-Authenticate": "Bearer"},
             )
-        if current_user.id != uploaded_img.user_id and not current_user.is_admin:
+        # Owner only (admins too: user data is behind the admin PIN endpoints).
+        if current_user.id != uploaded_img.user_id:
             raise HTTPException(status_code=403, detail="Not authorized to process this image")
 
     # Stored originals may be RGBA (transparent PNGs are preserved on upload), but

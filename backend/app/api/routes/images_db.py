@@ -110,12 +110,16 @@ def _sign_in_expired() -> HTTPException:
 
 
 def _require_owner(owner_id, current_user, what: str) -> None:
-    """Same rule everywhere: owner or admin; signed-out -> 401, other user -> 403."""
+    """Same rule everywhere: owner only; signed-out -> 401, anyone else -> 403.
+
+    Admins are not exempt here: other users' images are reached through the
+    admin endpoints, which require the admin PIN (utils/admin_pin.py).
+    """
     if owner_id is None:
         return
     if current_user is None:
         raise _sign_in_expired()
-    if current_user.id != owner_id and not current_user.is_admin:
+    if current_user.id != owner_id:
         raise HTTPException(status_code=403, detail=f"Not authorized to {what}")
 
 
@@ -461,10 +465,9 @@ async def get_session_images_list(
         # Verify the session belongs to the requesting user (or is a guest session)
         session_obj = db.query(DBSession).filter(DBSession.id == session_id).first()
         if session_obj:
-            # If the session is owned by a user, only that user (or an admin) may view it
+            # If the session is owned by a user, only that user may view it
             _require_owner(session_obj.user_id, current_user, "view this session")
-            # Opening the workspace counts as activity (keeps the session alive),
-            # except when an admin looks at someone else's session.
+            # Opening the workspace counts as activity (keeps the session alive).
             if session_obj.user_id is None or (current_user and current_user.id == session_obj.user_id):
                 touch_session(db, session_id, current_user.id if current_user else None)
 
@@ -611,7 +614,7 @@ async def cleanup_session(
         session = db.query(DBSession).filter(DBSession.id == session_id).first()
 
         # A signed-in user's session (and their images) may only be deleted by
-        # that user or an admin; knowing the session id is not enough.
+        # that user; knowing the session id is not enough.
         if session:
             _require_owner(session.user_id, current_user, "delete this session")
 
