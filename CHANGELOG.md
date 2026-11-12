@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
+## [1.4.0] - 2026-11-12
+
+Custom filters, sharing, background batch jobs, optional object storage, password
+reset and email verification, seven themes, and browser checks in CI.
 
 ### ✨ Workspace
 - **Try a sample**: six public-domain/CC0 photos to start with, no upload needed.
@@ -42,6 +45,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Email goes through `EMAIL_BACKEND=console` (logs the message; the default) or `smtp`
   (`SMTP_*`, `EMAIL_FROM`); links use `FRONTEND_URL`. See
   [deployment/ENVIRONMENT_VARIABLES.md](deployment/ENVIRONMENT_VARIABLES.md).
+
+### ⚙️ Platform
+- **Background batch jobs**: Apply Pipeline queues a job that a worker in the backend runs
+  image by image; results appear as each finishes, a reload picks the run back up, and Stop
+  cancels it. The queue is a database table (no Redis); interrupted jobs are re-queued on start.
+- **Error reporting**: browser errors and render crashes are reported to the backend log, and to
+  Sentry when `SENTRY_DSN` is set (no personal data). A crash shows a "Something went wrong"
+  page with Reload instead of a blank screen.
+- **Uptime check**: a scheduled GitHub Action pings `/api/health` and opens/closes an `uptime`
+  issue (set the `PRODUCTION_URL` repository variable).
+- **CI runs the browser checks**: the frontend production build plus every `scripts/e2e`
+  script and the Lighthouse/axe audit, on a fresh stack, for each push.
 
 ### 🎨 Themes and brand
 - **Appearance picker** in the header (palette icon): seven themes, each in light and dark
