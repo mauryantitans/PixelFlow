@@ -75,3 +75,6 @@ botocore==1.35.99
 s3transfer==0.10.4
 jmespath==1.1.0
 python-dateutil==2.9.0.post0
+
+# Optional error tracking (active only when SENTRY_DSN is set)
+sentry-sdk[fastapi]==2.18.0

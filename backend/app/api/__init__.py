@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Response
 
 from ..core.config import settings
-from .routes import admin, auth, images_db, jobs, oauth, pipelines, processing_db
+from .routes import admin, auth, client_errors, images_db, jobs, oauth, pipelines, processing_db
 
 api_router = APIRouter()
 
@@ -30,6 +30,8 @@ api_router.include_router(
     prefix="/images",
     tags=["images"]
 )
+api_router.include_router(client_errors.router, tags=["monitoring"])
+
 api_router.include_router(
     jobs.router,
     prefix="/processing/jobs",

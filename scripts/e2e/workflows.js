@@ -150,5 +150,5 @@ const check = (name, ok, detail) => {
     check('script error', false, e.message);
   }
   await browser.close();
-  console.log(`\n${results.filter(Boolean).length}/${results.length} passed`);
+  console.log(`\n${results.filter(Boolean).length}/${results.length} passed`); process.exitCode = results.every(Boolean) && results.length ? 0 : 1;
 })();

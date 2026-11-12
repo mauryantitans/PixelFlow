@@ -1,0 +1,65 @@
+name: Uptime
+
+# Pings the live site's health endpoint every 30 minutes. When it's down, an
+# issue labelled "uptime" is opened (or commented on); when it's back, the issue
+# is closed. Free on public repositories.
+#
+# Setup: Settings → Secrets and variables → Actions → Variables →
+#   PRODUCTION_URL = https://your-app.vercel.app
+# Until it's set, the check is skipped.
+#
+# Render's free instance sleeps after ~15 minutes, so the first request can take
+# up to a minute; the check waits for that. (A */14 schedule would also keep it
+# awake, at the cost of the free monthly instance hours.)
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    if: ${{ vars.PRODUCTION_URL != '' }}
+    steps:
+      - name: Check /api/health
+        id: check
+        run: |
+          url="${{ vars.PRODUCTION_URL }}/api/health"
+          for attempt in 1 2 3; do
+            code=$(curl -s -o /tmp/body -w '%{http_code}' --max-time 90 "$url" || echo 000)
+            if [ "$code" = "200" ] && grep -q '"healthy"' /tmp/body; then
+              echo "up=true" >> "$GITHUB_OUTPUT"; echo "OK ($code) on attempt $attempt"; exit 0
+            fi
+            echo "Attempt $attempt: HTTP $code"; sleep 20
+          done
+          echo "up=false" >> "$GITHUB_OUTPUT"
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+
+      - name: Open or update the outage issue
+        if: steps.check.outputs.up == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh label create uptime --color B60205 --description "Production health check" 2>/dev/null || true
+          open=$(gh issue list --label uptime --state open --json number --jq '.[0].number')
+          msg="Health check failed at $(date -u '+%Y-%m-%d %H:%M UTC'): ${{ vars.PRODUCTION_URL }}/api/health returned HTTP ${{ steps.check.outputs.code }} three times."
+          if [ -n "$open" ]; then gh issue comment "$open" --body "$msg"
+          else gh issue create --label uptime --title "Production is down" --body "$msg
+
+          Check the Render dashboard and logs. A free Render database is deleted 30 days after creation; see deployment/DEPLOYMENT_GUIDE.md."; fi
+          exit 1
+
+      - name: Close the outage issue
+        if: steps.check.outputs.up == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          for n in $(gh issue list --label uptime --state open --json number --jq '.[].number'); do
+            gh issue close "$n" --comment "Back up at $(date -u '+%Y-%m-%d %H:%M UTC')."
+          done

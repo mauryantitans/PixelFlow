@@ -26,8 +26,12 @@ const results = []; const check = (n, ok, d) => { results.push(ok); console.log(
   check('Choice is saved', await p.evaluate(() => localStorage.getItem('pixelflow_ui_theme')) === 'spectrum');
   for (const mode of ['light', 'dark']) {
     if (mode === 'dark') { await p.evaluate(() => document.querySelector('input[name="pf-ui-mode"][value="dark"]').click()); await sleep(400); }
+    // Let colour transitions finish: axe measuring a half-faded colour is a false failure.
+    await p.waitForFunction(() => document.getAnimations().every((an) => an.playState !== 'running'), { timeout: 5000 }).catch(() => {});
+    await sleep(100);
     const axe = await new AxePuppeteer(p).include('[role="dialog"]').withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
-    check(`axe: open picker, ${mode}`, axe.violations.length === 0, axe.violations.map((v) => v.id + ':' + v.nodes.length).join(', ') || 'no violations');
+    check(`axe: open picker, ${mode}`, axe.violations.length === 0,
+      axe.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ') + ' ' + (n.any[0]?.message || '')).join(' | ')}`).join('; ') || 'no violations');
   }
   check('Dark mode applied from the picker', await p.evaluate(() => document.documentElement.classList.contains('dark')));
   await p.keyboard.press('Escape'); await sleep(200);
@@ -43,5 +47,5 @@ const results = []; const check = (n, ok, d) => { results.push(ok); console.log(
   check('320px: panel fits, no horizontal scroll', box.l >= 0 && box.r <= box.w && box.ov <= 0, JSON.stringify(box));
   await p.evaluate(() => localStorage.removeItem('pixelflow_ui_theme'));
   await b.close();
-  console.log(`\n${results.filter(Boolean).length}/${results.length} passed`);
+  console.log(`\n${results.filter(Boolean).length}/${results.length} passed`); process.exitCode = results.every(Boolean) && results.length ? 0 : 1;
 })();

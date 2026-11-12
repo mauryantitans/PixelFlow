@@ -161,6 +161,8 @@ async function setTheme(page, theme) {
     document.documentElement.classList.toggle('dark', theme === 'dark');
   }, theme);
   await sleep(150);
+  // Let colour transitions finish so axe never measures a half-faded colour.
+  await page.waitForFunction(() => document.getAnimations().every((an) => an.playState !== 'running'), { timeout: 5000 }).catch(() => {});
 }
 
 async function currentTheme(page) {

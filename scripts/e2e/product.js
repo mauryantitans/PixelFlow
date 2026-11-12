@@ -28,6 +28,7 @@ async function signIn(p) {
 }
 const gallery = (p) => p.evaluate(() => +((document.body.innerText.match(/Gallery \((\d+)\)/) || [])[1] || 0));
 const axeOk = async (p, name, include) => {
+  await p.waitForFunction(() => document.getAnimations().every((an) => an.playState !== 'running'), { timeout: 5000 }).catch(() => {});
   const a = await new AxePuppeteer(p).include(include).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
   check(`axe: ${name}`, a.violations.length === 0, a.violations.map((v) => v.id + ':' + v.nodes.length).join(', ') || 'no violations');
 };
@@ -160,5 +161,5 @@ const axeOk = async (p, name, include) => {
     check('script error', false, e.message);
   }
   await b.close();
-  console.log(`\n${results.filter(Boolean).length}/${results.length} passed`);
+  console.log(`\n${results.filter(Boolean).length}/${results.length} passed`); process.exitCode = results.every(Boolean) && results.length ? 0 : 1;
 })();

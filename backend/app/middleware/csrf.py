@@ -30,6 +30,7 @@ UNSAFE_METHODS = {"POST", "PUT", "DELETE", "PATCH"}
 #  * forgot-password/reset-password/verify-email — reached from an emailed link,
 #    possibly in a browser with no session; they act only through the address or
 #    the signed single-use token in the body, never through the auth cookie.
+#  * client-errors — the browser's error reporter; it only adds a log line.
 #  * heartbeat/cleanup-session — keyed by a client-supplied session_id (not the
 #    authenticated identity) and reached via fetch/sendBeacon which can't set
 #    custom headers; forging them can't act on the user's account.
@@ -43,6 +44,7 @@ EXEMPT_PATHS = {
     "/api/auth/verify-email",
     "/api/images/heartbeat",
     "/api/images/cleanup-session",
+    "/api/client-errors",
 }
 
 

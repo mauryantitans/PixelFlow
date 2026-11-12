@@ -88,6 +88,7 @@ const check = (n, ok, d) => { results.push(ok); console.log(`${ok ? 'PASS' : 'FA
     for (const mode of ['light', 'dark']) {
       await p.evaluate((m) => document.documentElement.classList.toggle('dark', m === 'dark'), mode);
       await sleep(200);
+      await p.waitForFunction(() => document.getAnimations().every((an) => an.playState !== 'running'), { timeout: 5000 }).catch(() => {});
       const axe = await new AxePuppeteer(p).include('#main-content').withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
       check(`axe: workspace with the kernel editor (${mode})`, axe.violations.length === 0, axe.violations.map((v) => v.id + ':' + v.nodes.length).join(', ') || 'no violations');
     }
@@ -130,5 +131,5 @@ const check = (n, ok, d) => { results.push(ok); console.log(`${ok ? 'PASS' : 'FA
     check('script error', false, e.message);
   }
   await b.close();
-  console.log(`\n${results.filter(Boolean).length}/${results.length} passed`);
+  console.log(`\n${results.filter(Boolean).length}/${results.length} passed`); process.exitCode = results.every(Boolean) && results.length ? 0 : 1;
 })();

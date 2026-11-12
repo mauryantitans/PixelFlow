@@ -53,5 +53,5 @@ const check = (n, ok, d) => { results.push(ok); console.log(`${ok ? 'PASS' : 'FA
     check('script error', false, e.message);
   }
   await b.close();
-  console.log(`\n${results.filter(Boolean).length}/${results.length} passed`);
+  console.log(`\n${results.filter(Boolean).length}/${results.length} passed`); process.exitCode = results.every(Boolean) && results.length ? 0 : 1;
 })();

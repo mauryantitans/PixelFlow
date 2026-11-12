@@ -45,4 +45,4 @@ try{
  check('A signing back in gets A\'s session back', (await sid())===SA);
  check('…with A\'s image', await galleryCount()===1);
 }catch(e){check('script error',false,e.message)}
-await b.close();console.log(`\n${results.filter(Boolean).length}/${results.length} passed`);})();
+await b.close();console.log(`\n${results.filter(Boolean).length}/${results.length} passed`); process.exitCode = results.every(Boolean) && results.length ? 0 : 1;})();

@@ -12,6 +12,11 @@ from .core.security_config import CORSSettings
 from .api import api_router
 from .utils.cleanup_scheduler import start_cleanup_scheduler, stop_cleanup_scheduler
 from .utils.job_worker import start_job_worker, stop_job_worker
+from .utils.monitoring import init_monitoring
+
+# Optional Sentry (only when SENTRY_DSN is set); before the app is built so the
+# FastAPI integration instruments it.
+init_monitoring()
 from .middleware import RateLimitMiddleware, SecurityHeadersMiddleware, CSRFMiddleware
 
 # Configure logging
