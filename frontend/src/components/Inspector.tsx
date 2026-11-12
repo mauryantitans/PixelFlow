@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import * as LucideReact from 'lucide-react';
 import { ProcessedResult } from '../types';
-import { downloadImage, downloadAllIntermediates } from '../utils/download';
+import { downloadImage, downloadAllIntermediates, resultFilename } from '../utils/download';
 import { ImageAnalytics } from './ImageAnalytics';
 import PreviewCanvas from './PreviewCanvas';
 import CompareSlider from './CompareSlider';
@@ -136,9 +136,11 @@ const Inspector: React.FC<InspectorProps> = ({
 
   const handleDownload = () => {
     const imageUrl = getCurrentImageUrl();
-    const filename = currentStepIndex === -1 
-      ? `pixelflow_result_${result.id}.jpg`
-      : `pixelflow_result_${result.id}_step_${currentStepIndex + 1}.jpg`;
+    // The extension follows the actual data (results are PNG unless the source was JPEG).
+    const ext = resultFilename(imageUrl, 'x', 0).split('.').pop();
+    const filename = currentStepIndex === -1
+      ? `pixelflow_result_${result.id}.${ext}`
+      : `pixelflow_result_${result.id}_step_${currentStepIndex + 1}.${ext}`;
     
     downloadImage(imageUrl, filename);
   };

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import * as LucideReact from 'lucide-react';
 import {
   useStatus,
@@ -22,6 +22,7 @@ import { useDocumentTitle } from './hooks/useDocumentTitle';
 import { useDialog } from './hooks/useDialog';
 import { announce } from './utils/announce';
 import MyFiltersGroup from './components/MyFiltersGroup';
+import SampleImagesMenu from './components/SampleImagesMenu';
 import { CUSTOM_FILTER_OP, stepDisplayName } from './utils/pipelineSteps';
 
 const App: React.FC = () => {
@@ -131,7 +132,21 @@ const App: React.FC = () => {
   });
   
   // State for live processing toggle (separate from UI state for better control)
-  const [liveProcessingEnabled, setLiveProcessingEnabled] = useState(false);
+  // Live mode survives a reload in this tab (with the restored selection).
+  const [liveProcessingEnabled, setLiveProcessingEnabled] = useState<boolean>(() => {
+    try {
+      return sessionStorage.getItem('pixelflow_live') === '1';
+    } catch {
+      return false;
+    }
+  });
+  useEffect(() => {
+    try {
+      sessionStorage.setItem('pixelflow_live', liveProcessingEnabled ? '1' : '0');
+    } catch {
+      /* not remembered */
+    }
+  }, [liveProcessingEnabled]);
   
   // Filter operations based on search - improved logic
   const getFilteredOperations = (): Record<string, Record<string, string[]>> => {
@@ -150,13 +165,12 @@ const App: React.FC = () => {
   };
 
   // Enhanced file upload with feedback and quota handling
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (!files?.length) return;
-    
+  // One path for the file picker, drag-and-drop and sample images.
+  const uploadFiles = async (files: File[]) => {
+    if (!files.length) return;
     try {
       updateStatus('Uploading images...', 'processing');
-      const newImages = await addImages(Array.from(files));
+      const newImages = await addImages(files);
       updateStatus(`Successfully uploaded ${newImages.length} image(s)`, 'success');
     } catch (error: any) {
       // Check if it's a quota error
@@ -181,8 +195,42 @@ const App: React.FC = () => {
         updateStatus(`Upload failed: ${error.message}`, 'error');
       }
     }
-    
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files ?? []);
     event.target.value = '';
+    await uploadFiles(files);
+  };
+
+  // Drag-and-drop upload anywhere on the workspace (the Upload button stays
+  // the keyboard/screen-reader route). The counter survives child-element
+  // dragenter/dragleave pairs.
+  const [dragging, setDragging] = useState(false);
+  const dragDepth = useRef(0);
+  const hasFiles = (e: React.DragEvent) => Array.from(e.dataTransfer?.types ?? []).includes('Files');
+  const dropHandlers = {
+    onDragEnter: (e: React.DragEvent) => {
+      if (!hasFiles(e)) return;
+      e.preventDefault();
+      dragDepth.current += 1;
+      setDragging(true);
+    },
+    onDragOver: (e: React.DragEvent) => {
+      if (hasFiles(e)) e.preventDefault();
+    },
+    onDragLeave: (e: React.DragEvent) => {
+      if (!hasFiles(e)) return;
+      dragDepth.current = Math.max(0, dragDepth.current - 1);
+      if (dragDepth.current === 0) setDragging(false);
+    },
+    onDrop: (e: React.DragEvent) => {
+      if (!hasFiles(e)) return;
+      e.preventDefault();
+      dragDepth.current = 0;
+      setDragging(false);
+      uploadFiles(Array.from(e.dataTransfer.files));
+    },
   };
   
   // Enhanced live toggle with feedback - FIXED
@@ -394,13 +442,15 @@ const App: React.FC = () => {
 
   // Update live processing toggle state when selection changes - FIXED
   useEffect(() => {
-    if (selectedCount !== 1 && liveProcessingEnabled) {
+    // images.length guard: right after a reload the gallery is still loading,
+    // and the restored Live mode must not be switched off before it arrives.
+    if (images.length > 0 && selectedCount !== 1 && liveProcessingEnabled) {
       setLiveProcessingEnabled(false);
       setLiveProcessing(false);
       setCurrentView('grid');
       clearLiveResults();
     }
-  }, [selectedCount, liveProcessingEnabled, setLiveProcessing, setCurrentView, clearLiveResults]);
+  }, [images.length, selectedCount, liveProcessingEnabled, setLiveProcessing, setCurrentView, clearLiveResults]);
 
   useEffect(() => {
     const handleDetailsToggle = () => {
@@ -526,7 +576,14 @@ const App: React.FC = () => {
   }, [lightboxState.isOpen]);
 
   return (
-    <main id="main-content" tabIndex={-1} className="flex flex-col md:flex-row bg-slate-50 dark:bg-zinc-950 min-h-screen focus:outline-none">
+    <main id="main-content" tabIndex={-1} {...dropHandlers} className="relative flex flex-col md:flex-row bg-slate-50 dark:bg-zinc-950 min-h-screen focus:outline-none">
+      {dragging && (
+        <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-[90] flex items-center justify-center bg-blue-600/10 border-4 border-dashed border-blue-600 dark:border-blue-400">
+          <span className="rounded-lg bg-white dark:bg-zinc-900 px-5 py-3 text-lg font-semibold text-slate-900 dark:text-slate-50 shadow-lg">
+            Drop images to upload
+          </span>
+        </div>
+      )}
       {/* Single column below md (operations, toolbar, pipeline, results stacked); side by side from md up (WCAG 1.4.10 Reflow). */}
       <h1 className="sr-only">PixelFlow image processing workspace</h1>
       {/* Operations Sidebar */}
@@ -706,6 +763,7 @@ const App: React.FC = () => {
             >
               Upload Image(s)
             </label>
+            <SampleImagesMenu onPick={(file) => uploadFiles([file])} />
             {images.length > 0 && (
               <button
                 onClick={galleryModal.openModal}
@@ -901,6 +959,7 @@ const App: React.FC = () => {
               <ResultsGridComponent
                 results={batchResults}
                 loading={batchLoading}
+                imageNames={Object.fromEntries(images.map((img) => [img.id, img.filename]))}
                 onResultSelect={handleResultSelect}
                 onReset={() => {
                   clearBatchResults();

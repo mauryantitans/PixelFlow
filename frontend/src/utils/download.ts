@@ -1,6 +1,15 @@
 import JSZip from 'jszip';
 import { ProcessedResult } from '../types';
 
+const EXT: Record<string, string> = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp', 'image/bmp': 'bmp', 'image/tiff': 'tif' };
+
+/** "coffee.jpg" + a PNG result -> "coffee-pixelflow.png" (the extension matches the data). */
+export const resultFilename = (dataUrl: string, originalName: string | undefined, index: number): string => {
+  const mime = /^data:([^;,]+)/.exec(dataUrl)?.[1] ?? 'image/png';
+  const base = (originalName ?? '').replace(/\.[^.]+$/, '').replace(/[^\w.-]+/g, '_') || `image-${index + 1}`;
+  return `${base}-pixelflow.${EXT[mime] ?? 'png'}`;
+};
+
 /**
  * Download a single image from base64 data URL
  */
@@ -36,7 +45,9 @@ const dataURLtoBlob = (dataUrl: string): Blob => {
  */
 export const downloadAllAsZip = async (
   results: ProcessedResult[],
-  zipFilename: string = 'pixelflow-results.zip'
+  zipFilename: string = 'pixelflow-results.zip',
+  /** image id -> original file name, so files are named after their source */
+  names: Record<string, string> = {}
 ) => {
   if (results.length === 0) {
     alert('No results to download');
@@ -52,10 +63,14 @@ export const downloadAllAsZip = async (
     }
 
     // Add each processed image to the ZIP
+    const used = new Set<string>();
     results.forEach((result, index) => {
       if (result.processedUrl) {
         const blob = dataURLtoBlob(result.processedUrl);
-        const filename = `image-${index + 1}.jpg`;
+        let filename = resultFilename(result.processedUrl, names[result.id], index);
+        // Two results from images with the same name: keep both.
+        for (let n = 2; used.has(filename); n++) filename = filename.replace(/(-\d+)?(\.[^.]+)$/, `-${n}$2`);
+        used.add(filename);
         folder.file(filename, blob);
       }
     });

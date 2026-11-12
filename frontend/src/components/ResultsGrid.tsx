@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as LucideReact from 'lucide-react';
 import { ProcessedResult } from '../types';
 import { MasonryUtils } from '../utils/index';
-import { downloadAllAsZip, downloadImage } from '../utils/download';
+import { downloadAllAsZip, downloadImage, resultFilename } from '../utils/download';
 import { ImageAnalytics } from './ImageAnalytics';
 
 interface ResultsGridProps {
@@ -10,13 +10,16 @@ interface ResultsGridProps {
   loading: boolean;
   onResultSelect: (result: ProcessedResult) => void;
   onReset: () => void;
+  /** image id -> original file name, used to name downloads */
+  imageNames?: Record<string, string>;
 }
 
 const ResultsGridComponent: React.FC<ResultsGridProps> = ({
   results,
   loading,
   onResultSelect,
-  onReset
+  onReset,
+  imageNames = {}
 }) => {
   const gridRef = useRef<HTMLDivElement>(null);
   const [downloading, setDownloading] = useState(false);
@@ -98,7 +101,7 @@ const ResultsGridComponent: React.FC<ResultsGridProps> = ({
   const handleDownloadAll = async () => {
     setDownloading(true);
     try {
-      await downloadAllAsZip(results, 'pixelflow-results.zip');
+      await downloadAllAsZip(results, 'pixelflow-results.zip', imageNames);
     } catch (error) {
       console.error('Download failed:', error);
     } finally {
@@ -108,7 +111,7 @@ const ResultsGridComponent: React.FC<ResultsGridProps> = ({
 
   const handleDownloadSingle = (result: ProcessedResult, index: number, e: React.MouseEvent) => {
     e.stopPropagation();
-    downloadImage(result.processedUrl, `processed-${index + 1}.jpg`);
+    downloadImage(result.processedUrl, resultFilename(result.processedUrl, imageNames[result.id], index));
   };
 
   const handleShowAnalytics = (result: ProcessedResult, index: number, e: React.MouseEvent) => {
@@ -139,6 +142,7 @@ const ResultsGridComponent: React.FC<ResultsGridProps> = ({
           <LucideReact.Image aria-hidden="true" className="w-16 h-16 mx-auto mb-4" />
           <p className="font-semibold text-lg mb-2">Processed results will appear here</p>
           <p className="text-sm">Apply a pipeline to your selected images</p>
+          <p className="text-sm mt-1">No images yet? Use Upload Image(s), drop files anywhere on this page, or choose Try a sample.</p>
         </div>
       </div>
     );

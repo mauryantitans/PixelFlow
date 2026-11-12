@@ -179,3 +179,6 @@ DATABASE_ORGANIZATION_COMPLETE.md
 # Production config files
 render.yaml.prod
 docker-compose.prod.yml
+
+# Agent worktrees
+.claude/worktrees/

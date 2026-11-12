@@ -113,15 +113,28 @@ export function useImages() {
   const [loading, setLoading] = useState(false);
   const { sessionId } = useSession();
 
+  // Which images were selected survives a reload (per tab, like the pipeline).
+  const selectionKey = `pixelflow_selected:${sessionId}`;
+  const selectionRestored = useRef(false);
+
   // Load the session's images on mount and whenever the session changes
   // (e.g. after signing in/out), discarding the previous session's images.
   useEffect(() => {
     let cancelled = false;
+    selectionRestored.current = false;
     setImages([]);
     ApiService.getSessionImages(sessionId)
       .then(async (savedImages) => {
         if (cancelled) return;
-        setImages(savedImages);
+        let saved: string[] | null = null;
+        try {
+          const raw = sessionStorage.getItem(selectionKey);
+          saved = raw ? JSON.parse(raw) : null;
+        } catch {
+          saved = null;
+        }
+        setImages(Array.isArray(saved) ? savedImages.map((img) => ({ ...img, selected: saved!.includes(img.id) })) : savedImages);
+        selectionRestored.current = true;
         // Then load the full-size images one at a time (thumbnails are used
         // until each arrives).
         for (const img of savedImages) {
@@ -149,7 +162,7 @@ export function useImages() {
     return () => {
       cancelled = true;
     };
-  }, [sessionId]);
+  }, [sessionId, selectionKey]);
   
   const addImages = useCallback(async (files: File[]) => {
     // Check the files before sending anything (limits match the server).
@@ -285,6 +298,15 @@ export function useImages() {
     setImages(prev => prev.map(img => ({ ...img, selected: false })));
   }, []);
   
+  useEffect(() => {
+    if (!selectionRestored.current) return;
+    try {
+      sessionStorage.setItem(selectionKey, JSON.stringify(images.filter((img) => img.selected).map((img) => img.id)));
+    } catch {
+      /* storage blocked: selection just isn't remembered */
+    }
+  }, [images, selectionKey]);
+
   const selectedImages = useMemo(() => images.filter(img => img.selected), [images]);
   const selectedCount = selectedImages.length;
   
