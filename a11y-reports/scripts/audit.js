@@ -341,6 +341,11 @@ async function audit(page, name, { modal = false } = {}) {
   } catch (e) {
     row.lighthouseError = String(e.message || e);
   }
+  // Lighthouse clears its screen emulation when it's done. Newer Chrome (157+)
+  // then falls back to the 800x600 window, so restore the audit viewport before
+  // the remaining checks.
+  await page.setViewport({ width: VW, height: VH });
+  await sleep(200);
 
   // axe-core in both themes.
   row.axe = {};
