@@ -118,5 +118,11 @@ Optional Google OAuth (`authlib`) gated on `GOOGLE_CLIENT_ID`/`SECRET`. First ad
 ## Deployment
 Frontend → Vercel, backend + PostgreSQL → Render (optionally Cloudflare R2 / S3 for image bytes). Config in `deployment/` (`render.yaml`, `vercel.json`) and root `render.yaml`. Dockerfiles exist in `backend/` and `frontend/` plus a root `docker-compose.yml`; the backend entrypoint just starts uvicorn (migrations run in the app). Do **not** put real credentials in docs — provision the first admin via `ADMIN_EMAIL`/`ADMIN_PASSWORD`.
 
+## Commit authorship (maintainer's rule)
+- **Bug fixes** (`fix:` / `fix(scope):` commits): author *and* committer are the maintainer, with no Claude trailer lines:
+  `git -c user.name="Mourya Arnepalli" -c user.email="97488932+Mauryantitans@users.noreply.github.com" commit -m "fix(...): ..."`
+- **Everything else** (features, docs, tests, chores, refactors): commit with the session's default identity (Claude) as usual.
+- Keep a fix in its own commit so the split stays clean; don't mix a fix into a feature commit.
+
 ## Project docs
 `CONTRIBUTING.md` (workflow, conventions, PR checklist), `SECURITY.md` (reporting + security model), `CODE_OF_CONDUCT.md`, `CURRENT_LIMITATIONS.md` (known gaps; keep it honest when shipping features), `guides/` (user guide, API reference, adding operations, admin panel, database, OAuth, development), `deployment/` (deploy guide, env reference).
