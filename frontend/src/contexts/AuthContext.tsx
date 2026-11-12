@@ -7,7 +7,7 @@ import { AUTH_EXPIRED_EVENT } from '../services/tokenRefresh';
 
 /** Readable text from a FastAPI error: `detail` may be a string, an object, or a
  *  422 list like [{msg: 'value is not a valid email address'}]. */
-function apiErrorMessage(error: any, fallback: string): string {
+export function apiErrorMessage(error: any, fallback: string): string {
   const detail = error?.response?.data?.detail;
   if (typeof detail === 'string') return detail;
   if (Array.isArray(detail)) {
@@ -15,6 +15,9 @@ function apiErrorMessage(error: any, fallback: string): string {
     if (msgs.length) return msgs.join('. ');
   }
   if (detail && typeof detail === 'object' && typeof detail.message === 'string') return detail.message;
+  // Rate-limit (429) and CSRF (403) responses carry a top-level `message`.
+  const message = error?.response?.data?.message;
+  if (typeof message === 'string') return message;
   return fallback;
 }
 

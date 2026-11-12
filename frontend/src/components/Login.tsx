@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { GoogleSignIn } from './GoogleSignIn';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import BrandMark from './BrandMark';
@@ -97,6 +97,15 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
               placeholder="••••••••"
               disabled={loading}
             />
+            <p className="mt-2 text-right text-sm">
+              <Link
+                to="/forgot-password"
+                state={{ email }}
+                className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+              >
+                Forgot password?
+              </Link>
+            </p>
           </div>
 
           <button

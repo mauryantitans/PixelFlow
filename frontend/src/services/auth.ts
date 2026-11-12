@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {
   User,
+  AuthMessageResponse,
   RegisterRequest,
   SavedPipeline,
   CreatePipelineRequest
@@ -50,6 +51,34 @@ export const authService = {
   // Returns true on success, false if the refresh token is invalid/expired.
   refreshTokens(): Promise<boolean> {
     return refreshTokens();
+  },
+
+  // Password reset: always resolves with the same generic message (the
+  // backend never reveals whether an account exists for the address).
+  async forgotPassword(email: string): Promise<AuthMessageResponse> {
+    const response = await axios.post<AuthMessageResponse>(`${API_BASE_URL}/auth/forgot-password`, { email });
+    return response.data;
+  },
+
+  // Set a new password with the token from the emailed link.
+  async resetPassword(token: string, newPassword: string): Promise<AuthMessageResponse> {
+    const response = await axios.post<AuthMessageResponse>(`${API_BASE_URL}/auth/reset-password`, {
+      token,
+      new_password: newPassword,
+    });
+    return response.data;
+  },
+
+  // Confirm the email address with the token from the emailed link.
+  async verifyEmail(token: string): Promise<AuthMessageResponse> {
+    const response = await axios.post<AuthMessageResponse>(`${API_BASE_URL}/auth/verify-email`, { token });
+    return response.data;
+  },
+
+  // Signed in: email a fresh verification link.
+  async resendVerification(): Promise<AuthMessageResponse> {
+    const response = await axios.post<AuthMessageResponse>(`${API_BASE_URL}/auth/resend-verification`);
+    return response.data;
   },
 
   // Logout: backend clears the cookies and cleans up session data.
