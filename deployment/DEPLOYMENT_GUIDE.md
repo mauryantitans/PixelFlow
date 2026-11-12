@@ -126,6 +126,31 @@ Custom domain (optional): Vercel → Project → Settings → Domains. Then add 
 
 ---
 
+## Object storage (optional)
+
+Images are stored in PostgreSQL by default, which fills the free 1 GB database quickly. To
+keep image bytes in an S3-compatible bucket instead (the database then holds only metadata,
+object keys and small thumbnails), use Cloudflare R2 (free tier: 10 GB, no egress fees), AWS S3
+or MinIO. Variables: [ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md#image-storage-optional).
+
+**Cloudflare R2 in brief**
+1. Cloudflare dashboard → **R2** → **Create bucket** (e.g. `pixelflow-images`). Leave public
+   access off: the API serves images itself, after its ownership checks. (Cloudflare may ask
+   for a payment method before enabling R2, even on the free tier.)
+2. R2 → **Manage API tokens** → **Create API token** with *Object Read & Write*, limited to that
+   bucket. Copy the Access Key ID, the Secret Access Key and the S3 endpoint
+   (`https://<account-id>.r2.cloudflarestorage.com`).
+3. On the Render backend set `STORAGE_BACKEND=s3`, `S3_BUCKET`, `S3_ENDPOINT_URL`,
+   `S3_REGION=auto`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, and redeploy. Incomplete
+   settings stop startup with a message in the log.
+4. Upload an image and check that an object appears under `pixelflow/uploads/` in the bucket.
+
+Images uploaded before the switch stay in the database and keep working. Deletes (by users,
+admins and the cleanup job) also remove the objects; a bucket error is logged and never blocks
+the delete. `pg_dump` backups don't include bucket objects, so back up the bucket separately.
+
+---
+
 ## Free tier limits
 
 **Render**

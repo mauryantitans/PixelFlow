@@ -35,6 +35,26 @@ Environment Variables. They are compiled in at build time, so redeploy after cha
 | `HOST`, `PORT` | `0.0.0.0`, `8000` | Render sets `PORT` itself. |
 | `APP_NAME`, `VERSION` | `PixelFlow`, `1.3.0` | Shown at `/` and in logs. |
 
+### Image storage (optional)
+
+Image bytes are stored in the database by default. With `STORAGE_BACKEND=s3` they go to a
+private S3-compatible bucket instead (AWS S3, Cloudflare R2, MinIO); the database keeps the
+object key, the metadata and the small thumbnail. The API still serves every image itself
+(no public URLs). Setup: [Object storage](DEPLOYMENT_GUIDE.md#object-storage-optional).
+
+| Variable | Default | Notes |
+|---|---|---|
+| `STORAGE_BACKEND` | `database` | `database` or `s3`. Any other value, or `s3` without `S3_BUCKET`, **stops startup** with a message naming the problem. |
+| `S3_BUCKET` | — | Required with `s3`. Keep the bucket private. |
+| `S3_ENDPOINT_URL` | — (AWS) | For R2: `https://<account-id>.r2.cloudflarestorage.com`. For MinIO: e.g. `http://localhost:9000`. |
+| `S3_REGION` | — | AWS region (e.g. `eu-central-1`); `auto` for R2. |
+| `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY` | — | Set both, or neither to use the AWS default credential chain (IAM role, `AWS_*` variables). |
+| `S3_PREFIX` | `pixelflow/` | Prefix of every object key (`<prefix>uploads/<id>.jpg`). Rows store the full key, so changing it later doesn't break existing images. |
+
+Switching to `s3` is safe at any time: existing images stay in the database and remain readable;
+new uploads go to the bucket. Switching back to `database` makes bucket images unreadable (the
+API returns 503 with an explanation) until `s3` is configured again.
+
 Token lifetimes (access 30 min, refresh 7 days), rate limits and upload limits are constants in
 `backend/app/core/security_config.py`, not environment variables. Quotas, retention periods
 and session lifetimes are edited in the admin panel (stored in the `system_settings` table).
