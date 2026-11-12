@@ -13,6 +13,7 @@ import { ApiService } from '../services/api';
 import { hasSignedInSession } from '../services/tokenRefresh';
 import { SessionUtils } from '../utils';
 import { useAppearance } from '../theme/appearance';
+import { toApiSteps } from '../utils/pipelineSteps';
 
 /**
  * Session management hook - CLEANUP DISABLED for testing
@@ -392,7 +393,7 @@ export function usePipeline() {
   const generatePipelineHash = useCallback((imageIds: string[]) => {
     return JSON.stringify({
       imageIds: imageIds.sort(),
-      pipeline: pipeline.map(step => ({ name: step.name, params: step.params }))
+      pipeline: toApiSteps(pipeline)
     });
   }, [pipeline]);
   
@@ -468,7 +469,7 @@ export function useLiveProcessing() {
     try {
       const response = await ApiService.processLive({
         image_id: imageId,
-        pipeline: pipeline.map(step => ({ name: step.name, params: step.params })),
+        pipeline: toApiSteps(pipeline),
         session_id: sessionId
       }, abortControllerRef.current.signal);
       
@@ -612,7 +613,7 @@ export function useBatchProcessing() {
         try {
           const response = await ApiService.processLive({
             image_id: imageId,
-            pipeline: pipeline.map(step => ({ name: step.name, params: step.params })),
+            pipeline: toApiSteps(pipeline),
             session_id: sessionId
           }, controller.signal);
           if (!isCurrent()) break;

@@ -4,6 +4,7 @@ import { useDialog } from '../hooks/useDialog';
 import { handleTabListKeyDown } from '../utils/tabs';
 import { pipelineService } from '../services/auth';
 import { SavedPipeline } from '../types';
+import { FILTERS_CHANGED_EVENT } from '../hooks/useMyFilters';
 
 interface LoadPipelineModalProps {
   isOpen: boolean;
@@ -77,6 +78,7 @@ export const LoadPipelineModal: React.FC<LoadPipelineModalProps> = ({
       await pipelineService.deletePipeline(pipelineId);
       showNotification('Pipeline deleted');
       loadPipelines(); // Reload list
+      window.dispatchEvent(new Event(FILTERS_CHANGED_EVENT)); // it may have been a filter
     } catch (err: any) {
       console.error('Failed to delete pipeline:', err);
       setError(err.response?.data?.detail || 'Failed to delete pipeline');

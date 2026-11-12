@@ -3,6 +3,7 @@ import * as LucideReact from 'lucide-react';
 import { ParamSpecDTO } from '../../types';
 import { usePicker } from '../../contexts/PickerContext';
 import { announce } from '../../utils/announce';
+import MatrixEditor from './MatrixEditor';
 
 interface ParamControlProps {
   spec: ParamSpecDTO;
@@ -175,6 +176,49 @@ const ParamControl: React.FC<ParamControlProps> = ({ spec, value, stepId, contro
           )}
         </div>
       );
+
+    case 'text':
+      return (
+        <input
+          id={controlId}
+          type="text"
+          value={String(value ?? spec.default ?? '')}
+          maxLength={spec.max_length ?? 80}
+          onChange={(e) => onChange(e.target.value)}
+          className="input-field"
+        />
+      );
+
+    case 'matrix':
+      return (
+        <MatrixEditor
+          spec={spec}
+          value={value}
+          stepLabel={stepLabel}
+          labelledBy={controlId ? `${controlId}-label` : undefined}
+          onChange={onChange}
+        />
+      );
+
+    case 'steps': {
+      // The body of a saved filter: shown, not edited here (edit the filter's
+      // own pipeline and save it again).
+      const steps: Array<{ name: string; enabled?: boolean }> = Array.isArray(value) ? value : [];
+      return (
+        <ol aria-labelledby={controlId ? `${controlId}-label` : undefined} className="flex flex-wrap items-center gap-1 text-xs text-gray-700 dark:text-gray-300">
+          {steps.length === 0 && <li>No steps</li>}
+          {steps.map((s, i) => (
+            <li key={i} className="flex items-center gap-1">
+              {i > 0 && <LucideReact.ChevronRight aria-hidden="true" className="w-3 h-3 text-gray-500" />}
+              <span className={`rounded bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-600 px-1.5 py-0.5 ${s.enabled === false ? 'line-through opacity-70' : ''}`}>
+                {s.name}
+                {s.enabled === false && <span className="sr-only"> (off)</span>}
+              </span>
+            </li>
+          ))}
+        </ol>
+      );
+    }
 
     default:
       return null;

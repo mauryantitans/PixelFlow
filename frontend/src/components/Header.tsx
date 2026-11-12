@@ -92,6 +92,7 @@ export const Header: React.FC = () => {
       id: `step_${Date.now()}_${index}`,
       name: step.name,
       params: step.params || {},
+      enabled: step.enabled !== false,
     }));
 
     setPipeline(steps);

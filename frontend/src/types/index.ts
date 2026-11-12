@@ -19,7 +19,9 @@ export interface ImageData {
 export interface PipelineStep {
   id: string;
   name: string;
-  params: Record<string, number | string | boolean>;
+  params: Record<string, any>;
+  /** false = switched off: the step is kept but passes the image through. */
+  enabled?: boolean;
   lastProcessingTime?: number; // Add individual step timing
 }
 
@@ -36,7 +38,10 @@ export type ParamType =
   | 'color'
   | 'point'
   | 'points'
-  | 'rect';
+  | 'rect'
+  | 'matrix'
+  | 'text'
+  | 'steps';
 
 export interface ParamSpecDTO {
   name: string;
@@ -55,6 +60,15 @@ export interface ParamSpecDTO {
   space?: 'normalized' | 'pixel';
   min_points?: number;
   max_points?: number | null;
+  // matrix (custom kernels)
+  min_size?: number;
+  max_size?: number;
+  value_min?: number;
+  value_max?: number;
+  presets?: Array<{ label: string; value: number[][] }>;
+  // text / steps
+  max_length?: number;
+  max_steps?: number;
 }
 
 export interface OperationSpecDTO {
@@ -64,6 +78,8 @@ export interface OperationSpecDTO {
   subcategory: string | null;
   description: string;
   interactive: boolean;
+  /** Executable but not listed in the palette (e.g. Custom Filter). */
+  hidden?: boolean;
   params: ParamSpecDTO[];
 }
 
@@ -345,6 +361,7 @@ export interface SavedPipeline {
   pipeline_data: Array<{
     name: string;
     params: Record<string, any>;
+    enabled?: boolean;
   }>;
   is_public: boolean;
   is_template: boolean;
@@ -362,6 +379,7 @@ export interface CreatePipelineRequest {
   pipeline_data: Array<{
     name: string;
     params: Record<string, any>;
+    enabled?: boolean;
   }>;
   is_public?: boolean;
   category?: string;

@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 🧪 Custom filters
+- **Custom Kernel** (Custom → Kernels): type your own 3×3 to 9×9 convolution, or start from a
+  preset (blur, Gaussian, sharpen, edge detect, emboss, Sobel, motion blur). Normalize, absolute
+  value and offset options; out-of-range or non-numeric cells are reported per cell.
+- **Your own filters from existing steps**: tick *Save as a reusable filter* when saving a
+  pipeline; it appears under Custom → **My filters** and adds as one step that runs the saved
+  steps (a snapshot; filters can't contain filters).
+- **Switch a step off** without removing it (power button on each step); it's kept in saved
+  pipelines and skipped when processing.
+- **Database migrations** (Alembic) now run automatically at startup; existing databases are
+  adopted by a baseline revision.
+
 ### 🎨 Themes and brand
 - **Appearance picker** in the header (palette icon): seven themes, each in light and dark
   mode, applied instantly and remembered in the browser.

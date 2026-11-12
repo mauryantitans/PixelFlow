@@ -7,6 +7,8 @@ interface PipelineContextType {
   removeStep: (index: number) => void;
   updateStepParam: (stepId: string, paramName: string, value: any) => void;
   moveStep: (fromIndex: number, toIndex: number) => void;
+  /** Switch a step off (kept, but skipped) or back on. */
+  toggleStep: (stepId: string) => void;
   resetPipeline: () => void;
   setPipeline: (pipeline: PipelineStep[]) => void;
   undo: () => void;
@@ -118,6 +120,14 @@ export const PipelineProvider: React.FC<PipelineProviderProps> = ({ children }) 
     saveToHistory(newPipeline);
   }, [pipeline, saveToHistory]);
   
+  const toggleStep = useCallback((stepId: string) => {
+    const newPipeline = pipeline.map((step) =>
+      step.id === stepId ? { ...step, enabled: step.enabled === false } : step
+    );
+    setPipelineState(newPipeline);
+    saveToHistory(newPipeline);
+  }, [pipeline, saveToHistory]);
+
   const resetPipeline = useCallback(() => {
     const newPipeline: PipelineStep[] = [];
     setPipelineState(newPipeline);
@@ -160,6 +170,7 @@ export const PipelineProvider: React.FC<PipelineProviderProps> = ({ children }) 
     removeStep,
     updateStepParam,
     moveStep,
+    toggleStep,
     resetPipeline,
     setPipeline,
     undo,

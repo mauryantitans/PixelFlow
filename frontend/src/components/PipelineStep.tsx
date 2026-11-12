@@ -3,12 +3,15 @@ import * as LucideReact from 'lucide-react';
 import { PipelineStep, StepErrorDTO } from '../types';
 import { useOperationSchema } from '../contexts/OperationSchemaContext';
 import ParamControl from './params/ParamControl';
+import { stepDisplayName } from '../utils/pipelineSteps';
 
 interface PipelineStepProps {
   step: PipelineStep;
   index: number;
   totalSteps: number;
   onRemove: () => void;
+  /** Switch the step off (kept but skipped) or back on. */
+  onToggle?: () => void;
   onMove: (fromIndex: number, toIndex: number) => void;
   onParameterChange: (stepId: string, paramName: string, value: any) => void;
   onPreview: () => void;
@@ -23,6 +26,7 @@ const PipelineStepComponent: React.FC<PipelineStepProps> = ({
   index,
   totalSteps,
   onRemove,
+  onToggle,
   onMove,
   onParameterChange,
   onPreview,
@@ -33,7 +37,8 @@ const PipelineStepComponent: React.FC<PipelineStepProps> = ({
 }) => {
   const { getOp } = useOperationSchema();
   const op = getOp(step.name);
-  const stepLabel = op?.label ?? step.name;
+  const stepLabel = stepDisplayName(step, op?.label);
+  const enabled = step.enabled !== false;
 
   const upRef = useRef<HTMLButtonElement>(null);
   const downRef = useRef<HTMLButtonElement>(null);
@@ -114,7 +119,13 @@ const PipelineStepComponent: React.FC<PipelineStepProps> = ({
             <h3 className="font-semibold text-zinc-900 dark:text-white">
               <span className="sr-only">Step {index + 1} of {totalSteps}: </span>
               {stepLabel}
+              {!enabled && <span className="sr-only"> (off)</span>}
             </h3>
+            {!enabled && (
+              <span aria-hidden="true" className="text-xs font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded bg-gray-200 text-gray-700 dark:bg-zinc-700 dark:text-gray-300">
+                Off
+              </span>
+            )}
               {/* Info Button */}
                 <button
                   type="button"
@@ -140,12 +151,12 @@ const PipelineStepComponent: React.FC<PipelineStepProps> = ({
 
         {/* Parameters (rendered dynamically from the operation schema) */}
         {op && op.params.length > 0 && (
-          <div className="space-y-2">
+          <div className={`space-y-2 ${enabled ? '' : 'opacity-60'}`}>
             {op.params.map((param) => {
               const controlId = `${step.id}-${param.name}`;
               // bool controls carry their own <label>; coordinate pickers have no
               // single input, so their caption is referenced via aria-labelledby.
-              const hasSingleInput = param.type !== 'bool' && !['point', 'points', 'rect'].includes(param.type);
+              const hasSingleInput = param.type !== 'bool' && !['point', 'points', 'rect', 'matrix', 'steps'].includes(param.type);
               return (
                 <div key={param.name}>
                   {hasSingleInput ? (
@@ -191,6 +202,21 @@ const PipelineStepComponent: React.FC<PipelineStepProps> = ({
           >
             <LucideReact.X aria-hidden="true" className="w-5 h-5" />
           </button>
+          {onToggle && (
+            <button
+              type="button"
+              onClick={onToggle}
+              aria-label={`${enabled ? 'Turn off' : 'Turn on'} ${stepLabel} step`}
+              title={enabled ? 'Turn off (keep the step, skip it)' : 'Turn on'}
+              className={`transition-colors ${
+                enabled
+                  ? 'text-gray-600 hover:text-zinc-800 dark:hover:text-white dark:text-gray-400'
+                  : 'text-blue-600 dark:text-blue-400'
+              }`}
+            >
+              {enabled ? <LucideReact.Power aria-hidden="true" className="w-5 h-5" /> : <LucideReact.PowerOff aria-hidden="true" className="w-5 h-5" />}
+            </button>
+          )}
           <button
             type="button"
             onClick={onPreview}

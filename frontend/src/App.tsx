@@ -11,7 +11,7 @@ import {
 } from './hooks';
 import { usePipelineContext } from './contexts/PipelineContext';
 import { useOperationSchema } from './contexts/OperationSchemaContext';
-import { ProcessedResult } from './types';
+import { ProcessedResult, SavedPipeline } from './types';
 import PipelineStepComponent from './components/PipelineStep';
 import ResultsGridComponent from './components/ResultsGrid';
 import Inspector from './components/Inspector';
@@ -21,6 +21,8 @@ import MethodDetailsModal from './components/MethodDetailsModal';
 import { useDocumentTitle } from './hooks/useDocumentTitle';
 import { useDialog } from './hooks/useDialog';
 import { announce } from './utils/announce';
+import MyFiltersGroup from './components/MyFiltersGroup';
+import { CUSTOM_FILTER_OP, stepDisplayName } from './utils/pipelineSteps';
 
 const App: React.FC = () => {
   useDocumentTitle('Workspace');
@@ -61,6 +63,7 @@ const App: React.FC = () => {
     removeStep,
     updateStepParam,
     moveStep,
+    toggleStep,
     resetPipeline,
     undo,
     redo,
@@ -103,6 +106,7 @@ const App: React.FC = () => {
   const [operationSearch, setOperationSearch] = useState('');
   // Operation whose description is shown under the search box (hover/focus).
   const [hintOp, setHintOp] = useState<string | null>(null);
+  const [filterHint, setFilterHint] = useState<string | null>(null);
   
   // State for selected result in batch mode
   const [selectedResult, setSelectedResult] = useState<ProcessedResult | null>(null);
@@ -262,6 +266,15 @@ const App: React.FC = () => {
     // Live re-processing is driven by the live useEffect (single trigger).
   };
   
+  // Add a saved custom filter as one step that runs its saved steps.
+  const handleAddCustomFilter = (filter: SavedPipeline) => {
+    addStep(CUSTOM_FILTER_OP, {
+      filter_name: filter.name,
+      steps: filter.pipeline_data.map((s) => ({ name: s.name, params: s.params || {}, enabled: s.enabled !== false })),
+    });
+    announce(`Added filter ${filter.name} as step ${pipeline.length + 1} of ${pipeline.length + 1}`);
+  };
+
   // Handle parameter changes
   const handleParameterChange = (stepId: string, paramName: string, value: any) => {
     updateStepParam(stepId, paramName, value);
@@ -563,6 +576,8 @@ const App: React.FC = () => {
                 <>
                   <span className="font-semibold">{hintOp}:</span> {getOp(hintOp)?.description}
                 </>
+              ) : filterHint ? (
+                filterHint
               ) : (
                 'Hover over or focus an operation to see what it does. Click or press Enter to add it.'
               )}
@@ -598,6 +613,7 @@ const App: React.FC = () => {
                         {libraryName === 'Scikit-Image' && <LucideReact.Microscope aria-hidden="true" className="library-icon" />}
                         {libraryName === 'Basic Operations' && <LucideReact.Sliders aria-hidden="true" className="library-icon" />}
                         {libraryName === 'Search Results' && <LucideReact.Search aria-hidden="true" className="library-icon" />}
+                        {libraryName === 'Custom' && <LucideReact.Wand2 aria-hidden="true" className="library-icon" />}
                         {libraryName}
                       </div>
                       <LucideReact.ChevronDown aria-hidden="true" className="chevron-icon" />
@@ -635,8 +651,8 @@ const App: React.FC = () => {
                                   type="button"
                                   data-op={op}
                                   onClick={() => handleAddOperation(op)}
-                                  onMouseEnter={() => setHintOp(op)}
-                                  onFocus={() => setHintOp(op)}
+                                  onMouseEnter={() => { setHintOp(op); setFilterHint(null); }}
+                                  onFocus={() => { setHintOp(op); setFilterHint(null); }}
                                   aria-label={`Add ${op}`}
                                   aria-describedby={getOp(op)?.description ? `op-desc-${op.replace(/[^a-zA-Z0-9]/g, '-')}` : undefined}
                                   className="operation-btn-enhanced group"
@@ -653,6 +669,12 @@ const App: React.FC = () => {
                           </details>
                         </div>
                       ))}
+                      {libraryName === 'Custom' && (
+                        <MyFiltersGroup
+                          onAdd={handleAddCustomFilter}
+                          onHint={(text) => { setFilterHint(text); setHintOp(null); }}
+                        />
+                      )}
                     </div>
                   </details>
                 </div>
@@ -844,6 +866,10 @@ const App: React.FC = () => {
                         announce(`Removed ${label}. ${pipeline.length - 1} steps left.`);
                         // The focused button is gone; put focus somewhere sensible.
                         window.requestAnimationFrame(() => document.getElementById('pipeline-heading')?.focus());
+                      }}
+                      onToggle={() => {
+                        toggleStep(step.id);
+                        announce(`${stepDisplayName(step, getOp(step.name)?.label)} turned ${step.enabled === false ? 'on' : 'off'}`);
                       }}
                       onMove={(from, to) => {
                         moveStep(from, to);

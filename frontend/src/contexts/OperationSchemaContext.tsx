@@ -32,8 +32,11 @@ function buildFromSchema(schema: OperationSchema): { specs: OperationSpecDTO[]; 
       if (!group[subName]) group[subName] = [];
       sub.operations.forEach((op) => {
         specs.push(op);
-        group[subName].push(op.label);
+        // Hidden ops (e.g. Custom Filter) still render as steps but aren't
+        // added from the palette.
+        if (!op.hidden) group[subName].push(op.label);
       });
+      if (group[subName].length === 0) delete group[subName];
     });
     palette[lib] = group;
   });
@@ -93,7 +96,7 @@ export const OperationSchemaProvider: React.FC<{ children: React.ReactNode }> = 
       return out;
     };
 
-    return { loading, error, getOp, getDefaults, palette, allLabels: specs.map((s) => s.label) };
+    return { loading, error, getOp, getDefaults, palette, allLabels: specs.filter((s) => !s.hidden).map((s) => s.label) };
   }, [schema, loading, error]);
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

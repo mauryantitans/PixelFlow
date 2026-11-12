@@ -3,6 +3,8 @@ import { X, Save } from 'lucide-react';
 import { useDialog } from '../hooks/useDialog';
 import { pipelineService } from '../services/auth';
 import { PipelineStep } from '../types';
+import { CUSTOM_FILTER_CATEGORY, toApiSteps } from '../utils/pipelineSteps';
+import { FILTERS_CHANGED_EVENT } from '../hooks/useMyFilters';
 
 interface SavePipelineModalProps {
   isOpen: boolean;
@@ -22,6 +24,7 @@ export const SavePipelineModal: React.FC<SavePipelineModalProps> = ({
   const [isPublic, setIsPublic] = useState(false);
   const [category, setCategory] = useState('');
   const [tags, setTags] = useState('');
+  const [asFilter, setAsFilter] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -49,12 +52,9 @@ export const SavePipelineModal: React.FC<SavePipelineModalProps> = ({
       await pipelineService.createPipeline({
         name: name.trim(),
         description: description.trim() || undefined,
-        pipeline_data: pipeline.map(step => ({
-          name: step.name,
-          params: step.params,
-        })),
+        pipeline_data: toApiSteps(pipeline),
         is_public: isPublic,
-        category: category.trim() || undefined,
+        category: asFilter ? CUSTOM_FILTER_CATEGORY : category.trim() || undefined,
         tags: tags.trim() ? tags.split(',').map(t => t.trim()).filter(t => t) : undefined,
       });
 
@@ -64,7 +64,9 @@ export const SavePipelineModal: React.FC<SavePipelineModalProps> = ({
       setIsPublic(false);
       setCategory('');
       setTags('');
-      
+      if (asFilter) window.dispatchEvent(new Event(FILTERS_CHANGED_EVENT));
+      setAsFilter(false);
+
       onSaveSuccess();
       onClose();
     } catch (err: any) {
@@ -152,6 +154,27 @@ export const SavePipelineModal: React.FC<SavePipelineModalProps> = ({
             />
           </div>
 
+          {/* Save as a reusable filter (Custom → My filters) */}
+          <div className="flex items-start gap-2 p-3 rounded-md border border-gray-300">
+            <input
+              id="save-as-filter"
+              type="checkbox"
+              checked={asFilter}
+              onChange={(e) => setAsFilter(e.target.checked)}
+              aria-describedby="save-as-filter-help"
+              className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-500 rounded"
+              disabled={loading}
+            />
+            <div>
+              <label htmlFor="save-as-filter" className="text-sm font-medium text-gray-900">
+                Save as a reusable filter
+              </label>
+              <p id="save-as-filter-help" className="text-xs text-gray-600">
+                It appears under Custom → My filters, and adding it puts all these steps in as one step.
+              </p>
+            </div>
+          </div>
+
           {/* Category */}
           <div>
             <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
@@ -161,8 +184,8 @@ export const SavePipelineModal: React.FC<SavePipelineModalProps> = ({
               id="category"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              disabled={loading}
+              className="w-full px-3 py-2 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
+              disabled={loading || asFilter}
             >
               <option value="">Select a category</option>
               <option value="Filters">Filters</option>
