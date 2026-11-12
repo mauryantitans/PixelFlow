@@ -170,8 +170,12 @@ class UploadedImage(Base):
     
     # Image data
     filename = Column(String, nullable=False)
-    image_data = Column(LargeBinary, nullable=False)  # Original image as bytes
-    thumbnail_data = Column(LargeBinary, nullable=True)  # Thumbnail as bytes
+    # Original image bytes: in image_data (STORAGE_BACKEND=database) or in object
+    # storage under storage_key (STORAGE_BACKEND=s3). Read/write them only via
+    # app.storage.images (read_image_bytes / save_image_bytes).
+    image_data = Column(LargeBinary, nullable=True)
+    storage_key = Column(String, nullable=True)
+    thumbnail_data = Column(LargeBinary, nullable=True)  # Thumbnail bytes (always in the DB)
     
     # Metadata
     width = Column(Integer, nullable=False)
@@ -197,8 +201,9 @@ class ProcessedImage(Base):
     session_id = Column(String, index=True, nullable=False)
     original_image_id = Column(String, ForeignKey("uploaded_images.id"), nullable=False)
     
-    # Processed data
-    image_data = Column(LargeBinary, nullable=False)
+    # Processed data (image_data or an object under storage_key; see UploadedImage)
+    image_data = Column(LargeBinary, nullable=True)
+    storage_key = Column(String, nullable=True)
     
     # Processing details
     pipeline_data = Column(JSON, nullable=False)
@@ -250,3 +255,7 @@ class SystemSettings(Base):
     # Timestamps
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
     updated_by = Column(Integer, ForeignKey("users.id"), nullable=True)
+
+
+# Deleting image rows (also by cascade) removes their stored objects after commit.
+import app.storage.images  # noqa: E402,F401

@@ -33,3 +33,23 @@ def drop_column_if_present(table: str, column: str) -> None:
     if has_column(table, column):
         with op.batch_alter_table(table) as batch:
             batch.drop_column(column)
+
+
+def column_is_nullable(table: str, column: str) -> bool | None:
+    """True/False for an existing column, None when the table or column is missing."""
+    if not has_table(table):
+        return None
+    for c in sa.inspect(op.get_bind()).get_columns(table):
+        if c["name"] == column:
+            return bool(c["nullable"])
+    return None
+
+
+def set_nullable_if_needed(
+    table: str, column: str, existing_type: sa.types.TypeEngine, nullable: bool = True
+) -> None:
+    """Change a column's NULL constraint only when it differs (batch mode: SQLite + PostgreSQL)."""
+    current = column_is_nullable(table, column)
+    if current is not None and current != nullable:
+        with op.batch_alter_table(table) as batch:
+            batch.alter_column(column, existing_type=existing_type, nullable=nullable)
