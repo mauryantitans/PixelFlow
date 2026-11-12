@@ -994,7 +994,12 @@ async def delete_user(
     # Delete user's uploaded images
     db.query(UploadedImage).filter(UploadedImage.user_id == user_id).delete()
     
-    # Delete user's pipelines
+    # Delete user's pipelines (and their share links first: bulk deletes skip ORM cascades)
+    from app.models.db_models import SharedPipeline
+
+    pipeline_ids = [pid for (pid,) in db.query(SavedPipeline.id).filter(SavedPipeline.user_id == user_id)]
+    if pipeline_ids:
+        db.query(SharedPipeline).filter(SharedPipeline.pipeline_id.in_(pipeline_ids)).delete(synchronize_session=False)
     db.query(SavedPipeline).filter(SavedPipeline.user_id == user_id).delete()
     
     # Delete user's sessions

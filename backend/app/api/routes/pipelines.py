@@ -5,7 +5,10 @@ from typing import List, Optional
 
 from ...core.database import get_db
 from ...core.business_rules import UserLimits
-from ...models.db_models import User, SavedPipeline
+import secrets
+from datetime import datetime, timezone
+
+from ...models.db_models import User, SavedPipeline, SharedPipeline
 from ...models.schemas import (
     PipelineCreate, PipelineUpdate, PipelineResponse
 )
@@ -31,6 +34,79 @@ def _enforce_pipeline_limit(db: Session, user: User) -> None:
             status_code=status.HTTP_403_FORBIDDEN,
             detail=f"Pipeline limit reached. Free users can save up to {max_pipelines} pipelines. Please delete an existing pipeline or upgrade your account."
         )
+
+
+# ---- Share by link ---------------------------------------------------------
+# Declared before "/{pipeline_id}" so "/shared/..." isn't parsed as an id.
+
+
+def _share_payload(share: SharedPipeline) -> dict:
+    return {"token": share.share_token, "path": f"/p/{share.share_token}", "view_count": share.view_count or 0}
+
+
+@router.get("/shared/{token}")
+async def get_shared_pipeline(token: str, db: Session = Depends(get_db)):
+    """Public: a pipeline someone shared by link (no account needed)."""
+    share = db.query(SharedPipeline).filter(SharedPipeline.share_token == token).first()
+    now = datetime.now(timezone.utc)
+    expires = share.expires_at if share else None
+    if expires is not None and expires.tzinfo is None:
+        expires = expires.replace(tzinfo=timezone.utc)
+    if not share or (expires is not None and expires < now):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="This share link doesn't exist or was turned off.")
+    pipeline = db.query(SavedPipeline).filter(SavedPipeline.id == share.pipeline_id).first()
+    if not pipeline:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="This share link doesn't exist or was turned off.")
+    share.view_count = (share.view_count or 0) + 1
+    db.commit()
+    author = pipeline.user.username if pipeline.user else None
+    return {
+        "name": pipeline.name,
+        "description": pipeline.description,
+        "pipeline_data": pipeline.pipeline_data,
+        "author": author,
+        "created_at": pipeline.created_at.isoformat() if pipeline.created_at else None,
+        "view_count": share.view_count,
+    }
+
+
+def _owned_pipeline(db: Session, pipeline_id: int, user: User) -> SavedPipeline:
+    pipeline = db.query(SavedPipeline).filter(SavedPipeline.id == pipeline_id).first()
+    if not pipeline:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Pipeline not found")
+    if pipeline.user_id != user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to share this pipeline")
+    return pipeline
+
+
+@router.get("/{pipeline_id}/share")
+async def get_share_link(pipeline_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """The pipeline's share link, or null if it isn't shared."""
+    _owned_pipeline(db, pipeline_id, current_user)
+    share = db.query(SharedPipeline).filter(SharedPipeline.pipeline_id == pipeline_id).first()
+    return {"share": _share_payload(share) if share else None}
+
+
+@router.post("/{pipeline_id}/share")
+async def create_share_link(pipeline_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Create (or return the existing) share link. Anyone with it can view and copy the pipeline."""
+    pipeline = _owned_pipeline(db, pipeline_id, current_user)
+    share = db.query(SharedPipeline).filter(SharedPipeline.pipeline_id == pipeline.id).first()
+    if not share:
+        share = SharedPipeline(pipeline_id=pipeline.id, share_token=secrets.token_urlsafe(12), view_count=0)
+        db.add(share)
+        db.commit()
+        db.refresh(share)
+    return {"share": _share_payload(share)}
+
+
+@router.delete("/{pipeline_id}/share", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_share_link(pipeline_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Turn sharing off: the old link stops working."""
+    _owned_pipeline(db, pipeline_id, current_user)
+    db.query(SharedPipeline).filter(SharedPipeline.pipeline_id == pipeline_id).delete()
+    db.commit()
+    return None
 
 
 # Both "/api/pipelines" and "/api/pipelines/" are served directly: a redirect

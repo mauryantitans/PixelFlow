@@ -78,6 +78,8 @@ class SavedPipeline(Base):
     # Relationships
     user = relationship("User", back_populates="saved_pipelines")
     processing_history = relationship("ProcessingHistory", back_populates="pipeline")
+    # Share links die with the pipeline.
+    shares = relationship("SharedPipeline", cascade="all, delete-orphan")
 
 
 class ProcessingHistory(Base):
