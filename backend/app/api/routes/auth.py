@@ -14,6 +14,7 @@ from ...models.schemas import (
     UserCreate, UserResponse, UserUpdate,
     LoginRequest,
     ForgotPasswordRequest, ResetPasswordRequest, VerifyEmailRequest,
+    PreferencesUpdate,
 )
 from ...utils.auth import (
     get_password_hash, authenticate_user,
@@ -227,6 +228,22 @@ async def login(
 async def get_current_user_info(current_user: User = Depends(get_current_user)):
     """Get current user information"""
     return current_user
+
+@router.put("/me/preferences", response_model=UserResponse)
+async def update_preferences(
+    prefs: PreferencesUpdate,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Save UI preferences (theme, mode) to the account so they follow the user
+    to other browsers. Keys that aren't sent are kept."""
+    merged = dict(current_user.preferences or {})
+    merged.update({k: v for k, v in prefs.model_dump().items() if v is not None})
+    current_user.preferences = merged  # reassign so the JSON column is marked dirty
+    db.commit()
+    db.refresh(current_user)
+    return current_user
+
 
 @router.put("/me", response_model=UserResponse)
 async def update_current_user(

@@ -4,6 +4,8 @@ import {
   AuthMessageResponse,
   RegisterRequest,
   SavedPipeline,
+  ShareLink,
+  SharedPipelineView,
   CreatePipelineRequest
 } from '../types';
 import { markTokensFresh, prepareRequest, refreshTokens, retryOn401 } from './tokenRefresh';
@@ -42,6 +44,11 @@ export const authService = {
   },
 
   // Update user profile
+  async updatePreferences(prefs: { ui_theme?: string; mode?: 'light' | 'dark' }): Promise<User> {
+    const response = await axios.put<User>(`${API_BASE_URL}/auth/me/preferences`, prefs);
+    return response.data;
+  },
+
   async updateProfile(data: Partial<User>): Promise<User> {
     const response = await axios.put<User>(`${API_BASE_URL}/auth/me`, data);
     return response.data;
@@ -133,6 +140,27 @@ export const pipelineService = {
   // Delete pipeline
   async deletePipeline(id: number): Promise<void> {
     await axios.delete(`${API_BASE_URL}/pipelines/${id}`);
+  },
+
+  // Share by link
+  async getShareLink(id: number): Promise<ShareLink | null> {
+    const response = await axios.get<{ share: ShareLink | null }>(`${API_BASE_URL}/pipelines/${id}/share`);
+    return response.data.share;
+  },
+
+  async createShareLink(id: number): Promise<ShareLink> {
+    const response = await axios.post<{ share: ShareLink }>(`${API_BASE_URL}/pipelines/${id}/share`);
+    return response.data.share;
+  },
+
+  async deleteShareLink(id: number): Promise<void> {
+    await axios.delete(`${API_BASE_URL}/pipelines/${id}/share`);
+  },
+
+  /** Public: open a shared pipeline (no account needed). */
+  async getSharedPipeline(token: string): Promise<SharedPipelineView> {
+    const response = await axios.get<SharedPipelineView>(`${API_BASE_URL}/pipelines/shared/${encodeURIComponent(token)}`);
+    return response.data;
   },
 
   // Duplicate pipeline

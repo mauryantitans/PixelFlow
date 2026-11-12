@@ -45,7 +45,7 @@ const check = (name, ok, detail) => {
   const setSelection = (n) =>
     page.evaluate(async (n) => {
       // keep only the first n gallery images selected
-      document.querySelector('button.btn-secondary').click();
+      [...document.querySelectorAll('button')].find((x) => /^Gallery \(\d+\)/.test(x.innerText.trim())).click();
       await new Promise((r) => setTimeout(r, 400));
       [...document.querySelectorAll('[aria-pressed]')].forEach((b, i) => {
         const want = i < n;
@@ -69,7 +69,7 @@ const check = (name, ok, detail) => {
 
     // 2. TIFF: preview comes from the server copy (browsers can't show TIFF)
     await upload(process.env.TIFF);
-    await page.evaluate(() => document.querySelector('button.btn-secondary').click());
+    await page.evaluate(() => [...document.querySelectorAll('button')].find((x) => /^Gallery \(\d+\)/.test(x.innerText.trim())).click());
     await sleep(500);
     await page.evaluate(() => [...document.querySelectorAll('button[aria-label^="View full size"]')].pop().click());
     await sleep(800);
@@ -130,7 +130,7 @@ const check = (name, ok, detail) => {
     for (let i = 0; i < 3; i++) await addOp('Non-Local Means Denoising');
     await sleep(300);
     const selected = await page.evaluate(async () => {
-      document.querySelector('button.btn-secondary').click();
+      [...document.querySelectorAll('button')].find((x) => /^Gallery \(\d+\)/.test(x.innerText.trim())).click();
       await new Promise((r) => setTimeout(r, 400));
       const n = document.querySelectorAll('[aria-pressed="true"]').length;
       document.querySelector('button[aria-label="Close gallery"]').click();

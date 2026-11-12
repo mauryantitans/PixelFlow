@@ -38,6 +38,8 @@ class User(Base):
     # Email verification (see utils/account_tokens.py). Google sign-ins are verified.
     email_verified = Column(Boolean, nullable=False, default=False, server_default=false())
     email_verified_at = Column(DateTime(timezone=True), nullable=True)
+    # Appearance and other UI preferences, e.g. {"ui_theme": "verdant", "mode": "dark"}
+    preferences = Column(JSON, nullable=True)
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

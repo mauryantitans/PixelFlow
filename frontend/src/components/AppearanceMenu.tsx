@@ -148,7 +148,7 @@ export const AppearanceMenu: React.FC = () => {
             </div>
           </fieldset>
 
-          <p className="mt-3 text-xs text-slate-600 dark:text-slate-400">Saved in this browser.</p>
+          <p className="mt-3 text-xs text-slate-600 dark:text-slate-400">Saved in this browser, and to your account when you are signed in.</p>
         </div>
       )}
     </div>

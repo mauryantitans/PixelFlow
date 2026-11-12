@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, FolderOpen, Users, Lock, Calendar, Layers, Trash2, Copy, Eye, EyeOff } from 'lucide-react';
+import { X, FolderOpen, Users, Lock, Calendar, Layers, Trash2, Copy, Eye, EyeOff, Link2 } from 'lucide-react';
+import SharePanel from './SharePanel';
 import { useDialog } from '../hooks/useDialog';
 import { handleTabListKeyDown } from '../utils/tabs';
 import { pipelineService } from '../services/auth';
@@ -20,6 +21,7 @@ export const LoadPipelineModal: React.FC<LoadPipelineModalProps> = ({
   const [userPipelines, setUserPipelines] = useState<SavedPipeline[]>([]);
   const [publicPipelines, setPublicPipelines] = useState<SavedPipeline[]>([]);
   const [activeTab, setActiveTab] = useState<'my' | 'public'>('my');
+  const [sharingId, setSharingId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [notification, setNotification] = useState('');
@@ -345,6 +347,19 @@ export const LoadPipelineModal: React.FC<LoadPipelineModalProps> = ({
                         </button>
 
                         <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); setSharingId(sharingId === pipeline.id ? null : pipeline.id); }}
+                          aria-expanded={sharingId === pipeline.id}
+                          aria-controls={`share-panel-${pipeline.id}`}
+                          className="flex items-center justify-center space-x-1 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                          title="Share by link"
+                          aria-label={`Share ${pipeline.name} by link`}
+                        >
+                          <Link2 aria-hidden="true" size={14} />
+                          <span className="hidden sm:inline">Share</span>
+                        </button>
+
+                        <button
                           onClick={(e) => handleDuplicate(pipeline, e)}
                           className="flex items-center justify-center space-x-1 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
                           title="Duplicate"
@@ -376,6 +391,11 @@ export const LoadPipelineModal: React.FC<LoadPipelineModalProps> = ({
                       </button>
                     )}
                   </div>
+                  {activeTab === 'my' && sharingId === pipeline.id && (
+                    <div id={`share-panel-${pipeline.id}`}>
+                      <SharePanel pipelineId={pipeline.id} pipelineName={pipeline.name} />
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

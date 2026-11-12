@@ -147,6 +147,12 @@ def test_object_storage_downgrade_refuses_to_strand_bucket_rows(tmp_path):
             )
         )
 
+    # Step below the later revisions first, so the refusal under test is the
+    # only thing that happens in the failing transaction.
+    with engine.begin() as c:
+        cfg.attributes["connection"] = c
+        command.downgrade(cfg, "0003_object_storage")
+
     with pytest.raises(RuntimeError, match="object storage"):
         with engine.begin() as c:
             cfg.attributes["connection"] = c

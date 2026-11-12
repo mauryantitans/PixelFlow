@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### ✨ Workspace
+- **Try a sample**: six public-domain/CC0 photos to start with, no upload needed.
+- **Drag and drop** image files anywhere on the workspace (the Upload button still works).
+- **Share a pipeline by link** (Load → Share): anyone with the link sees its steps on a public
+  page and can open them in their own workspace; images are never shared; turn it off any time.
+- **Theme follows your account**: signed-in users get their theme and mode in every browser.
+- The gallery selection and Live mode survive a reload; downloads are named after the source
+  image with the right extension.
+
 ### 🧪 Custom filters
 - **Custom Kernel** (Custom → Kernels): type your own 3×3 to 9×9 convolution, or start from a
   preset (blur, Gaussian, sharpen, edge detect, emboss, Sobel, motion blur). Normalize, absolute

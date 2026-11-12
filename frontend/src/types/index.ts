@@ -322,6 +322,8 @@ export interface User {
   is_admin: boolean;
   profile_picture?: string;  // OAuth profile picture URL
   email_verified?: boolean;  // false until the emailed link is opened (Google sign-ins are verified)
+  /** Saved to the account so the appearance follows the user to other browsers. */
+  preferences?: { ui_theme?: string; mode?: 'light' | 'dark' } | null;
   created_at: string;
 }
 
@@ -394,4 +396,22 @@ export interface CreatePipelineRequest {
   category?: string;
   tags?: string[];
   thumbnail_data?: string;
+}
+
+/** A pipeline's share link (GET/POST /pipelines/{id}/share). */
+export interface ShareLink {
+  token: string;
+  /** Frontend path, e.g. /p/abc123 */
+  path: string;
+  view_count: number;
+}
+
+/** What anyone with a share link sees (GET /pipelines/shared/{token}). */
+export interface SharedPipelineView {
+  name: string;
+  description?: string | null;
+  pipeline_data: Array<{ name: string; params: Record<string, any>; enabled?: boolean }>;
+  author?: string | null;
+  created_at?: string | null;
+  view_count: number;
 }

@@ -22,10 +22,18 @@ class UserResponse(UserBase):
     is_active: bool
     is_admin: bool
     email_verified: bool = False
+    preferences: Optional[dict] = None
     created_at: datetime
     
     class Config:
         from_attributes = True
+
+class PreferencesUpdate(BaseModel):
+    """UI preferences saved to the account (both optional; omitted keys are kept)."""
+
+    ui_theme: Optional[str] = Field(None, pattern=r"^[a-z][a-z0-9-]{0,31}$")
+    mode: Optional[str] = Field(None, pattern=r"^(light|dark)$")
+
 
 # Authentication schemas
 class Token(BaseModel):

@@ -11,6 +11,8 @@ import { ResetPassword } from './components/ResetPassword';
 import { VerifyEmail } from './components/VerifyEmail';
 import { VerifyEmailBanner } from './components/VerifyEmailBanner';
 import App from './App';
+import { SharedPipelinePage } from './components/SharedPipelinePage';
+import AppearanceSync from './theme/AppearanceSync';
 
 const AppRoutes: React.FC = () => {
   return (
@@ -21,6 +23,8 @@ const AppRoutes: React.FC = () => {
       }}
     >
       <AuthProvider>
+        {/* Theme + mode follow the signed-in account across browsers. */}
+        <AppearanceSync />
         <PipelineProvider>
           <Routes>
             {/* Landing page - public */}
@@ -34,6 +38,9 @@ const AppRoutes: React.FC = () => {
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/verify-email" element={<VerifyEmail />} />
+
+            {/* A pipeline shared by link - public */}
+            <Route path="/p/:token" element={<SharedPipelinePage />} />
             
             {/* Main app - accessible to everyone (guest mode) */}
             <Route
