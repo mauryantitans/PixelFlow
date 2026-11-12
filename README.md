@@ -7,7 +7,7 @@
 **Build image processing pipelines visually.**<br />
 Chain 77 OpenCV, scikit-image and Pillow operations, preview every step live, design your own filters, and batch-process images. No code required.
 
-[![CI](https://github.com/Mauryantitans/PixelFlow/actions/workflows/ci.yml/badge.svg?branch=React_FastAPI)](https://github.com/Mauryantitans/PixelFlow/actions/workflows/ci.yml)
+[![CI](https://github.com/Mauryantitans/PixelFlow/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Mauryantitans/PixelFlow/actions/workflows/ci.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Live demo](https://img.shields.io/badge/demo-live-2bd483.svg)](https://pixel-flow-woad.vercel.app)
 [![WCAG 2.1 AA](https://img.shields.io/badge/accessibility-WCAG%202.1%20AA-5c8dff.svg)](a11y-reports/REPORT.md)

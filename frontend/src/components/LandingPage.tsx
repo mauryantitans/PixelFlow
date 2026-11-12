@@ -286,7 +286,7 @@ export const LandingPage: React.FC = () => {
               <h2 className="font-semibold text-slate-900 dark:text-slate-50 mb-4">Resources</h2>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <a href="https://github.com/Mauryantitans/PixelFlow/blob/React_FastAPI/README.md" target="_blank" rel="noopener noreferrer" className="text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                  <a href="https://github.com/Mauryantitans/PixelFlow/blob/main/README.md" target="_blank" rel="noopener noreferrer" className="text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                     Documentation
                   </a>
                 </li>
@@ -332,7 +332,7 @@ export const LandingPage: React.FC = () => {
             <p className="text-sm text-slate-600 dark:text-slate-400">
               © 2025 PixelFlow. Open source image processing.{' '}
               <a 
-                href="https://github.com/Mauryantitans/PixelFlow/blob/React_FastAPI/LICENSE" 
+                href="https://github.com/Mauryantitans/PixelFlow/blob/main/LICENSE" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-blue-700 dark:text-blue-400 underline hover:no-underline"

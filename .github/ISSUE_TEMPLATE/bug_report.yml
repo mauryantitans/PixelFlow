@@ -6,8 +6,8 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for reporting. Please check [CURRENT_LIMITATIONS.md](https://github.com/Mauryantitans/PixelFlow/blob/React_FastAPI/CURRENT_LIMITATIONS.md) and the open issues first.
-        **Security problems:** don't file them here. Use the repository's Security tab → *Report a vulnerability* (see [SECURITY.md](https://github.com/Mauryantitans/PixelFlow/blob/React_FastAPI/SECURITY.md)).
+        Thanks for reporting. Please check [CURRENT_LIMITATIONS.md](https://github.com/Mauryantitans/PixelFlow/blob/main/CURRENT_LIMITATIONS.md) and the open issues first.
+        **Security problems:** don't file them here. Use the repository's Security tab → *Report a vulnerability* (see [SECURITY.md](https://github.com/Mauryantitans/PixelFlow/blob/main/SECURITY.md)).
   - type: textarea
     id: summary
     attributes:

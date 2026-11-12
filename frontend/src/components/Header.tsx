@@ -153,7 +153,7 @@ export const Header: React.FC = () => {
               </Link>
 
               <a
-                href="https://github.com/Mauryantitans/PixelFlow/blob/React_FastAPI/README.md"
+                href="https://github.com/Mauryantitans/PixelFlow/blob/main/README.md"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center space-x-1.5 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-md transition-colors"

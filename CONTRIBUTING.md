@@ -27,7 +27,7 @@ Security problems are the exception: don't open a public issue. See [SECURITY.md
 
 ## Branches and commits
 
-Branch from `React_FastAPI` (the branch CI badges and deploys track) and give the branch a short,
+Branch from `main` (the default branch, which CI badges and deploys track) and give the branch a short,
 descriptive name, e.g. `fix/batch-stop` or `feat/webp-output`.
 
 Commit messages follow the Conventional Commits style used in the history:

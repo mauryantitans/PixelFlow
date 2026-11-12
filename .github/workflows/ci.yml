@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [React_FastAPI, main]
+    branches: [main]
   pull_request:
 
 concurrency:
