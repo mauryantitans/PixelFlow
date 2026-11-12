@@ -619,7 +619,7 @@ export function useBatchProcessing() {
     jobId: string,
     runId: number,
     onProgress?: (current: number, total: number, result: ProcessedResult) => void
-  ): Promise<ProcessedResult[]> => {
+  ): Promise<ProcessedResult[] | null> => {
     const isCurrent = () => runIdRef.current === runId;
     const controller = new AbortController();
     abortControllerRef.current = controller;
@@ -659,12 +659,13 @@ export function useBatchProcessing() {
         if (finished && seen >= job.results.length) break;
         await new Promise((r) => setTimeout(r, 700));
       }
-      if (isCurrent()) {
-        setTimingData({
-          total_time: allTimings.reduce((sum, t) => sum + t.duration, 0) / 1000,
-          step_timings: allTimings,
-        });
-      }
+      // null = this run was stopped or replaced by a newer one: its caller
+      // must not report anything (it would talk over the newer run).
+      if (!isCurrent()) return null;
+      setTimingData({
+        total_time: allTimings.reduce((sum, t) => sum + t.duration, 0) / 1000,
+        step_timings: allTimings,
+      });
       return allResults;
     } finally {
       if (isCurrent()) {
@@ -690,7 +691,7 @@ export function useBatchProcessing() {
       const job = await ApiService.createJob({ image_ids: imageIds, pipeline: toApiSteps(pipeline), session_id: sessionId });
       if (runIdRef.current !== runId) {
         ApiService.cancelJob(job.id, sessionId).catch(() => {});
-        return [];
+        return null;
       }
       jobIdRef.current = job.id;
       try { sessionStorage.setItem(BATCH_JOB_KEY, job.id); } catch { /* ignore */ }
@@ -703,7 +704,12 @@ export function useBatchProcessing() {
   }, [sessionId, follow]);
 
   // A batch that was running when the page reloaded: keep following it.
+  // Only on page load: re-running when the session id settles would orphan a
+  // batch started in the meantime.
+  const resumeChecked = useRef(false);
   useEffect(() => {
+    if (resumeChecked.current) return;
+    resumeChecked.current = true;
     let stored: string | null = null;
     try { stored = sessionStorage.getItem(BATCH_JOB_KEY); } catch { stored = null; }
     if (!stored) return;

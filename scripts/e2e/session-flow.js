@@ -21,6 +21,8 @@ const logout=async()=>{await pg.click('button[aria-controls="account-menu"]');aw
 const upload=async(f)=>{const i=await pg.$('#upload-image');await i.uploadFile(f);await sleep(2500)};
 try{
  await login(process.env.A_EMAIL,process.env.A_PASSWORD);
+ // The first health check can be slow while the server is busy (e.g. a batch still running): wait for it.
+ await pg.waitForFunction(()=>document.querySelector('[data-connection-state]')?.getAttribute('data-connection-state')!=='checking',{timeout:20000}).catch(()=>{});
  const conn=await pg.evaluate(()=>document.querySelector('[data-connection-state]')?.getAttribute('data-connection-state'));
  check('Connection badge shows connected', conn==='connected', conn);
  await upload(process.env.IMG1); const SA=await sid();

@@ -284,8 +284,10 @@ const App: React.FC = () => {
         }
       );
       
+      // null: stopped or superseded by a newer run, which reports for itself.
+      if (results === null) return;
       // Show final success message with actual count
-      if (results && results.length > 0) {
+      if (results.length > 0) {
         updateStatus(`Successfully processed ${results.length} of ${selectedCount} image(s). Click a result to inspect.`, 'success');
       } else {
         updateStatus('No images were processed successfully', 'error');
