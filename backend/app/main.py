@@ -11,6 +11,7 @@ from .core.database import init_db
 from .core.security_config import CORSSettings
 from .api import api_router
 from .utils.cleanup_scheduler import start_cleanup_scheduler, stop_cleanup_scheduler
+from .utils.job_worker import start_job_worker, stop_job_worker
 from .middleware import RateLimitMiddleware, SecurityHeadersMiddleware, CSRFMiddleware
 
 # Configure logging
@@ -47,6 +48,7 @@ async def lifespan(app: FastAPI):
     # Start the periodic database cleanup (expired sessions, retention,
     # orphans, expired refresh tokens; honours the admin auto-cleanup switch)
     start_cleanup_scheduler()
+    start_job_worker()
     
     logger.info("PixelFlow backend started successfully")
     
@@ -57,6 +59,7 @@ async def lifespan(app: FastAPI):
     
     # Stop background tasks
     await stop_cleanup_scheduler()
+    stop_job_worker()
     
     logger.info("PixelFlow backend shutdown complete")
 

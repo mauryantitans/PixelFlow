@@ -415,3 +415,20 @@ export interface SharedPipelineView {
   created_at?: string | null;
   view_count: number;
 }
+
+/** A background batch run (POST/GET /processing/jobs). */
+export interface BatchJob {
+  id: string;
+  status: 'queued' | 'running' | 'done' | 'failed' | 'cancelled';
+  total: number;
+  completed: number;
+  results: Array<{
+    image_id: string;
+    status: 'done' | 'skipped' | 'failed';
+    error?: string | null;
+    total_time?: number | null;
+    step_timings?: ProcessingTiming[] | null;
+    step_errors?: Array<StepErrorDTO | null> | null;
+  }>;
+  error?: string | null;
+}

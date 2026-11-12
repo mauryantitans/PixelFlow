@@ -7,6 +7,7 @@ import {
   UIState,
   ProcessingCache,
   ProcessingTiming,
+  BatchJob,
   StepErrorDTO,
 } from '../types';
 import { ApiService } from '../services/api';
@@ -596,105 +597,131 @@ export function useLiveProcessing() {
 /**
  * Batch processing hook with real-time results and cancellation
  */
+/** sessionStorage key of the batch job this tab is following. */
+const BATCH_JOB_KEY = 'pixelflow_batch_job';
+
 export function useBatchProcessing() {
   const [results, setResults] = useState<ProcessedResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [timingData, setTimingData] = useState<{ total_time: number; step_timings: ProcessingTiming[] }>({ total_time: 0, step_timings: [] });
   const { sessionId } = useSession();
   const abortControllerRef = useRef<AbortController | null>(null);
-  // Each run gets an id. Stop or a new run makes older runs "stale": they stop
-  // at the next image and never touch state again. (Before, Stop followed by
-  // Apply Pipeline let both loops run and mixed their results.)
+  // Each run gets an id. Stop or a new run makes older runs "stale": their
+  // polling stops and never touches state again (Stop then Apply used to mix
+  // results from both runs).
   const runIdRef = useRef(0);
-  
+  const jobIdRef = useRef<string | null>(null);
+
+  // Batches run as background jobs on the server: this follows one, adding
+  // each image's result as soon as it's ready. The job id is kept per tab so
+  // a reload picks the same run back up.
+  const follow = useCallback(async (
+    jobId: string,
+    runId: number,
+    onProgress?: (current: number, total: number, result: ProcessedResult) => void
+  ): Promise<ProcessedResult[]> => {
+    const isCurrent = () => runIdRef.current === runId;
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    const allResults: ProcessedResult[] = [];
+    const allTimings: ProcessingTiming[] = [];
+    let seen = 0;
+    try {
+      while (isCurrent()) {
+        let job: BatchJob;
+        try {
+          job = await ApiService.getJob(jobId, sessionId, controller.signal);
+        } catch (e: any) {
+          if (!isCurrent()) break;
+          if (e?.response?.status === 404) break; // job gone (expired / other account)
+          await new Promise((r) => setTimeout(r, 1500)); // transient: try again
+          continue;
+        }
+        if (!isCurrent()) break;
+        while (seen < job.results.length && isCurrent()) {
+          const entry = job.results[seen];
+          if (entry.status === 'done') {
+            try {
+              const r = await ApiService.getJobResult(jobId, seen, sessionId, controller.signal);
+              if (!isCurrent()) break;
+              const result: ProcessedResult = { id: r.image_id, originalUrl: '', processedUrl: r.final, intermediateResults: r.steps };
+              allResults.push(result);
+              setResults((prev) => [...prev, result]);
+              if (entry.step_timings) allTimings.push(...entry.step_timings);
+              onProgress?.(job.completed, job.total, result);
+            } catch {
+              if (!isCurrent()) break;
+            }
+          }
+          seen += 1;
+        }
+        const finished = job.status === 'done' || job.status === 'failed' || job.status === 'cancelled';
+        if (finished && seen >= job.results.length) break;
+        await new Promise((r) => setTimeout(r, 700));
+      }
+      if (isCurrent()) {
+        setTimingData({
+          total_time: allTimings.reduce((sum, t) => sum + t.duration, 0) / 1000,
+          step_timings: allTimings,
+        });
+      }
+      return allResults;
+    } finally {
+      if (isCurrent()) {
+        setLoading(false);
+        abortControllerRef.current = null;
+        jobIdRef.current = null;
+        try { sessionStorage.removeItem(BATCH_JOB_KEY); } catch { /* ignore */ }
+      }
+    }
+  }, [sessionId]);
+
   const processBatch = useCallback(async (
-    imageIds: string[], 
+    imageIds: string[],
     pipeline: PipelineStep[],
     onProgress?: (current: number, total: number, result: ProcessedResult) => void
   ) => {
     abortControllerRef.current?.abort();
     const runId = ++runIdRef.current;
-    const isCurrent = () => runIdRef.current === runId;
-    const controller = new AbortController();
-    abortControllerRef.current = controller;
-
     setLoading(true);
     setResults([]);
     setTimingData({ total_time: 0, step_timings: [] });
-    
     try {
-      const allResults: ProcessedResult[] = [];
-      const allTimings: ProcessingTiming[] = [];
-      
-      // Process images one by one
-      for (let i = 0; i < imageIds.length; i++) {
-        if (!isCurrent()) break;
-        
-        const imageId = imageIds[i];
-        
-        try {
-          const response = await ApiService.processLive({
-            image_id: imageId,
-            pipeline: toApiSteps(pipeline),
-            session_id: sessionId
-          }, controller.signal);
-          if (!isCurrent()) break;
-          
-          if (response.success && response.results.length > 0) {
-            const result: ProcessedResult = {
-              id: imageId,
-              originalUrl: '',
-              processedUrl: response.results[response.results.length - 1],
-              intermediateResults: response.results
-            };
-            
-            allResults.push(result);
-            
-            // Add to results immediately (real-time update)
-            setResults(prev => [...prev, result]);
-            
-            // Track timings
-            if (response.step_timings) {
-              allTimings.push(...response.step_timings);
-            }
-            
-            // Call progress callback
-            if (onProgress) {
-              onProgress(i + 1, imageIds.length, result);
-            }
-          }
-        } catch {
-          // Continue with next image on failure
-        }
+      const job = await ApiService.createJob({ image_ids: imageIds, pipeline: toApiSteps(pipeline), session_id: sessionId });
+      if (runIdRef.current !== runId) {
+        ApiService.cancelJob(job.id, sessionId).catch(() => {});
+        return [];
       }
-      
-      if (!isCurrent()) return allResults;
-
-      // Update final timing data
-      setTimingData({
-        total_time: allTimings.reduce((sum, t) => sum + t.duration, 0) / 1000,
-        step_timings: allTimings
-      });
-      
-      return allResults;
+      jobIdRef.current = job.id;
+      try { sessionStorage.setItem(BATCH_JOB_KEY, job.id); } catch { /* ignore */ }
+      return await follow(job.id, runId, onProgress);
     } catch (error) {
+      if (runIdRef.current === runId) setLoading(false);
       console.error('Batch processing error:', error);
       throw error;
-    } finally {
-      // Only the current run may end the loading state.
-      if (isCurrent()) {
-        setLoading(false);
-        abortControllerRef.current = null;
-      }
     }
-  }, [sessionId]);
-  
+  }, [sessionId, follow]);
+
+  // A batch that was running when the page reloaded: keep following it.
+  useEffect(() => {
+    let stored: string | null = null;
+    try { stored = sessionStorage.getItem(BATCH_JOB_KEY); } catch { stored = null; }
+    if (!stored) return;
+    const runId = ++runIdRef.current;
+    jobIdRef.current = stored;
+    setLoading(true);
+    follow(stored, runId).catch(() => {});
+  }, [follow]);
+
   const cancelBatch = useCallback(() => {
     runIdRef.current += 1; // makes the running batch stale
     abortControllerRef.current?.abort();
     abortControllerRef.current = null;
+    if (jobIdRef.current) ApiService.cancelJob(jobIdRef.current, sessionId).catch(() => {});
+    jobIdRef.current = null;
+    try { sessionStorage.removeItem(BATCH_JOB_KEY); } catch { /* ignore */ }
     setLoading(false);
-  }, []);
+  }, [sessionId]);
   
   const setResultsManually = useCallback((newResults: ProcessedResult[]) => {
     setResults(newResults);

@@ -48,6 +48,7 @@ class User(Base):
     saved_pipelines = relationship("SavedPipeline", back_populates="user", cascade="all, delete-orphan")
     processing_history = relationship("ProcessingHistory", back_populates="user", cascade="all, delete-orphan")
     api_keys = relationship("APIKey", back_populates="user", cascade="all, delete-orphan")
+    processing_jobs = relationship("ProcessingJob", cascade="all, delete-orphan")
 
 
 class LoginAttempt(Base):
@@ -223,6 +224,33 @@ class ProcessedImage(Base):
     
     # Relationships
     original_image = relationship("UploadedImage", back_populates="processed_images")
+
+
+class ProcessingJob(Base):
+    """A batch run processed in the background (see app/utils/job_worker.py).
+
+    ``results`` has one entry per image, in order:
+    ``{"image_id", "status": "done"|"skipped"|"failed", "error"?, "processed_ids": [...],
+    "step_timings": [...], "step_errors": [...], "total_time"}`` where processed_ids are
+    ProcessedImage ids, one per step (the last is the final image).
+    """
+
+    __tablename__ = "processing_jobs"
+
+    id = Column(String, primary_key=True, index=True)  # UUID
+    session_id = Column(String, index=True, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True, index=True)
+    status = Column(String, nullable=False, default="queued", index=True)  # queued|running|done|failed|cancelled
+    pipeline = Column(JSON, nullable=False)
+    image_ids = Column(JSON, nullable=False)
+    total = Column(Integer, nullable=False, default=0)
+    completed = Column(Integer, nullable=False, default=0)
+    results = Column(JSON, nullable=True)
+    error = Column(Text, nullable=True)
+    cancel_requested = Column(Boolean, nullable=False, default=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), index=True)
+    started_at = Column(DateTime(timezone=True), nullable=True)
+    finished_at = Column(DateTime(timezone=True), nullable=True)
 
 
 class SystemSettings(Base):

@@ -1010,6 +1010,11 @@ async def delete_user(
     if pipeline_ids:
         db.query(SharedPipeline).filter(SharedPipeline.pipeline_id.in_(pipeline_ids)).delete(synchronize_session=False)
     db.query(SavedPipeline).filter(SavedPipeline.user_id == user_id).delete()
+
+    # Their background batch jobs
+    from app.models.db_models import ProcessingJob
+
+    db.query(ProcessingJob).filter(ProcessingJob.user_id == user_id).delete(synchronize_session=False)
     
     # Delete user's sessions
     db.query(DBSession).filter(DBSession.user_id == user_id).delete()

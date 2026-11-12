@@ -195,6 +195,7 @@ class CleanupService:
             "old_processed": CleanupService.cleanup_old_processed_images(db),
             "orphaned": CleanupService.cleanup_orphaned_images(db),
             "expired_refresh_tokens": CleanupService.cleanup_expired_refresh_tokens(db),
+            "finished_jobs": {"deleted": _delete_finished_jobs(db)},
         }
 
         total_deleted = (
@@ -204,7 +205,8 @@ class CleanupService:
             results["old_uploads"]["user_deleted"] +
             results["old_processed"]["deleted"] +
             results["orphaned"]["deleted"] +
-            results["expired_refresh_tokens"]["deleted"]
+            results["expired_refresh_tokens"]["deleted"] +
+            results["finished_jobs"]["deleted"]
         )
         
         logger.info(f"Cleanup complete. Total items deleted: {total_deleted}")
@@ -275,3 +277,9 @@ def manual_cleanup():
 
 if __name__ == "__main__":
     manual_cleanup()
+
+
+def _delete_finished_jobs(db) -> int:
+    from .job_worker import delete_finished_jobs
+
+    return delete_finished_jobs(db)

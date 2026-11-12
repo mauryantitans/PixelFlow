@@ -7,7 +7,8 @@ import {
   LiveProcessResponse,
   UploadResponse,
   MultipleUploadResponse,
-  OperationSchema
+  OperationSchema,
+  BatchJob
 } from '../types';
 
 import { prepareRequest, retryOn401 } from './tokenRefresh';
@@ -93,6 +94,30 @@ export class ApiService {
   /**
    * Process single image with live updates
    */
+  // ---- Background batch jobs (POST/GET /processing/jobs) ----
+  static async createJob(request: { image_ids: string[]; pipeline: any[]; session_id: string }): Promise<BatchJob> {
+    try {
+      const response = await api.post<{ job: BatchJob }>('/processing/jobs', request);
+      return response.data.job;
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  }
+
+  static async getJob(jobId: string, sessionId: string, signal?: AbortSignal): Promise<BatchJob> {
+    const response = await api.get<{ job: BatchJob }>(`/processing/jobs/${jobId}`, { params: { session_id: sessionId }, signal });
+    return response.data.job;
+  }
+
+  static async getJobResult(jobId: string, index: number, sessionId: string, signal?: AbortSignal): Promise<{ image_id: string; steps: string[]; final: string }> {
+    const response = await api.get(`/processing/jobs/${jobId}/results/${index}`, { params: { session_id: sessionId }, signal });
+    return response.data;
+  }
+
+  static async cancelJob(jobId: string, sessionId: string): Promise<void> {
+    await api.post(`/processing/jobs/${jobId}/cancel`, null, { params: { session_id: sessionId } });
+  }
+
   static async processLive(
     request: LiveProcessRequest,
     signal?: AbortSignal
