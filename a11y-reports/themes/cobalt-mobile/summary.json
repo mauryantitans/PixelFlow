@@ -1,0 +1,821 @@
+[
+  {
+    "state": "route-landing",
+    "url": "http://localhost:3000/",
+    "mode": "navigation",
+    "lighthouse": 100,
+    "lighthouseFailed": []
+  },
+  {
+    "state": "route-auth",
+    "url": "http://localhost:3000/auth",
+    "mode": "navigation",
+    "lighthouse": 100,
+    "lighthouseFailed": []
+  },
+  {
+    "state": "route-app",
+    "url": "http://localhost:3000/app",
+    "mode": "navigation",
+    "lighthouse": 100,
+    "lighthouseFailed": []
+  },
+  {
+    "state": "landing",
+    "url": "http://localhost:3000/",
+    "renderedTheme": "light",
+    "lighthouse": 100,
+    "lighthouseFailed": [],
+    "axe": {
+      "light": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      }
+    },
+    "layout": {
+      "overflowX": 0,
+      "textSpacingClipped": 0,
+      "text200Clipped": null,
+      "text200OverflowX": null
+    },
+    "keyboard": {
+      "tabStops": 26,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": null
+    }
+  },
+  {
+    "state": "auth-login",
+    "url": "http://localhost:3000/auth",
+    "renderedTheme": "light",
+    "lighthouse": 100,
+    "lighthouseFailed": [],
+    "axe": {
+      "light": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      }
+    },
+    "layout": {
+      "overflowX": 0,
+      "textSpacingClipped": 0,
+      "text200Clipped": null,
+      "text200OverflowX": null
+    },
+    "keyboard": {
+      "tabStops": 4,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": null
+    }
+  },
+  {
+    "state": "auth-register",
+    "url": "http://localhost:3000/auth",
+    "renderedTheme": "light",
+    "lighthouse": 100,
+    "lighthouseFailed": [],
+    "axe": {
+      "light": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      }
+    },
+    "layout": {
+      "overflowX": 0,
+      "textSpacingClipped": 0,
+      "text200Clipped": null,
+      "text200OverflowX": null
+    },
+    "keyboard": {
+      "tabStops": 7,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": null
+    }
+  },
+  {
+    "state": "auth-login-error",
+    "url": "http://localhost:3000/auth",
+    "renderedTheme": "light",
+    "lighthouse": 100,
+    "lighthouseFailed": [],
+    "axe": {
+      "light": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      }
+    },
+    "layout": {
+      "overflowX": 0,
+      "textSpacingClipped": 0,
+      "text200Clipped": null,
+      "text200OverflowX": null
+    },
+    "keyboard": {
+      "tabStops": 4,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": null
+    }
+  },
+  {
+    "state": "app-empty",
+    "url": "http://localhost:3000/app",
+    "renderedTheme": "light",
+    "lighthouse": 100,
+    "lighthouseFailed": [],
+    "axe": {
+      "light": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      }
+    },
+    "layout": {
+      "overflowX": 0,
+      "textSpacingClipped": 0,
+      "text200Clipped": null,
+      "text200OverflowX": null
+    },
+    "keyboard": {
+      "tabStops": 33,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": null
+    }
+  },
+  {
+    "state": "app-pipeline",
+    "url": "http://localhost:3000/app",
+    "renderedTheme": "light",
+    "lighthouse": 100,
+    "lighthouseFailed": [],
+    "axe": {
+      "light": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      }
+    },
+    "layout": {
+      "overflowX": 0,
+      "textSpacingClipped": 0,
+      "text200Clipped": null,
+      "text200OverflowX": null
+    },
+    "keyboard": {
+      "tabStops": 59,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": null
+    }
+  },
+  {
+    "state": "modal-gallery",
+    "url": "http://localhost:3000/app",
+    "renderedTheme": "light",
+    "lighthouse": 100,
+    "lighthouseFailed": [],
+    "axe": {
+      "light": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      }
+    },
+    "layout": {
+      "overflowX": 0,
+      "textSpacingClipped": 0,
+      "text200Clipped": null,
+      "text200OverflowX": null
+    },
+    "keyboard": {
+      "tabStops": 7,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": 0
+    }
+  },
+  {
+    "state": "modal-lightbox",
+    "url": "http://localhost:3000/app",
+    "renderedTheme": "light",
+    "lighthouse": 100,
+    "lighthouseFailed": [],
+    "axe": {
+      "light": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      }
+    },
+    "layout": {
+      "overflowX": 0,
+      "textSpacingClipped": 0,
+      "text200Clipped": null,
+      "text200OverflowX": null
+    },
+    "keyboard": {
+      "tabStops": 3,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": 0
+    }
+  },
+  {
+    "state": "modal-method-details",
+    "url": "http://localhost:3000/app",
+    "renderedTheme": "light",
+    "lighthouse": 100,
+    "lighthouseFailed": [],
+    "axe": {
+      "light": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      }
+    },
+    "layout": {
+      "overflowX": 0,
+      "textSpacingClipped": 0,
+      "text200Clipped": null,
+      "text200OverflowX": null
+    },
+    "keyboard": {
+      "tabStops": 3,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": 0
+    }
+  },
+  {
+    "state": "app-results",
+    "url": "http://localhost:3000/app",
+    "renderedTheme": "light",
+    "lighthouse": 100,
+    "lighthouseFailed": [],
+    "axe": {
+      "light": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      }
+    },
+    "layout": {
+      "overflowX": 0,
+      "textSpacingClipped": 0,
+      "text200Clipped": null,
+      "text200OverflowX": null
+    },
+    "keyboard": {
+      "tabStops": 59,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": null
+    }
+  },
+  {
+    "state": "modal-analytics",
+    "url": "http://localhost:3000/app",
+    "renderedTheme": "light",
+    "lighthouse": 100,
+    "lighthouseFailed": [],
+    "axe": {
+      "light": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      }
+    },
+    "layout": {
+      "overflowX": 0,
+      "textSpacingClipped": 0,
+      "text200Clipped": null,
+      "text200OverflowX": null
+    },
+    "keyboard": {
+      "tabStops": 4,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": 0
+    }
+  },
+  {
+    "state": "app-inspector",
+    "url": "http://localhost:3000/app",
+    "renderedTheme": "light",
+    "lighthouse": 100,
+    "lighthouseFailed": [],
+    "axe": {
+      "light": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      }
+    },
+    "layout": {
+      "overflowX": 0,
+      "textSpacingClipped": 0,
+      "text200Clipped": null,
+      "text200OverflowX": null
+    },
+    "keyboard": {
+      "tabStops": 59,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": null
+    }
+  },
+  {
+    "state": "app-inspector-slider",
+    "url": "http://localhost:3000/app",
+    "renderedTheme": "light",
+    "lighthouse": 100,
+    "lighthouseFailed": [],
+    "axe": {
+      "light": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      }
+    },
+    "layout": {
+      "overflowX": 0,
+      "textSpacingClipped": 0,
+      "text200Clipped": null,
+      "text200OverflowX": null
+    },
+    "keyboard": {
+      "tabStops": 60,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": null
+    }
+  },
+  {
+    "state": "app-live",
+    "url": "http://localhost:3000/app",
+    "renderedTheme": "light",
+    "lighthouse": 100,
+    "lighthouseFailed": [],
+    "axe": {
+      "light": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      }
+    },
+    "layout": {
+      "overflowX": 0,
+      "textSpacingClipped": 0,
+      "text200Clipped": null,
+      "text200OverflowX": null
+    },
+    "keyboard": {
+      "tabStops": 59,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": null
+    }
+  },
+  {
+    "state": "app-signed-in",
+    "url": "http://localhost:3000/app",
+    "renderedTheme": "light",
+    "lighthouse": 100,
+    "lighthouseFailed": [],
+    "axe": {
+      "light": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      }
+    },
+    "layout": {
+      "overflowX": 0,
+      "textSpacingClipped": 0,
+      "text200Clipped": null,
+      "text200OverflowX": null
+    },
+    "keyboard": {
+      "tabStops": 39,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": null
+    }
+  },
+  {
+    "state": "menu-user",
+    "url": "http://localhost:3000/app",
+    "renderedTheme": "light",
+    "lighthouse": 100,
+    "lighthouseFailed": [],
+    "axe": {
+      "light": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      }
+    },
+    "layout": {
+      "overflowX": 0,
+      "textSpacingClipped": 0,
+      "text200Clipped": null,
+      "text200OverflowX": null
+    },
+    "keyboard": {
+      "tabStops": 39,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": null
+    }
+  },
+  {
+    "state": "modal-save-pipeline",
+    "url": "http://localhost:3000/app",
+    "renderedTheme": "light",
+    "lighthouse": 100,
+    "lighthouseFailed": [],
+    "axe": {
+      "light": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      }
+    },
+    "layout": {
+      "overflowX": 0,
+      "textSpacingClipped": 0,
+      "text200Clipped": null,
+      "text200OverflowX": null
+    },
+    "keyboard": {
+      "tabStops": 7,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": 0
+    }
+  },
+  {
+    "state": "modal-load-pipeline",
+    "url": "http://localhost:3000/app",
+    "renderedTheme": "light",
+    "lighthouse": 100,
+    "lighthouseFailed": [],
+    "axe": {
+      "light": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      }
+    },
+    "layout": {
+      "overflowX": 0,
+      "textSpacingClipped": 0,
+      "text200Clipped": null,
+      "text200OverflowX": null
+    },
+    "keyboard": {
+      "tabStops": 4,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": 0
+    }
+  },
+  {
+    "state": "modal-admin",
+    "url": "http://localhost:3000/app",
+    "renderedTheme": "light",
+    "lighthouse": 100,
+    "lighthouseFailed": [],
+    "axe": {
+      "light": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      }
+    },
+    "layout": {
+      "overflowX": 0,
+      "textSpacingClipped": 0,
+      "text200Clipped": null,
+      "text200OverflowX": null
+    },
+    "keyboard": {
+      "tabStops": 12,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": 0
+    }
+  },
+  {
+    "state": "modal-admin-pin",
+    "url": "http://localhost:3000/app",
+    "renderedTheme": "light",
+    "lighthouse": 100,
+    "lighthouseFailed": [],
+    "axe": {
+      "light": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      }
+    },
+    "layout": {
+      "overflowX": 0,
+      "textSpacingClipped": 0,
+      "text200Clipped": null,
+      "text200OverflowX": null
+    },
+    "keyboard": {
+      "tabStops": 4,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": 0
+    }
+  },
+  {
+    "state": "modal-admin-userdata",
+    "url": "http://localhost:3000/app",
+    "renderedTheme": "light",
+    "lighthouse": 100,
+    "lighthouseFailed": [],
+    "axe": {
+      "light": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      },
+      "dark": {
+        "rules": [],
+        "nodesByImpact": {
+          "critical": 0,
+          "serious": 0,
+          "moderate": 0,
+          "minor": 0
+        }
+      }
+    },
+    "layout": {
+      "overflowX": 0,
+      "textSpacingClipped": 0,
+      "text200Clipped": null,
+      "text200OverflowX": null
+    },
+    "keyboard": {
+      "tabStops": 11,
+      "noVisibleFocus": 0,
+      "focusEscapedDialog": 0
+    }
+  }
+]

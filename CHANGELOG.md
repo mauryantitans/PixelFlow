@@ -23,7 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   only when chosen; timings and values use the theme's monospace face.
 - **Contrast is preserved by construction:** every theme shade has the same luminance as the
   Tailwind shade it replaces (`frontend/scripts/gen-themes.py`), so all WCAG AA results carry
-  over. Each theme was re-audited (Lighthouse + axe, desktop and 320px).
+  over. Each theme was re-audited: 24 states at desktop and 320px, Lighthouse 100 and 0 axe
+  violations in light and dark ([a11y-reports/themes/](a11y-reports/themes/README.md)).
 - Themes other than Classic use a neutral operations sidebar and a single accent colour
   (colourful chrome next to the preview skews colour judgement).
 - **New mark:** three overlapping R/G/B pixels on a dark tile, used in the header, landing
