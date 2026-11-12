@@ -20,9 +20,10 @@ Sign-in sets **httpOnly cookies**; tokens never appear in response bodies.
 | `pf_admin_pin` | 15 min | Admin PIN grant, sent only to `/api/admin`. |
 
 **CSRF.** Cookie-authenticated `POST`/`PUT`/`PATCH`/`DELETE` requests under `/api` must send
-`X-CSRF-Token` equal to the `pf_csrf` cookie. Exempt: register, login, OAuth, and the
+`X-CSRF-Token` equal to the `pf_csrf` cookie, or get 403. Exempt: register, login, OAuth, and the
 session-id-keyed `heartbeat` / `cleanup-session`. Also exempt: forgot-password, reset-password
-and verify-email, which act only through the email address or the token in the body.
+and verify-email, which act only through the email address or the token in the body, and
+`client-errors`, which can only add a log line.
 
 **Non-browser clients** can send `Authorization: Bearer <token>` instead of cookies (no CSRF
 header needed then), e.g. a token from `create_access_token` in tests.
@@ -36,7 +37,8 @@ The web app refreshes proactively after 20 minutes and retries once on a 401.
 | `POST /auth/login` | `{email, password}` → user; sets cookies. Repeated failures lock the account temporarily. |
 | `POST /auth/refresh` | Rotates tokens → `{success: true}`. 401 if the refresh token is invalid. |
 | `POST /auth/logout` | Clears cookies, revokes refresh tokens. |
-| `GET /auth/me` · `PUT /auth/me` · `DELETE /auth/me` | Current user; update profile; delete account. |
+| `GET /auth/me` · `PUT /auth/me` · `DELETE /auth/me` | Current user; update profile; delete account. The user includes `email_verified` and `preferences`. |
+| `PUT /auth/me/preferences` | `{ui_theme?, mode?}` → user. Saves the appearance to the account so it follows the user to other browsers. `ui_theme` is a theme id (`^[a-z][a-z0-9-]{0,31}$`), `mode` is `light` or `dark`; keys you leave out are kept. |
 | `GET /auth/google/status` · `GET /auth/google/login` · `POST /auth/google/callback` | Google sign-in, only when configured. |
 | `POST /auth/forgot-password` | `{email}` → always the same 200 `{success, message}`, whether or not the account exists. Emails a reset link (Google-only accounts get a "use Google sign-in" email instead); at most one per address per minute. |
 | `POST /auth/reset-password` | `{token, new_password}` → 200. The token comes from the emailed link, is valid 1 hour and works once. Applies the password policy (422), revokes all the user's refresh tokens and clears the login lockout; the user then signs in. 400 `{detail: {message, code}}` with `code` `token_expired` or `token_invalid`. |
@@ -90,8 +92,9 @@ frontend renders its controls from), plus a flat legacy list for backward compat
 **Response (abridged):**
 ```json
 {
-  "version": "1",
-  "total_count": 77,
+  "success": true,
+  "version": "2",
+  "total_count": 78,
   "categories": [
     {
       "name": "Basic",
@@ -106,9 +109,10 @@ frontend renders its controls from), plus a flat legacy list for backward compat
               "subcategory": "Adjustments",
               "description": "Adjust image brightness",
               "interactive": false,
+              "hidden": false,
               "params": [
-                {"name": "amount", "label": "Amount", "type": "int",
-                 "default": 0, "min": -100, "max": 100}
+                {"name": "amount", "label": "Brightness", "type": "int", "default": 0,
+                 "min": -100, "max": 100, "help": "", "advanced": false}
               ]
             }
           ]
@@ -120,9 +124,24 @@ frontend renders its controls from), plus a flat legacy list for backward compat
 }
 ```
 
-Param `type` is one of: `int`, `float`, `odd_kernel`, `angle`, `enum`, `bool`, `color`,
-`point`, `points`, `rect`. Coordinate params (`point`/`points`/`rect`) carry a `space`
-(`normalized` by default) and are picked on the preview in the UI.
+Every param has `name`, `label`, `type`, `default`, `help` and `advanced`. `type` is one of:
+
+| `type` | Extra fields | Value sent |
+|---|---|---|
+| `int`, `float`, `angle` | `min`, `max`, `step` | number |
+| `odd_kernel` | `min`, `max`, `step` (2) | odd integer |
+| `enum` | `options: [{value, label}]` | one option value |
+| `bool` | | `true` / `false` |
+| `color` | | `"#RRGGBB"` (or `[r, g, b]`) |
+| `point`, `points`, `rect` | `space` (`normalized`); `points` also `min_points`, `max_points` | normalized [0..1] coordinates, picked on the preview |
+| `matrix` | `min_size`, `max_size`, `value_min`, `value_max`, `presets: [{label, value}]` | square, odd-sized list of rows of numbers (Custom Kernel) |
+| `text` | `max_length` | string (trimmed and cut to `max_length`) |
+| `steps` | `max_steps` (30) | list of `{name, params, enabled}` (the body of a saved filter) |
+
+Operations with `"hidden": true` are in `categories` but not in the legacy `operations` list or
+`total_count`. They run when a pipeline names them, but the palette doesn't list them. Today that is only
+**Custom Filter**, the step that runs a saved filter's `steps` in order (a filter can't contain
+another filter). So the count is 78: the 77 built-in operations plus Custom Kernel.
 
 ### Live processing (one image)
 
@@ -144,7 +163,8 @@ POST /api/processing/process-live
 
 Operation identity is the `name` (a display label or `id`); both resolve through the
 backend alias map. Params use the keys from each operation's schema. Coordinate params are
-sent as normalized [0..1] values.
+sent as normalized [0..1] values. A step may carry `"enabled": false`: it is skipped (the image
+passes through unchanged) and reports no error. `enabled` defaults to `true`.
 
 **Response:**
 ```json
@@ -167,7 +187,7 @@ sent as normalized [0..1] values.
 succeeded, or `{"op", "kind", "message", "param_errors": [...]}` when a step's params were
 invalid or the op failed (the pipeline is not aborted — one bad step is reported, not fatal).
 
-### Batch processing
+### Batch processing (synchronous)
 
 ```http
 POST /api/processing/process
@@ -175,10 +195,28 @@ POST /api/processing/process
 
 **Request Body:** like live, but `image_ids: string[]` instead of a single `image_id`.
 The response includes `processed_images`, optional `intermediate_results`, `step_timings`,
-and a per-image `step_errors`.
+and a per-image `step_errors`. The whole batch runs inside the request. The web app uses
+background jobs instead (below).
 
----
+### Background batch jobs
 
+The web app runs batches as jobs. A worker thread in the backend processes queued jobs one at a
+time, so a run continues if the browser reloads or closes. A job belongs to the account that
+started it; a guest's job belongs to its session, so guests pass `?session_id=` on every call
+below. Someone else's job returns 404.
+
+| Endpoint | Notes |
+|---|---|
+| `POST /processing/jobs` | Body as for `/processing/process` (`image_ids` ≤ 100, `pipeline`, `session_id`) → 202 `{job}`. 400 if either list is empty or too long. |
+| `GET /processing/jobs/{id}` | → `{job}`: `id`, `status` (`queued`, `running`, `done`, `failed`, `cancelled`), `total`, `completed`, `results[]`, `error`, `created_at`, `finished_at`. |
+| `GET /processing/jobs/{id}/results/{i}` | Image `i`'s output after every step: `{image_id, steps: [data URL…], final}`. 404 until that image is `done`; 410 once its processed images were removed by cleanup. |
+| `POST /processing/jobs/{id}/cancel` | A queued job is cancelled at once; a running job stops before its next image. → `{job}`. |
+
+Each `results[]` entry, in image order: `{image_id, status, error, total_time, step_timings,
+step_errors}`, where `status` is `done`, `skipped` (not your image, or deleted) or `failed`. Poll
+`GET /processing/jobs/{id}` and fetch each result once its status is `done`. A job interrupted
+by a server restart is queued again and starts over from its first image. Finished jobs are
+deleted by the cleanup job after a day.
 
 ---
 
@@ -193,8 +231,21 @@ and a per-image `step_errors`.
 | `PUT /pipelines/{id}` · `DELETE /pipelines/{id}` | Owner only. |
 | `POST /pipelines/{id}/duplicate` | Also counts toward the limit. |
 
-Saved steps reference operations by display name; old names keep working through the
-registry's alias map.
+`GET /pipelines/?category=Custom%20filter` lists the user's saved filters (pipelines saved
+with "Save as a reusable filter" get that category). Saved steps reference operations by display
+name; old names keep working through the registry's alias map.
+
+### Share by link
+
+| Endpoint | Notes |
+|---|---|
+| `GET /pipelines/{id}/share` | Owner only. → `{share: {token, path, view_count}}`, or `{share: null}` when not shared. |
+| `POST /pipelines/{id}/share` | Owner only. Creates the link (or returns the existing one) → `{share}`. `path` is `/p/{token}`, a frontend route. |
+| `DELETE /pipelines/{id}/share` | Owner only. → 204; the old link stops working. |
+| `GET /pipelines/shared/{token}` | **Public**, no sign-in. → `{name, description, pipeline_data, author, created_at, view_count}`; each call counts a view. 404 if the link doesn't exist or was turned off. |
+
+A share link exposes the pipeline's name, description, steps with their parameter values, and
+the owner's username. It never exposes images.
 
 ---
 
@@ -232,10 +283,20 @@ it.
 
 ---
 
+## Client error reports
+
+`POST /api/client-errors` with `{kind?, message, stack?, path?, user_agent?}` → 204. The web app
+sends uncaught browser errors here. They are written to the backend log and, when `SENTRY_DSN`
+is set, forwarded to Sentry. Fields are length-capped (message 2,000 characters, stack 8,000).
+No sign-in, no CSRF header. Reports past 10 per client IP per minute are dropped silently
+(still 204).
+
+---
+
 ## Rate limits
 
-Per client IP and per minute: auth 10, upload 30, processing 150, admin 30, everything else
-100. Exceeding one returns 429 `{"detail": "Too many requests. Please slow down and try again
+Per client IP and per minute: auth 10, upload 30, processing 150 (including the job routes,
+so polling counts), admin 30, everything else 100. Exceeding one returns 429 `{"detail": "Too many requests. Please slow down and try again
 later."}`. Behind proxies, set `TRUSTED_PROXY_HOPS` so the real client IP is used (see
 [deployment/ENVIRONMENT_VARIABLES.md](../deployment/ENVIRONMENT_VARIABLES.md)).
 

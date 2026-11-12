@@ -33,7 +33,7 @@ Environment Variables. They are compiled in at build time, so redeploy after cha
 | `DB_CLEANUP_INTERVAL_SECONDS` | `900` | How often the built-in cleanup job runs. Whether it deletes anything is the admin's Auto-cleanup switch (Admin → Retention). |
 | `DB_CLEANUP_INITIAL_DELAY_SECONDS` | `120` | Delay before the first run after startup. |
 | `HOST`, `PORT` | `0.0.0.0`, `8000` | Render sets `PORT` itself. |
-| `APP_NAME`, `VERSION` | `PixelFlow`, `1.3.0` | Shown at `/` and in logs. |
+| `APP_NAME`, `VERSION` | `PixelFlow`, `1.4.0` | Shown at `/` and in logs. |
 
 ### Image storage (optional)
 
@@ -59,6 +59,29 @@ Token lifetimes (access 30 min, refresh 7 days), rate limits and upload limits a
 `backend/app/core/security_config.py`, not environment variables. Quotas, retention periods
 and session lifetimes are edited in the admin panel (stored in the `system_settings` table).
 
+### Background batch jobs
+
+Batch runs are queued in the `processing_jobs` table and processed by one worker thread inside
+the backend process ([API](../guides/API_REFERENCE.md#background-batch-jobs)).
+
+| Variable | Default | Notes |
+|---|---|---|
+| `JOB_WORKER_ENABLED` | `true` | `false`, `0` or `no` doesn't start the worker. Jobs then stay queued, so only turn it off in a process that shouldn't process batches. |
+| `JOB_POLL_SECONDS` | `1` | How often the worker checks for queued jobs. A new job also wakes it at once when it was queued by the same process. |
+
+### Error tracking (optional)
+
+Off unless `SENTRY_DSN` is set. Server errors are reported by Sentry's FastAPI integration;
+browser errors arrive through `POST /api/client-errors` and are forwarded. Personal data is not
+sent (`send_default_pii=False`: no cookies, request bodies or user emails). Without a DSN, browser
+errors are still written to the backend log.
+
+| Variable | Default | Notes |
+|---|---|---|
+| `SENTRY_DSN` | — | Your Sentry project's DSN. |
+| `SENTRY_ENVIRONMENT` | `production` | Environment tag on each event. |
+| `SENTRY_TRACES_SAMPLE_RATE` | `0` | Share of requests to trace for performance (`0.0`–`1.0`). `0` sends errors only. |
+
 ### Email (password reset and verification)
 
 | Variable | Default | Notes |
@@ -77,6 +100,12 @@ and session lifetimes are edited in the admin panel (stored in the `system_setti
 | `REACT_APP_API_URL` | `/api` in production | Relative, so the API is same-origin and cookies are first-party. `frontend/vercel.json` rewrites `/api/*` to the Render backend: set its destination to your backend URL. Locally `start.sh` writes `http://localhost:8000/api` to `frontend/.env.local`. |
 | `REACT_APP_GOOGLE_CLIENT_ID` | — | Shows the Google button. Must match the backend's `GOOGLE_CLIENT_ID`. |
 | `REACT_APP_TOKEN_REFRESH_MINUTES` | `20` | Refresh tokens proactively after this many minutes. Keep it below the 30-minute access-token lifetime. |
+
+## GitHub Actions
+
+| Setting | Where | Notes |
+|---|---|---|
+| `PRODUCTION_URL` | Repository → Settings → Secrets and variables → Actions → **Variables** | e.g. `https://your-app.vercel.app`, no trailing slash. `.github/workflows/uptime.yml` checks `$PRODUCTION_URL/api/health` every 30 minutes and opens an issue labelled `uptime` while it fails. The check is skipped until this is set. |
 
 ## Troubleshooting
 

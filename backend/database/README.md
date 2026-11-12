@@ -40,7 +40,7 @@ All scripts use the app's settings: `backend/.env` plus the shell environment. `
 python database/init_db.py
 ```
 
-Creates any missing tables (`Base.metadata.create_all`, the same thing the backend does on startup), then
+Brings the schema up to date (the same Alembic migrations the backend runs on startup), then
 prompts for an admin's email, username, optional full name and password (min 8 characters, entered twice). It
 refuses if that email or username already exists, and offers to retry. Existing data is never dropped.
 

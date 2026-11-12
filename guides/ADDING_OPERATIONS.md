@@ -60,6 +60,11 @@ If you add a new module, import it in `ensure_registered()` in
 **Renaming later:** change `label`, and add the old label to `aliases=[...]`. Never remove an
 alias. Saved pipelines refer to operations by display name and resolve through the alias map.
 
+**Hidden operations:** `hidden=True` keeps an operation runnable (pipelines can name it and the
+executor resolves it) but leaves it out of the palette, the legacy `operations` list and
+`total_count`. Use it for steps that the UI adds some other way. The one example is
+`custom_filter` in `operations/custom.py`, which the UI adds from **Custom → My filters**.
+
 ## Parameter types
 
 All take `name`, `label`, `default`, and optionally `help` (tooltip text) and `advanced`.
@@ -76,6 +81,13 @@ All take `name`, `label`, `default`, and optionally `help` (tooltip text) and `a
 | `PointParam` | `point` | | click on the preview | `(x, y)` pixels, or `None` |
 | `PointsParam` | `points` | `min_points`, `max_points` | several clicks | list of `(x, y)` |
 | `RectParam` | `rect` | | drag a region | `(x, y, w, h)` pixels, or `None` |
+| `MatrixParam` | `matrix` | `min_size`, `max_size` (odd), `value_min`, `value_max`, `presets=[{"label", "value"}]` | matrix editor with presets and a size picker | square `list[list[float]]`, odd size |
+| `TextParam` | `text` | `max_length` (80) | text field | `str`, trimmed and cut to `max_length` |
+| `StepsParam` | `steps` | `max_steps` (30) | read-only list of the steps | `list` of `{"name", "params", "enabled"}` |
+
+`StepsParam` is for operations that run other steps (see `custom_filter`): pass each step to
+`execute_step` rather than calling operation functions directly, so validation, coordinates and
+`enabled` work the same as in a pipeline.
 
 Coordinates are stored and sent as normalized `[0..1]` values and converted to pixels in
 `processing/coords.py` against the image **at that step**. A point picked before an upstream
@@ -95,8 +107,10 @@ def test_posterize_edges():
     assert err is None and out.size == _gradient().size
 ```
 
-Then run the quality gate from `backend/`: `ruff check .`, `ruff format --check .`,
-`mypy app`, `pytest`. If your operation has a "no change" setting (e.g. amount 0), add it to
+Then run the quality gate from `backend/`, as CI does: `ruff check app/processing tests`,
+`ruff format --check app/processing tests`, `mypy` (scope set in `pyproject.toml`), `pytest`.
+The registry and API tests count operations (`test_registry.py`, `test_operations_api.py`,
+`test_builtins_smoke.py`), so update those counts when you add one. If your operation has a "no change" setting (e.g. amount 0), add it to
 the identity cases in `test_operation_ranges.py`, which catches uint8 wrap-around.
 
 ## 4. Check it in the app

@@ -1,0 +1,34 @@
+cff-version: 1.2.0
+message: "If you use PixelFlow in your work, please cite it using the metadata from this file."
+type: software
+title: PixelFlow
+abstract: >-
+  PixelFlow is a web application for building image-processing pipelines
+  visually. Users chain operations from OpenCV, scikit-image and Pillow
+  (77 built-in operations plus user-defined convolution kernels), preview
+  a single image live with incremental recomputation, and run pipelines
+  over many images as background jobs. The operation library is declared
+  once in a schema-driven backend registry (FastAPI, Python) from which the
+  React/TypeScript frontend renders every control, including interactive
+  point, region and colour picks. Pipelines can be saved, reused as custom
+  filters and shared by link.
+authors:
+  - alias: Mauryantitans
+version: 1.4.0
+date-released: 2026-11-12
+license: Apache-2.0
+repository-code: "https://github.com/Mauryantitans/PixelFlow"
+url: "https://pixel-flow-woad.vercel.app"
+keywords:
+  - image processing
+  - computer vision
+  - pipeline builder
+  - visual programming
+  - OpenCV
+  - scikit-image
+  - Pillow
+  - convolution kernels
+  - FastAPI
+  - React
+  - TypeScript
+  - accessibility

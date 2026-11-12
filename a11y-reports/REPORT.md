@@ -31,6 +31,12 @@ use the app:
 - On a phone, or zoomed in, the workspace was up to 1073px wide, and the header
   navigation disappeared completely.
 
+> **Since this audit:** every appearance theme has been audited the same way (desktop and 320px,
+> light and dark); per-theme results are in [themes/README.md](themes/README.md). CI
+> (`.github/workflows/ci.yml`, `e2e` job) re-runs this audit at desktop size on every pull request
+> and on pushes to the main branches, and fails the build on any finding
+> (`scripts/check-summary.py`). See [section 8](#8-re-running-the-audit).
+
 ## 2. How I tested
 
 | | |
@@ -451,3 +457,12 @@ Then rebuild the tables in this report:
 ```bash
 python3 a11y-reports/scripts/make_tables.py
 ```
+
+Check a run for any finding (what CI does with `PHASE=ci`; exits 1 on a problem):
+
+```bash
+python3 a11y-reports/scripts/check-summary.py a11y-reports/after/summary.json
+```
+
+Another theme: add `UI_THEME=<theme id>` and a `PHASE=themes/<id>` folder, see
+[themes/README.md](themes/README.md).

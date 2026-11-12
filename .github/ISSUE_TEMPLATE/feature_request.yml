@@ -1,0 +1,52 @@
+name: Feature request
+description: Suggest an idea or improvement for PixelFlow.
+title: "feat: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the idea. [CURRENT_LIMITATIONS.md](https://github.com/Mauryantitans/PixelFlow/blob/React_FastAPI/CURRENT_LIMITATIONS.md) lists what's known to be missing; a thumbs-up reaction on an existing issue helps too.
+        Want a new image operation? Most are one function and one registration in the backend, see [guides/ADDING_OPERATIONS.md](https://github.com/Mauryantitans/PixelFlow/blob/React_FastAPI/guides/ADDING_OPERATIONS.md).
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What are you trying to do, and what gets in the way today?
+      placeholder: When I batch-process product photos I need transparent PNGs, but results are always JPEG.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: How you'd like it to work. Mock-ups or examples from other tools are welcome.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other ways to solve it, or workarounds you use now.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Operations / processing
+        - Workspace UI
+        - Pipelines, filters and sharing
+        - Accounts and sign-in
+        - Admin panel
+        - API
+        - Deployment and hosting
+        - Documentation
+        - Other
+    validations:
+      required: true
+  - type: checkboxes
+    id: contribute
+    attributes:
+      label: Contributing
+      options:
+        - label: I'd like to work on this (see CONTRIBUTING.md)

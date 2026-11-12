@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: User guide
+    url: https://github.com/Mauryantitans/PixelFlow/blob/React_FastAPI/guides/GETTING_STARTED.md
+    about: How to upload images, build pipelines, use custom filters and share them.
+  - name: Installation and troubleshooting
+    url: https://github.com/Mauryantitans/PixelFlow/blob/React_FastAPI/INSTALLATION.md#troubleshooting
+    about: Setting up PixelFlow locally and fixing common problems.
+  - name: Report a security vulnerability
+    url: https://github.com/Mauryantitans/PixelFlow/security/advisories/new
+    about: Please report security problems privately, not as an issue.

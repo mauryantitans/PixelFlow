@@ -1,388 +1,184 @@
+<div align="center">
+
+<img src="docs/assets/logo.svg" alt="PixelFlow logo" width="96" height="96" />
+
 # PixelFlow
 
-## Visual Image Processing Pipeline Builder
+**Build image processing pipelines visually.**<br />
+Chain 77 OpenCV, scikit-image and Pillow operations, preview every step live, design your own filters, and batch-process images. No code required.
 
-**Version 1.3.0** | [V1.0.0 on GitHub](https://github.com/Mauryantitans/PixelFlow/tree/v1.0.0) | [Changelog](CHANGELOG.md)
+[![CI](https://github.com/Mauryantitans/PixelFlow/actions/workflows/ci.yml/badge.svg?branch=React_FastAPI)](https://github.com/Mauryantitans/PixelFlow/actions/workflows/ci.yml)
+[![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+[![Live demo](https://img.shields.io/badge/demo-live-2bd483.svg)](https://pixel-flow-woad.vercel.app)
+[![WCAG 2.1 AA](https://img.shields.io/badge/accessibility-WCAG%202.1%20AA-5c8dff.svg)](a11y-reports/REPORT.md)
+<br />
+[![Python 3.11](https://img.shields.io/badge/python-3.11-3776ab.svg?logo=python&logoColor=white)](backend/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688.svg?logo=fastapi&logoColor=white)](backend/)
+[![React 18 + TypeScript](https://img.shields.io/badge/React%2018-TypeScript-3178c6.svg?logo=react&logoColor=white)](frontend/)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-ff5468.svg)](CONTRIBUTING.md)
 
----
+[**Try it live**](https://pixel-flow-woad.vercel.app) · [Getting started](guides/GETTING_STARTED.md) · [API](guides/API_REFERENCE.md) · [Report a bug](https://github.com/Mauryantitans/PixelFlow/issues/new?template=bug_report.yml) · [Request a feature](https://github.com/Mauryantitans/PixelFlow/issues/new?template=feature_request.yml)
 
-A comprehensive web application that enables developers and researchers to build, test, and apply sophisticated image processing pipelines through an intuitive visual interface.
+<br />
 
-PixelFlow eliminates the need for manual parameter tuning by providing **real-time visual feedback** and extensive operation libraries from **OpenCV** and **Scikit-Image**.
+<img src="docs/images/workspace.png" alt="The PixelFlow workspace: an operations sidebar, a three-step pipeline with sliders and timings, and the Inspector showing the processed image" width="100%" />
 
----
-
-## 📸 Screenshots
-
-<table>
-  <tr>
-    <td><img src="images/PixelFlow (1).png" alt="Screenshot 1" width="100%"/></td>
-    <td><img src="images/PixelFlow (2).png" alt="Screenshot 2" width="100%"/></td>
-    <td><img src="images/PixelFlow (3).png" alt="Screenshot 3" width="100%"/></td>
-    <td><img src="images/PixelFlow (4).png" alt="Screenshot 4" width="100%"/></td>
-  </tr>
-  <tr>
-    <td><img src="images/PixelFlow (5).png" alt="Screenshot 5" width="100%"/></td>
-    <td><img src="images/PixelFlow (6).png" alt="Screenshot 6" width="100%"/></td>
-    <td><img src="images/PixelFlow (7).png" alt="Screenshot 7" width="100%"/></td>
-    <td><img src="images/PixelFlow (8).png" alt="Screenshot 8" width="100%"/></td>
-  </tr>
-  <tr>
-    <td><img src="images/PixelFlow (9).png" alt="Screenshot 9" width="100%"/></td>
-    <td><img src="images/PixelFlow (10).png" alt="Screenshot 10" width="100%"/></td>
-    <td><img src="images/PixelFlow (11).png" alt="Screenshot 11" width="100%"/></td>
-    <td><img src="images/PixelFlow (12).png" alt="Screenshot 12" width="100%"/></td>
-  </tr>
-  <tr>
-    <td><img src="images/PixelFlow (13).png" alt="Screenshot 13" width="100%"/></td>
-    <td><img src="images/PixelFlow (14).png" alt="Screenshot 14" width="100%"/></td>
-    <td><img src="images/PixelFlow (15).png" alt="Screenshot 15" width="100%"/></td>
-    <td><img src="images/PixelFlow (16).png" alt="Screenshot 16" width="100%"/></td>
-  </tr>
-</table>
-
-> 💡 **Want to see it in action?** Check out our live demo deployment below!
+</div>
 
 ---
 
-## 🌐 Live Demo
+## Why PixelFlow?
 
-Experience PixelFlow without any setup required!
+Tuning an image-processing pipeline usually means editing a script, re-running it, and squinting
+at the output. PixelFlow turns that loop into a direct-manipulation tool:
 
-**🔗 Live Demo:** [https://pixel-flow-woad.vercel.app](https://pixel-flow-woad.vercel.app)
+- **See every step.** Move a slider and the preview updates; inspect the output of any step,
+  wipe between before and after, or diff two steps.
+- **Real algorithms.** 77 operations from OpenCV, scikit-image and Pillow, from basic
+  adjustments to edge detection, morphology, denoising and segmentation, with typed parameters.
+- **Make it yours.** Write your own convolution kernels, save any pipeline as a reusable filter,
+  and share pipelines with a link.
+- **For everyone.** Runs in the browser, works with a keyboard and screen reader (WCAG 2.1 AA),
+  down to 320px wide, in seven themes.
 
-Register a free account in the app to try the pipeline builder. To explore the
-admin features locally, create your own admin account — see [Quick Start](#-quick-start)
-(set `ADMIN_EMAIL` / `ADMIN_PASSWORD` and the admin sets their own panel PIN on first use).
+<p align="center">
+  <img src="docs/images/demo.gif" alt="Adding steps and moving a slider; the live preview updates after each change" width="85%" />
+</p>
 
-> Admin credentials are never published here; provision your own via the
-> `ADMIN_EMAIL` / `ADMIN_PASSWORD` environment variables.
+## Features
 
----
+| | |
+|---|---|
+| **Build** | 77 operations in a searchable palette · reorder with buttons or Alt+↑/↓ · undo/redo · switch a step off without deleting it · interactive inputs: click a seed point, drag a region, pick a colour on the image |
+| **Preview** | Live mode re-runs only the steps after your edit (prefix cache) · per-step timings · Inspector with step-by-step view, compare slider, diff and histograms |
+| **Customize** | **Custom Kernel** editor (3×3 to 9×9, presets for blur, sharpen, edges, emboss, Sobel) · save a pipeline as **your own filter** and add it as one step |
+| **Batch** | Process many images as a background job · results stream in · survives a page reload · download all as ZIP |
+| **Share** | Save pipelines to your account · public pipelines · **share by link** (viewers open the steps in their own workspace; images are never shared) |
+| **Accounts** | Email + password or Google · password reset · email verification · httpOnly-cookie sessions with CSRF protection |
+| **Look and feel** | Seven themes (Classic, Spectrum, Verdant, Cobalt, Fjord, Orchid, Safelight), each light and dark, saved to your account · sample images to start with · drag-and-drop upload |
+| **Operate** | Admin panel (quotas, retention, users) behind a server-side PIN · automatic cleanup · optional S3/R2 image storage · error reporting (optional Sentry) · uptime check |
 
-## 🆕 What's New in 1.3.0 — Sessions, security and accessibility
+<p align="center">
+  <img src="docs/images/themes.png" alt="The same workspace in four themes: Classic light, Spectrum dark, Verdant dark and Safelight dark" width="100%" />
+</p>
 
-- ✅ **WCAG 2.1 AA** — keyboard access, screen-reader announcements, focus management, contrast, reflow down to 320px; audit reports in [a11y-reports/](a11y-reports/REPORT.md)
-- ✅ **Mobile-friendly layout** — the workspace works on phones and small windows
-- ✅ **Automatic cleanup** — the server deletes data past the retention periods every 15 minutes (switchable in Admin → Retention)
-- ✅ **Sessions you can trust** — sliding expiry from real activity, never shared between accounts; signing back in restores your work
-- ✅ **Stay signed in** — tokens refresh in the background instead of silently dropping you to guest after 30 minutes
-- ✅ **Admin PIN enforced by the server**, with a lockout after 5 wrong PINs
-- ✅ **Connection badge** — the header shows whether the backend is reachable (`GET /api/health`), replacing the old heartbeat
-- ✅ **Workflow fixes** — partial uploads, TIFF previews, Stop-then-Apply in batch mode, stale previews, picking on the right image, pipeline kept on reload
+## Quick start
 
-See [CHANGELOG.md](CHANGELOG.md) for details and earlier releases (1.2.0: schema-driven registry and 77 operations; 1.1.0: PostgreSQL, accounts, admin panel).
-
----
-
-## 📋 Table of Contents
-
-- [Features](#-features)
-- [Architecture](#-architecture)
-- [Quick Start](#-quick-start)
-- [Project Structure](#-project-structure)
-- [Usage](#-usage)
-- [API Documentation](#-api-documentation)
-- [Operations Library](#-operations-library)
-- [Deployment](#-deployment)
-- [Limitations](#-limitations)
-- [Contributing](#-contributing)
-- [Contact & Support](#-contact--support)
-
----
-
-## ✨ Features
-
-### Core Functionality
-
-- **Visual Pipeline Builder**: Real-time parameter controls with immediate visual feedback
-- **Dual Processing Modes**:
-  - **Live Mode**: Instant single-image processing with real-time preview
-  - **Batch Mode**: Efficient multi-image processing with progress tracking
-- **77 Operations**: Industry-standard algorithms from OpenCV, Scikit-Image and PIL, served from a declarative backend registry (the UI renders each operation's controls dynamically from its schema)
-- **Typed & Interactive Parameters**: Scalars, enums, booleans, angles, colors, and image-coordinate inputs (click a point, drag a region, eyedropper a color) — picked directly on the preview
-- **Incremental Live Preview**: A prefix cache recomputes only the steps after the one you edited
-- **Step-by-Step Comparison**: Before/after wipe slider, any-two-step side-by-side, and a diff/overlay view
-- **Hierarchical Organization**: Logical categorization by library and operation type
-
-### Advanced Features
-
-- **User Authentication**: JWT in httpOnly cookies with CSRF protection, plus optional Google sign-in
-- **Admin Panel**: User management, session tracking, quota administration, and database tools
-- **Database Storage**: PostgreSQL support with SQLAlchemy ORM for data persistence
-- **Session Management**: Activity-based sessions with sliding expiry and automatic cleanup
-- **Pipeline Saving**: Save, load, and manage your processing pipelines
-- **Performance Analytics**: Millisecond-precision timing for every operation
-- **Undo/Redo System**: Complete operation history (Ctrl+Z/Ctrl+Y)
-- **Seven themes, light and dark**: pick Classic, Spectrum, Verdant, Cobalt, Fjord, Orchid or Safelight from the palette icon in the header; every theme keeps WCAG 2.1 AA contrast
-- **Accessible, responsive interface**: WCAG 2.1 AA, works down to 320px wide
-- **Tested + CI**: pytest suite, GitHub Actions (ruff/mypy/pytest), and pre-commit hooks
-
-### Developer Tools
-
-- **Interactive API Docs**: FastAPI automatic documentation at `/docs`
-- **Session Monitoring**: Real-time session statistics and debugging
-- **Performance Profiling**: Built-in timing and resource usage tracking
-- **Database Scripts**: Complete set of utilities for backup, restore, cleanup
-- **Extensible Architecture**: Easy addition of new operations and features
-
----
-
-## 🏗️ Architecture
-
-```
-┌─────────────────────┐    ┌────────────────────────┐    ┌─────────────────────┐
-│                     │    │                        │    │                     │
-│   REACT CLIENT      │    │   FASTAPI SERVER       │    │   POSTGRESQL DB     │
-│                     │    │                        │    │                     │
-│ • TypeScript        │◄──►│ • Python 3.11+         │◄──►│ • User data         │
-│ • Tailwind CSS      │    │ • OpenCV               │    │ • Image storage     │
-│ • Custom Hooks      │    │ • Scikit-Image         │    │ • Session tracking  │
-│ • State Management  │    │ • SQLAlchemy           │    │ • Pipeline storage  │
-│ • Cookie auth       │    │ • Google OAuth         │    │ • Audit logs        │
-│                     │    │ • Cleanup scheduler    │    │                     │
-└─────────────────────┘    └────────────────────────┘    └─────────────────────┘
-```
-
-### Technology Stack
-
-**Frontend:**
-- React 18.2+ with TypeScript
-- Tailwind CSS for styling
-- Axios for API communication
-- React Router for navigation
-- Lucide React for icons
-
-**Backend:**
-- FastAPI 0.115+ (high-performance API)
-- OpenCV 4.8+ (computer vision)
-- Scikit-Image 0.22+ (scientific image analysis)
-- PIL/Pillow 10.4+ (image manipulation)
-- SQLAlchemy 2.0+ (database ORM)
-- PostgreSQL (production database)
-- Alembic (database migrations)
-
-**Quality & Tooling:**
-- pytest (test suite) + GitHub Actions CI
-- ruff (lint + format) and mypy (typing)
-- pre-commit hooks
-- Docker + docker-compose
-
-**Authentication & Security:**
-- JWT in **httpOnly cookies** (python-jose) — not readable by JS
-- **CSRF protection** (double-submit cookie) + refresh-token rotation/revocation
-- Google OAuth 2.0 (authlib)
-- Bcrypt password hashing (passlib)
-- Rate limiting middleware (per-IP on auth/upload/processing)
-- Security headers (CSP, HSTS, XSS protection)
-
----
-
-## 🚀 Quick Start
-
-Fastest path (SQLite, hot reload, both servers):
+**Fastest (SQLite, hot reload):**
 
 ```bash
-git clone https://github.com/MauryanTitans/pixelflow.git
-cd pixelflow
+git clone https://github.com/Mauryantitans/PixelFlow.git
+cd PixelFlow
 ./start.sh          # Windows: start.bat
 ```
 
-Or the full stack with PostgreSQL: `docker compose up`.
+**With PostgreSQL (Docker):**
 
-- App: http://localhost:3000 · API docs: http://localhost:8000/docs · Health: http://localhost:8000/api/health
-- **Admin account:** set `ADMIN_EMAIL` and `ADMIN_PASSWORD` in `backend/.env` before starting; the first admin is created automatically. There are no default credentials.
-
-Manual setup, prerequisites and troubleshooting: [INSTALLATION.md](INSTALLATION.md).
-
----
-
-## 📂 Project Structure
-
-```
-pixelflow/
-├── backend/            FastAPI app (app/processing = the operation registry), tests, database scripts
-├── frontend/           React + TypeScript app (renders every operation from the API schema)
-├── guides/             User, developer, API, admin and OAuth guides
-├── deployment/         Render / Vercel deployment docs and env-var reference
-├── a11y-reports/       Accessibility audit results and scripts
-├── scripts/e2e/        Browser workflow checks
-└── docker-compose.yml, start.sh, start.bat
+```bash
+docker compose up
 ```
 
-A file-by-file architecture tour lives in [CLAUDE.md](CLAUDE.md#architecture).
+Then open <http://localhost:3000> (API docs at <http://localhost:8000/docs>). To get an admin
+account, set `ADMIN_EMAIL` and `ADMIN_PASSWORD` in `backend/.env` before starting; there are no
+default credentials. Manual setup and troubleshooting: [INSTALLATION.md](INSTALLATION.md).
 
----
+## How it works
 
-## 💻 Usage
+```mermaid
+flowchart LR
+  subgraph Browser["Browser (React + TypeScript)"]
+    UI["Palette · Pipeline · Inspector<br/>rendered from the operation schema"]
+  end
+  subgraph API["FastAPI backend"]
+    REG["Operation registry<br/>(typed params)"]
+    EXE["Executor + prefix cache"]
+    JOBS["Batch job worker"]
+  end
+  DB[("PostgreSQL / SQLite")]
+  S3[("S3 / R2<br/>(optional)")]
 
-### Basic Workflow
+  UI -- "GET /operations (schema)" --> REG
+  UI -- "live preview" --> EXE
+  UI -- "batch job" --> JOBS
+  JOBS --> EXE
+  EXE --> DB
+  JOBS --> DB
+  DB -. image bytes .- S3
+```
 
-1. **Create Account / Login**
-   - Register with email and password
-   - Or use Google Sign-In (if configured)
+Operations are declared **once, in the backend**: each is a Python function plus a typed
+parameter schema. The UI renders every control from `GET /api/processing/operations`, so adding
+an operation needs no frontend change ([how](guides/ADDING_OPERATIONS.md)). Coordinates are
+normalized, so a point picked before a Resize still lands in the right place. The full tour is in
+[CLAUDE.md](CLAUDE.md#architecture).
 
-2. **Upload Images**
-   - Click "Upload Image(s)" (JPEG, PNG, BMP, TIFF up to 50MB, 20 at a time)
-   - Images are stored on the server for your browser session; automatic cleanup removes them after the retention period (24 h for guests, 7 days for accounts by default)
+| Layer | Technology |
+|---|---|
+| Frontend | React 18, TypeScript, Tailwind CSS (themes via CSS variables), Axios, Lucide icons |
+| Backend | FastAPI, SQLAlchemy 2, Alembic, Pydantic 2 |
+| Image processing | OpenCV, scikit-image, Pillow, NumPy |
+| Data | PostgreSQL (production), SQLite (local), optional S3-compatible storage |
+| Auth | JWT in httpOnly cookies, CSRF double-submit, refresh rotation, Google OAuth |
+| Quality | pytest, ruff, mypy, Jest, Puppeteer browser checks, Lighthouse + axe-core in CI |
+| Hosting | Vercel (frontend) + Render (backend, PostgreSQL); Docker for self-hosting |
 
-3. **Build Pipeline**
-   - Browse 77 operations
-   - Add to pipeline and adjust parameters
-   - Save pipeline for reuse
+## Documentation
 
-4. **Choose Mode**:
-   - **Live Mode**: Real-time processing for single image
-   - **Batch Mode**: Process multiple images efficiently
+| | |
+|---|---|
+| [Getting started](guides/GETTING_STARTED.md) | Using the app: pipelines, live vs batch, custom filters, sharing |
+| [Installation](INSTALLATION.md) | Local setup and troubleshooting |
+| [API reference](guides/API_REFERENCE.md) | Auth, images, processing, jobs, pipelines, admin |
+| [Adding operations](guides/ADDING_OPERATIONS.md) | Register a new operation in about 20 lines |
+| [Deployment](deployment/DEPLOYMENT_GUIDE.md) · [Env vars](deployment/ENVIRONMENT_VARIABLES.md) | Render + Vercel, every environment variable |
+| [Admin panel](guides/ADMIN_PANEL.md) · [Database](guides/DATABASE_SETUP.md) | Operating an instance |
+| [Accessibility report](a11y-reports/REPORT.md) | WCAG 2.1 AA audit, per-theme results |
+| [Changelog](CHANGELOG.md) · [Known limitations](CURRENT_LIMITATIONS.md) | What changed and what's next |
 
-5. **Apply & Download**
-   - Process images and download results
+## Testing and quality
 
-### Admin Features (Admin Users Only)
+Every push runs the [CI workflow](.github/workflows/ci.yml):
 
-- **User Management**: View, activate/deactivate, delete users
-- **System Statistics**: Monitor storage, sessions, and usage
-- **Database Viewer**: PIN-protected access to user data
-- **Cleanup Tools**: Manual cleanup, fix orphaned images
-- **Settings**: Adjust quotas, limits, and retention policies
+- **Backend:** `ruff`, `mypy`, and the `pytest` suite (operations, executor, migrations, auth,
+  sessions, jobs, storage, sharing).
+- **Frontend:** strict TypeScript, Jest, and the production build with ESLint warnings as errors.
+- **Browser checks:** a fresh stack is started and six Puppeteer scripts drive real workflows
+  (uploads, live preview, batch jobs, custom filters, sharing, sessions, themes), followed by a
+  Lighthouse + axe-core accessibility audit of 24 screens in light and dark mode.
 
-For detailed usage instructions, see [guides/GETTING_STARTED.md](guides/GETTING_STARTED.md)
+Run them locally: see [CONTRIBUTING.md](CONTRIBUTING.md).
 
----
+## Roadmap
 
-## 📚 API Documentation
+Ideas and known gaps live in [CURRENT_LIMITATIONS.md](CURRENT_LIMITATIONS.md) and the
+[issue tracker](https://github.com/Mauryantitans/PixelFlow/issues). Next up: more operations,
+expression-based custom filters (`r * 0.9 + b * 0.1`) evaluated safely on the server, and
+processing history.
 
-Interactive docs run at http://localhost:8000/docs. The guide to auth (httpOnly cookies +
-`X-CSRF-Token`), sessions, processing, pipelines, admin and error codes is
-[guides/API_REFERENCE.md](guides/API_REFERENCE.md).
+## Contributing
 
----
+Contributions of all sizes are welcome: new operations, bug fixes, docs and design. Start with
+[CONTRIBUTING.md](CONTRIBUTING.md), and please follow the [code of conduct](CODE_OF_CONDUCT.md).
+Found a security issue? See [SECURITY.md](SECURITY.md) and report it privately.
 
-## 🎨 Operations Library
+## Acknowledgements
 
-PixelFlow ships **77 operations** across Basic, OpenCV and Scikit-Image libraries. The
-live list is served from the backend registry (`GET /api/processing/operations`) and the UI
-renders each operation's controls dynamically from its schema, so the in-app palette is
-always the source of truth. Highlights:
+Built on [OpenCV](https://opencv.org/), [scikit-image](https://scikit-image.org/),
+[Pillow](https://python-pillow.org/), [FastAPI](https://fastapi.tiangolo.com/) and
+[React](https://react.dev/). Sample images are public-domain/CC0 photos bundled with
+scikit-image ([credits](frontend/public/samples/CREDITS.md)). Typefaces from Google Fonts.
 
-- **Adjustments & tone**: Brightness, Contrast, Saturation, Exposure, Gamma, Hue Rotate, Temperature, Detail Enhance
-- **Filters & blur**: Gaussian / Median / Box / Bilateral, Non-Local Means, Motion Blur, TV & Wavelet denoise
-- **Edges & features**: Canny, Sobel, Scharr, Laplacian, Prewitt, FAST corners, ORB, Harris
-- **Morphology & segmentation**: Open / Close / Dilate / Erode / Gradient / Top-Hat / Black-Hat, Skeletonize, Otsu / Adaptive / Triangle thresholding, Watershed, SLIC
-- **Stylize & effects**: Sepia, Posterize, Solarize, Vignette, Grain, Emboss, Pixelate, Cartoon, Pencil / Color Sketch, Stylization, Duotone
-- **Color spaces & geometry**: RGB ↔ HSV / LAB / YUV, Resize, Rotate, Flip, Crop
-- **Interactive (pick on the image)**: Flood Fill (click a seed point), Crop & Inpaint Region (drag a region), eyedropper colors
+## Contact
 
-Operations carry **typed parameters** — scalars, enums, booleans, angles, colors, and
-image-coordinate inputs (points / regions) picked directly on the preview. Adding a new
-operation is ~10 lines (register a function with its param schema; the UI adapts
-automatically) — see [guides/ADDING_OPERATIONS.md](guides/ADDING_OPERATIONS.md).
+| | |
+|---|---|
+| GitHub | [@Mauryantitans](https://github.com/Mauryantitans) |
+| LinkedIn | [mourya-arnepalli](https://www.linkedin.com/in/mourya-arnepalli) |
+| Instagram | [@mouryaarnepalli](https://www.instagram.com/mouryaarnepalli) |
 
----
+Questions and ideas: [GitHub Issues](https://github.com/Mauryantitans/PixelFlow/issues).
 
-## 🚀 Deployment
+## License
 
-Free tiers: **frontend on Vercel**, **backend + PostgreSQL on Render**. The frontend calls `/api`
-on its own origin and Vercel proxies it to Render, so the auth cookies stay first-party.
-
-- Step by step: [deployment/DEPLOYMENT_GUIDE.md](deployment/DEPLOYMENT_GUIDE.md)
-- Every environment variable: [deployment/ENVIRONMENT_VARIABLES.md](deployment/ENVIRONMENT_VARIABLES.md)
-- Other hosts and self-hosting: [deployment/ALTERNATIVE_HOSTING_OPTIONS.md](deployment/ALTERNATIVE_HOSTING_OPTIONS.md)
-
----
-
-## ⚠️ Limitations
-
-No password reset or email verification yet, synchronous processing, images stored in
-Postgres, and the usual free-tier cold starts. Render deletes a free database after 30 days.
-The full list is in [CURRENT_LIMITATIONS.md](CURRENT_LIMITATIONS.md).
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! Here's how you can help:
-
-### Reporting Issues
-
-Use the [GitHub issue tracker](https://github.com/MauryanTitans/pixelflow/issues) to:
-- Report bugs with detailed reproduction steps
-- Request features with use cases and benefits
-- Ask questions about usage or development
-
-### Development Workflow
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Make your changes and test thoroughly
-4. Commit: `git commit -m 'Add amazing feature'`
-5. Push: `git push origin feature/amazing-feature`
-6. Open a Pull Request
-
-### Areas Needing Help
-
-See [CURRENT_LIMITATIONS.md](CURRENT_LIMITATIONS.md) for areas where contributions would be valuable:
-- Email verification & password reset
-- Object storage for images and a job queue for heavy processing
-- Accessibility checks in CI
-- More image-processing operation batches
-- End-to-end (Playwright) tests in CI
-
-### Adding New Operations
-
-Operations are added **entirely in the backend** — write a function and register it with a
-typed parameter schema; the UI picks it up automatically (no frontend changes). See
-[guides/ADDING_OPERATIONS.md](guides/ADDING_OPERATIONS.md).
-
----
-
-## 📧 Contact & Support
-
-### Developer
-
-| Platform | Link |
-|----------|------|
-| **GitHub** | [@MauryanTitans](https://github.com/Mauryantitans) |
-| **LinkedIn** | [mourya-arnepalli](https://www.linkedin.com/in/mourya-arnepalli) |
-| **Instagram** | [@mouryaarnepalli](https://www.instagram.com/mouryaarnepalli) |
-
-### Support
-
-- **Bug Reports**: [GitHub Issues](https://github.com/MauryanTitans/pixelflow/issues)
-- **Questions**: GitHub Discussions
-- **Documentation**: [guides/](guides/) folder
-- **Deployment Help**: [deployment/](deployment/) folder
-
----
-
-## 📄 License
-
-This project is licensed under the Apache-2.0 License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 📖 Documentation
-
-- **[INSTALLATION.md](INSTALLATION.md)** - Local setup and troubleshooting
-- **[guides/GETTING_STARTED.md](guides/GETTING_STARTED.md)** - Using the app
-- **[guides/API_REFERENCE.md](guides/API_REFERENCE.md)** - API
-- **[a11y-reports/REPORT.md](a11y-reports/REPORT.md)** - Accessibility audit
-- **[CHANGELOG.md](CHANGELOG.md)** - Version history and changes
-- **[CURRENT_LIMITATIONS.md](CURRENT_LIMITATIONS.md)** - Known issues and limitations
-- **[guides/](guides/)** - Development and usage guides
-- **[deployment/](deployment/)** - Deployment documentation
-
----
-
-<div align="center">
-
-### Built with ❤️ for the image processing community
-
-**⭐ Star this repository if PixelFlow helps your projects! ⭐**
-
-[![GitHub stars](https://img.shields.io/github/stars/MauryanTitans/pixelflow?style=social)](https://github.com/MauryanTitans/pixelflow)
-[![GitHub forks](https://img.shields.io/github/forks/MauryanTitans/pixelflow?style=social)](https://github.com/MauryanTitans/pixelflow/fork)
-
-**Current Version: 1.3.0** | [View Previous Versions](CHANGELOG.md)
-
-</div>
+[Apache License 2.0](LICENSE). If you use PixelFlow in research, GitHub's **Cite this repository**
+button (from [CITATION.cff](CITATION.cff)) gives a ready-made citation.

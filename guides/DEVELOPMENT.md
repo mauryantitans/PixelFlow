@@ -59,14 +59,15 @@ def process_image(image: Image.Image, strength: int = 50) -> Image.Image:
 Commit message format:
 
 ```
-Type: Short description (50 chars max)
+type(scope): short description (about 50 characters)
 
 Longer description if needed: what changed and why.
 
 Fixes #123
 ```
 
-Types: `Add:`, `Fix:`, `Update:`, `Remove:`, `Refactor:`, `Docs:`, `Style:`.
+Types used in this repo: `feat`, `fix`, `docs`, `test`, `perf`, `a11y`, `chore` (see
+[CONTRIBUTING.md](../CONTRIBUTING.md)).
 
 ---
 
@@ -104,8 +105,14 @@ These need `puppeteer-core`, which is installed outside the repo. Environment va
 file's header.
 
 ```bash
-node scripts/e2e/session-flow.js          # sign-in, token expiry, shared-browser sessions
+python3 scripts/e2e/make_fixtures.py      # test images -> scripts/e2e/fixtures/
+node scripts/e2e/serve-build.js frontend/build 3000   # serve the production build
 node scripts/e2e/workflows.js             # uploads, live preview, batch Stop/Apply, picking, reload
+node scripts/e2e/session-flow.js          # sign-in, token expiry, shared-browser sessions
+node scripts/e2e/custom-filters.js        # kernel editor, step on/off, saved filters
+node scripts/e2e/product.js               # samples, drag-and-drop, share links, theme sync
+node scripts/e2e/batch-jobs.js            # background batch survives a reload
+node scripts/e2e/appearance.js            # theme picker
 node a11y-reports/scripts/audit.js        # accessibility audit (VIEWPORT=320x640 for mobile)
 node a11y-reports/scripts/keyboard-checks.js
 ```
@@ -158,16 +165,18 @@ See [a11y-reports/REPORT.md](../a11y-reports/REPORT.md).
 
 ## Database schema changes
 
-The app creates missing tables at startup with `Base.metadata.create_all` (in `init_db()`), so a new
-**table** in `backend/app/models/db_models.py` appears on the next start. `create_all` does **not** alter
-existing tables. A new or changed **column** on an existing table needs a manual `ALTER TABLE` (or a fresh
-local database: delete `backend/pixelflow.db`).
+Schema changes are Alembic migrations, and the backend applies them itself on every start
+(`run_migrations()` in `backend/app/core/database.py`), on Render, Docker and locally alike.
 
-Alembic is configured (`backend/alembic.ini`, `backend/alembic/env.py`, targeting `Base.metadata`), but there
-is no `alembic/versions/` directory and no migrations yet. The Docker entrypoint's `alembic upgrade head`
-therefore has nothing to apply. If you start using migrations, create `alembic/versions/`, generate the first
-revision against an empty database (`alembic revision --autogenerate -m "baseline"`), and run `alembic stamp head`
-on existing databases that `create_all` already built. See [DATABASE_SETUP.md](DATABASE_SETUP.md).
+1. Change the model in `backend/app/models/db_models.py`.
+2. Add a revision in `backend/alembic/versions/` (`alembic revision -m "..."` from `backend/`) whose
+   `down_revision` is the current head.
+3. Make it **idempotent** with `backend/app/core/migration_helpers.py` (`add_column_if_missing`,
+   `has_table`, …): a fresh database already gets current columns from `0001_baseline`, and older
+   production databases were built by `create_all` before migrations existed.
+4. `pytest tests/test_migrations.py` checks a fresh database, an adopted one and a repeated run.
+
+See [DATABASE_SETUP.md](DATABASE_SETUP.md) for PostgreSQL specifics.
 
 ---
 
