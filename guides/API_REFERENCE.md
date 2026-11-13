@@ -94,7 +94,7 @@ frontend renders its controls from), plus a flat legacy list for backward compat
 {
   "success": true,
   "version": "2",
-  "total_count": 78,
+  "total_count": 79,
   "categories": [
     {
       "name": "Basic",
@@ -110,6 +110,7 @@ frontend renders its controls from), plus a flat legacy list for backward compat
               "description": "Adjust image brightness",
               "interactive": false,
               "hidden": false,
+              "presets": [],
               "params": [
                 {"name": "amount", "label": "Brightness", "type": "int", "default": 0,
                  "min": -100, "max": 100, "help": "", "advanced": false}
@@ -135,13 +136,17 @@ Every param has `name`, `label`, `type`, `default`, `help` and `advanced`. `type
 | `color` | | `"#RRGGBB"` (or `[r, g, b]`) |
 | `point`, `points`, `rect` | `space` (`normalized`); `points` also `min_points`, `max_points` | normalized [0..1] coordinates, picked on the preview |
 | `matrix` | `min_size`, `max_size`, `value_min`, `value_max`, `presets: [{label, value}]` | square, odd-sized list of rows of numbers (Custom Kernel) |
-| `text` | `max_length` | string (trimmed and cut to `max_length`) |
+| `text` | `max_length`, `code` | string, trimmed and cut to `max_length`. With `code: true` (a formula, e.g. Expression's channels) a longer value is rejected instead |
 | `steps` | `max_steps` (30) | list of `{name, params, enabled}` (the body of a saved filter) |
 
 Operations with `"hidden": true` are in `categories` but not in the legacy `operations` list or
 `total_count`. They run when a pipeline names them, but the palette doesn't list them. Today that is only
 **Custom Filter**, the step that runs a saved filter's `steps` in order (a filter can't contain
-another filter). So the count is 78: the 77 built-in operations plus Custom Kernel.
+another filter). So the count is 79: the 77 built-in operations plus Custom Kernel and Expression.
+
+An operation's `presets` (often empty) are starting points for the whole step:
+`[{"label": "Sepia", "params": {"red": "...", "green": "...", "blue": "..."}}]`. Sending those
+params is all a preset does; the UI offers them as **Start from a preset**.
 
 ### Live processing (one image)
 

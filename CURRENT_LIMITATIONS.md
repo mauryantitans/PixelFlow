@@ -32,6 +32,7 @@ here; see [CHANGELOG.md](CHANGELOG.md) for what changed and when.
 | Job progress is polled | The browser polls about once a second, and those requests count toward the per-IP processing rate limit (150 per minute). |
 | Custom filters are snapshots | Adding a saved filter copies its steps into the pipeline. Editing the filter later doesn't update pipelines that already use it; filters can't contain other filters. Saving filters needs an account. |
 | Custom Kernel limits | Square, odd sizes from 3×3 to 9×9, weights from −100 to 100. |
+| Expression limits | One formula per colour channel, up to 200 characters each; per pixel only (no neighbouring pixels: use Custom Kernel for that); alpha passes through unchanged; no user-defined variables or functions. |
 | Images are stored in Postgres by default | Simple, but it fills a small database quickly. Optional S3-compatible object storage (AWS S3, Cloudflare R2, MinIO) keeps image bytes out of the database (`STORAGE_BACKEND=s3`, see [deployment/DEPLOYMENT_GUIDE.md](deployment/DEPLOYMENT_GUIDE.md#object-storage-optional)). Images uploaded before the switch stay in the database. |
 | Uploaded images' alt text is their file name | The app can't know what a photo shows; users can't add a description yet. |
 

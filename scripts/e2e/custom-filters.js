@@ -1,7 +1,8 @@
 /*
  * Browser checks for custom filters: the Custom Kernel editor (presets, size,
  * validation), switching a step off, saving a pipeline as a filter and adding
- * it back from Custom → My filters. Also axe on the kernel editor.
+ * it back from Custom → My filters, and the Expression step (presets as one
+ * undo step, formula errors). Also axe on the kernel editor and the formulas.
  *
  *   TOOLS=/path/with/puppeteer-core+@axe-core/puppeteer IMG=small.png \
  *   USER_EMAIL=… USER_PASSWORD=… node scripts/e2e/custom-filters.js
@@ -127,6 +128,45 @@ const check = (n, ok, d) => { results.push(ok); console.log(`${ok ? 'PASS' : 'FA
       const list = await (await fetch('http://localhost:8000/api/pipelines/', { credentials: 'include' })).json().catch(() => []);
       for (const f of list.filter ? list.filter((x) => x.name === n) : []) await fetch(`http://localhost:8000/api/pipelines/${f.id}`, { method: 'DELETE', credentials: 'include', headers: { 'X-CSRF-Token': decodeURIComponent(csrf || '') } });
     }, filterName);
+
+    // Expression: presets, one undo step, formula errors
+    await p.evaluate(() => [...document.querySelectorAll('button')].find((x) => x.innerText.trim() === 'Reset')?.click());
+    await sleep(400);
+    await p.click('[data-op="Expression"]');
+    await p.waitForFunction(() => /Live preview updated/.test(document.body.innerText), { timeout: 30000 });
+    const field = (c) => p.$eval(`input[id$="-${c}"]`, (e) => e.value);
+    check('Expression step has monospace formula fields with defaults', (await field('red')) === 'r' && (await p.$eval('input[id$="-red"]', (e) => e.classList.contains('font-mono') && e.spellcheck === false)));
+    await p.evaluate(() => {
+      const sel = document.querySelector('select[id$="-preset"]');
+      sel.value = [...sel.options].find((o) => o.text === 'Invert').value;
+      sel.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    await sleep(300);
+    check('The "Invert" preset fills all three formulas', (await field('red')) === '1 - r' && (await field('blue')) === '1 - b');
+    await p.waitForFunction(() => /Live preview updated/.test(document.body.innerText), { timeout: 30000 });
+    check('…and the preview runs without a step error', !(await p.$('[role="alert"].mt-2')));
+    await p.evaluate(() => [...document.querySelectorAll('button')].find((x) => x.innerText.trim() === 'Undo')?.click());
+    await sleep(300);
+    check('One Undo reverts the whole preset', (await field('red')) === 'r' && (await field('blue')) === 'b');
+    await p.evaluate(() => [...document.querySelectorAll('button')].find((x) => x.innerText.trim() === 'Redo')?.click());
+    await sleep(300);
+    const red = await p.$('input[id$="-red"]');
+    await red.click({ clickCount: 3 }); await red.type('r.real');
+    await p.waitForFunction(() => /red formula: can't use attribute access/.test(document.body.innerText), { timeout: 30000 }).catch(() => {});
+    check('An unsafe formula shows a per-step error', /red formula: can't use attribute access/.test(await text()));
+    await red.click({ clickCount: 3 }); await red.type('0.3*r + 0.59*g + 0.11*b');
+    await p.waitForFunction(() => !/red formula:/.test(document.body.innerText), { timeout: 30000 }).catch(() => {});
+    check('…and a valid formula clears it', !/red formula:/.test(await text()));
+    await p.evaluate(() => { const d = document.querySelector('details:has(> p[id$="-code-help"])'); if (d) d.open = true; });
+    check('The formula reference lists the variables', /Variables: r, g, b, l \(luma\)/.test(await text()));
+    for (const mode of ['light', 'dark']) {
+      await p.evaluate((m) => document.documentElement.classList.toggle('dark', m === 'dark'), mode);
+      await sleep(200);
+      await p.waitForFunction(() => document.getAnimations().every((an) => an.playState !== 'running'), { timeout: 5000 }).catch(() => {});
+      const axe = await new AxePuppeteer(p).include('#main-content').withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
+      check(`axe: workspace with the Expression step (${mode})`, axe.violations.length === 0, axe.violations.map((v) => v.id + ':' + v.nodes.length).join(', ') || 'no violations');
+    }
+    await p.evaluate(() => document.documentElement.classList.remove('dark'));
   } catch (e) {
     check('script error', false, e.message);
   }

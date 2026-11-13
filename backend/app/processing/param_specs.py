@@ -299,20 +299,29 @@ class RectParam(ParamSpec):
 
 @dataclass
 class TextParam(ParamSpec):
-    """A short free-text value (e.g. a custom filter's display name)."""
+    """A short free-text value (e.g. a custom filter's display name).
+
+    ``code=True`` marks a formula: the UI uses a monospace field without
+    spell-checking or auto-capitalization.
+    """
 
     max_length: int = 80
+    code: bool = False
     kind: str = field(default="text", init=False)
 
     def schema(self) -> dict[str, Any]:
-        return {**super().schema(), "max_length": self.max_length}
+        return {**super().schema(), "max_length": self.max_length, "code": self.code}
 
     def coerce(self, value: Any) -> str:
         if value is None:
             return ""
         if not isinstance(value, str):
             raise ParamError(self.name, f"expected text, got {value!r}")
-        return value.strip()[: self.max_length]
+        text = value.strip()
+        if self.code and len(text) > self.max_length:
+            # Cutting a formula short would only turn it into a confusing syntax error.
+            raise ParamError(self.name, f"longer than {self.max_length} characters")
+        return text[: self.max_length]
 
 
 @dataclass

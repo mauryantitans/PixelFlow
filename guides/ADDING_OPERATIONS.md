@@ -60,6 +60,10 @@ If you add a new module, import it in `ensure_registered()` in
 **Renaming later:** change `label`, and add the old label to `aliases=[...]`. Never remove an
 alias. Saved pipelines refer to operations by display name and resolve through the alias map.
 
+**Presets:** `presets=[{"label": "Sepia", "params": {...}}]` on the `OperationSpec` adds a
+**Start from a preset** select to the step; choosing one sets those params in one undo step. See
+`expression` in `operations/custom.py`. (A `MatrixParam` has its own `presets` for its grid.)
+
 **Hidden operations:** `hidden=True` keeps an operation runnable (pipelines can name it and the
 executor resolves it) but leaves it out of the palette, the legacy `operations` list and
 `total_count`. Use it for steps that the UI adds some other way. The one example is
@@ -82,7 +86,7 @@ All take `name`, `label`, `default`, and optionally `help` (tooltip text) and `a
 | `PointsParam` | `points` | `min_points`, `max_points` | several clicks | list of `(x, y)` |
 | `RectParam` | `rect` | | drag a region | `(x, y, w, h)` pixels, or `None` |
 | `MatrixParam` | `matrix` | `min_size`, `max_size` (odd), `value_min`, `value_max`, `presets=[{"label", "value"}]` | matrix editor with presets and a size picker | square `list[list[float]]`, odd size |
-| `TextParam` | `text` | `max_length` (80) | text field | `str`, trimmed and cut to `max_length` |
+| `TextParam` | `text` | `max_length` (80), `code` | text field (monospace with `code=True`) | `str`, trimmed and cut to `max_length` (rejected instead when `code=True`) |
 | `StepsParam` | `steps` | `max_steps` (30) | read-only list of the steps | `list` of `{"name", "params", "enabled"}` |
 
 `StepsParam` is for operations that run other steps (see `custom_filter`): pass each step to

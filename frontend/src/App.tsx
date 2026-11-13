@@ -63,6 +63,7 @@ const App: React.FC = () => {
     addStep,
     removeStep,
     updateStepParam,
+    updateStepParams,
     moveStep,
     toggleStep,
     resetPipeline,
@@ -693,7 +694,9 @@ const App: React.FC = () => {
                                 {categoryName === 'Enhancement' && <LucideReact.Sun aria-hidden="true" className="w-3 h-3 mr-1" />}
                                 {categoryName === 'Restoration' && <LucideReact.Wrench aria-hidden="true" className="w-3 h-3 mr-1" />}
                                 {categoryName === 'Found Operations' && <LucideReact.Search aria-hidden="true" className="w-3 h-3 mr-1" />}
-                                {!['Adjustments', 'Filters', 'Blur & Sharpen', 'Effects', 'Filtering', 'Edge Detection', 'Enhancement', 'Restoration', 'Found Operations'].includes(categoryName) && 
+                                {categoryName === 'Kernels' && <LucideReact.LayoutGrid aria-hidden="true" className="w-3 h-3 mr-1" />}
+                                {categoryName === 'Formulas' && <LucideReact.Sigma aria-hidden="true" className="w-3 h-3 mr-1" />}
+                                {!['Adjustments', 'Filters', 'Blur & Sharpen', 'Effects', 'Filtering', 'Edge Detection', 'Enhancement', 'Restoration', 'Found Operations', 'Kernels', 'Formulas'].includes(categoryName) && 
                                 <LucideReact.Folder aria-hidden="true" className="w-3 h-3 mr-1" />}
                                 <span className="text-slate-700 dark:text-slate-300">{categoryName}</span>
                               </div>
@@ -936,6 +939,7 @@ const App: React.FC = () => {
                         announce(`${getOp(step.name)?.label ?? step.name} moved to position ${to + 1} of ${pipeline.length}`);
                       }}
                       onParameterChange={handleParameterChange}
+                      onApplyPreset={updateStepParams}
                       onPreview={() => {
                         if (liveProcessingEnabled) {
                           // Show (or un-show) this step's image in the Inspector.

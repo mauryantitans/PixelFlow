@@ -3,6 +3,9 @@ User-defined filters.
 
 * **Custom Kernel**: type your own convolution matrix (3×3 … 9×9) or start from a
   preset. Safe by construction: it is only ever a matrix of numbers.
+* **Expression**: one formula per channel (``0.3*r + 0.59*g + 0.11*b``),
+  evaluated per pixel by the safe evaluator in ``processing/expression.py``
+  (an allow-list of operators and functions; never ``eval``).
 * **Custom Filter**: a reusable filter made of existing steps. Saving a pipeline
   "as a filter" stores its steps; adding the filter puts one step in the
   pipeline that runs those steps in order. It's a snapshot, so later edits to
@@ -17,7 +20,8 @@ import cv2
 import numpy as np
 from PIL import Image
 
-from ..param_specs import BoolParam, IntParam, MatrixParam, StepsParam, TextParam
+from ..expression import MAX_LENGTH, ExpressionError, compile_formula, evaluate
+from ..param_specs import BoolParam, FloatParam, IntParam, MatrixParam, StepsParam, TextParam
 from ..registry import OperationSpec, registry
 
 KERNEL_PRESETS: list[dict[str, Any]] = [
@@ -58,6 +62,57 @@ def custom_kernel(image: Image.Image, kernel, normalize=True, offset=0, absolute
         out = np.abs(out)
     out = out + float(offset)
     return Image.fromarray(np.clip(out, 0, 255).astype(np.uint8))
+
+
+def _channel_presets(
+    label: str, r: str, g: str | None = None, b: str | None = None
+) -> dict[str, Any]:
+    return {"label": label, "params": {"red": r, "green": g or r, "blue": b or r}}
+
+
+EXPRESSION_PRESETS: list[dict[str, Any]] = [
+    _channel_presets("Identity", "r", "g", "b"),
+    _channel_presets("Invert", "1 - r", "1 - g", "1 - b"),
+    _channel_presets("Grayscale (luma)", "l"),
+    _channel_presets(
+        "Sepia",
+        "0.393*r + 0.769*g + 0.189*b",
+        "0.349*r + 0.686*g + 0.168*b",
+        "0.272*r + 0.534*g + 0.131*b",
+    ),
+    _channel_presets("Swap red and blue", "b", "g", "r"),
+    _channel_presets("Threshold at 50%", "step(0.5, l)"),
+    _channel_presets(
+        "Solarize", "r if r < 0.5 else 1 - r", "g if g < 0.5 else 1 - g", "b if b < 0.5 else 1 - b"
+    ),
+    _channel_presets("Brighten shadows (gamma)", "r ** 0.6", "g ** 0.6", "b ** 0.6"),
+    _channel_presets(
+        "Vignette",
+        "r * (1 - 1.2*((x - 0.5)**2 + (y - 0.5)**2))",
+        "g * (1 - 1.2*((x - 0.5)**2 + (y - 0.5)**2))",
+        "b * (1 - 1.2*((x - 0.5)**2 + (y - 0.5)**2))",
+    ),
+    _channel_presets("Keep only red", "r", "l", "l"),
+]
+
+
+def expression(image: Image.Image, red="r", green="g", blue="b", amount=1.0):
+    formulas = []
+    for channel, text in (("red", red), ("green", green), ("blue", blue)):
+        try:
+            # An empty field leaves that channel as it is.
+            formulas.append(compile_formula(text.strip() or channel[0]))
+        except ExpressionError as e:
+            raise ValueError(f"{channel} formula: {e}") from None
+    alpha = image.getchannel("A") if image.mode in ("RGBA", "LA") else None
+    src = np.asarray(image.convert("RGB"), dtype=np.float32) / 255.0
+    out = np.stack(evaluate(formulas, src), axis=-1)
+    if amount < 1.0:
+        out = src + (out - src) * float(amount)
+    result = Image.fromarray(np.clip(np.rint(out * 255.0), 0, 255).astype(np.uint8))
+    if alpha is not None:
+        result.putalpha(alpha)
+    return result
 
 
 def custom_filter(image: Image.Image, filter_name="", steps=()):
@@ -114,6 +169,60 @@ registry.register(
                 min=-255,
                 max=255,
                 help="Added after filtering; 128 centres emboss-style kernels on grey.",
+            ),
+        ],
+    )
+)
+
+_FORMULA_HELP = (
+    "Per pixel, values 0 to 1. Variables: r, g, b, l (luma), x, y (position 0 to 1), "
+    "w, h (size in pixels), pi, e. Operators: + - * / % ** < > == and or not, "
+    "a if cond else b. Functions: abs sqrt exp log sin cos tan floor ceil round pow "
+    "min max clamp mix step smoothstep where. Leave empty to keep the channel."
+)
+
+registry.register(
+    OperationSpec(
+        id="expression",
+        label="Expression",
+        category="Custom",
+        subcategory="Formulas",
+        description="Your own formula for each colour channel, e.g. 0.3*r + 0.59*g + 0.11*b (values 0 to 1).",
+        fn=expression,
+        presets=EXPRESSION_PRESETS,
+        params=[
+            TextParam(
+                name="red",
+                label="Red",
+                default="r",
+                max_length=MAX_LENGTH,
+                code=True,
+                help=_FORMULA_HELP,
+            ),
+            TextParam(
+                name="green",
+                label="Green",
+                default="g",
+                max_length=MAX_LENGTH,
+                code=True,
+                help=_FORMULA_HELP,
+            ),
+            TextParam(
+                name="blue",
+                label="Blue",
+                default="b",
+                max_length=MAX_LENGTH,
+                code=True,
+                help=_FORMULA_HELP,
+            ),
+            FloatParam(
+                name="amount",
+                label="Amount",
+                default=1.0,
+                min=0.0,
+                max=1.0,
+                step=0.05,
+                help="Blend between the original (0) and the formula's result (1).",
             ),
         ],
     )

@@ -36,7 +36,7 @@ at the output. PixelFlow turns that loop into a direct-manipulation tool:
   wipe between before and after, or diff two steps.
 - **Real algorithms.** 77 operations from OpenCV, scikit-image and Pillow, from basic
   adjustments to edge detection, morphology, denoising and segmentation, with typed parameters.
-- **Make it yours.** Write your own convolution kernels, save any pipeline as a reusable filter,
+- **Make it yours.** Write your own convolution kernels and per-pixel formulas, save any pipeline as a reusable filter,
   and share pipelines with a link.
 - **For everyone.** Runs in the browser, works with a keyboard and screen reader (WCAG 2.1 AA),
   down to 320px wide, in seven themes.
@@ -51,7 +51,7 @@ at the output. PixelFlow turns that loop into a direct-manipulation tool:
 |---|---|
 | **Build** | 77 operations in a searchable palette · reorder with buttons or Alt+↑/↓ · undo/redo · switch a step off without deleting it · interactive inputs: click a seed point, drag a region, pick a colour on the image |
 | **Preview** | Live mode re-runs only the steps after your edit (prefix cache) · per-step timings · Inspector with step-by-step view, compare slider, diff and histograms |
-| **Customize** | **Custom Kernel** editor (3×3 to 9×9, presets for blur, sharpen, edges, emboss, Sobel) · save a pipeline as **your own filter** and add it as one step |
+| **Customize** | **Custom Kernel** editor (3×3 to 9×9, presets for blur, sharpen, edges, emboss, Sobel) · **Expression**: your own per-pixel formula per channel (`0.3*r + 0.59*g + 0.11*b`), evaluated safely on the server · save a pipeline as **your own filter** and add it as one step |
 | **Batch** | Process many images as a background job · results stream in · survives a page reload · download all as ZIP |
 | **Share** | Save pipelines to your account · public pipelines · **share by link** (viewers open the steps in their own workspace; images are never shared) |
 | **Accounts** | Email + password or Google · password reset · email verification · httpOnly-cookie sessions with CSRF protection |
@@ -151,9 +151,8 @@ Run them locally: see [CONTRIBUTING.md](CONTRIBUTING.md).
 ## Roadmap
 
 Ideas and known gaps live in [CURRENT_LIMITATIONS.md](CURRENT_LIMITATIONS.md) and the
-[issue tracker](https://github.com/Mauryantitans/PixelFlow/issues). Next up: more operations,
-expression-based custom filters (`r * 0.9 + b * 0.1`) evaluated safely on the server, and
-processing history.
+[issue tracker](https://github.com/Mauryantitans/PixelFlow/issues). Next up: more operations, processing
+history, and a friendlier first load while the free-tier server wakes up.
 
 ## Contributing
 

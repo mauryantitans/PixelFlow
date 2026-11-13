@@ -29,8 +29,8 @@ def test_operations_keeps_legacy_list_for_compat(client):
     assert "Gaussian Blur" in body["operations"]
     assert "Flood Fill" in body["operations"]
     # 77 built-in + Custom Kernel; the hidden Custom Filter step isn't listed
-    assert body["total_count"] == 78
-    assert len(body["operations"]) == 78
+    assert body["total_count"] == 79
+    assert len(body["operations"]) == 79
     assert "Custom Filter" not in body["operations"]
 
 

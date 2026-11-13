@@ -68,6 +68,8 @@ export interface ParamSpecDTO {
   presets?: Array<{ label: string; value: number[][] }>;
   // text / steps
   max_length?: number;
+  /** A formula: monospace field, no spell-check or auto-capitalization. */
+  code?: boolean;
   max_steps?: number;
 }
 
@@ -80,7 +82,14 @@ export interface OperationSpecDTO {
   interactive: boolean;
   /** Executable but not listed in the palette (e.g. Custom Filter). */
   hidden?: boolean;
+  /** Starting points for the whole step; choosing one sets these params. */
+  presets?: OperationPresetDTO[];
   params: ParamSpecDTO[];
+}
+
+export interface OperationPresetDTO {
+  label: string;
+  params: Record<string, any>;
 }
 
 export interface OperationSchema {

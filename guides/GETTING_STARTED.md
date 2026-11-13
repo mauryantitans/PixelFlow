@@ -93,7 +93,7 @@ and the remaining results still arrive.
 - **Search** at the top (Ctrl+K).
 - Grouped by library: **Basic**, **OpenCV**, **Scikit-Image**, **Stylize** and **Custom**. Click a category
   to expand it.
-- **Custom** holds **Custom Kernel** and, when you are signed in, **My filters**.
+- **Custom** holds **Custom Kernel**, **Expression** and, when you are signed in, **My filters**.
 
 ### Pipeline
 - Steps run top to bottom. Each step shows its parameters, and an error banner if that step failed (the other
@@ -120,6 +120,27 @@ weighted sum of its neighbours.
 4. **Normalize** divides by the sum of the weights so brightness stays the same. **Absolute value** helps
    edge kernels, whose results can be negative. **Offset** is added afterwards (128 centres emboss-style
    kernels on grey).
+
+### Expression (your own formula)
+**Custom → Formulas → Expression** computes each colour channel from a formula you type, for every
+pixel. Values run from 0 (black) to 1 (full).
+
+1. Pick **Start from a preset** (Invert, Grayscale, Sepia, Swap red and blue, Threshold, Solarize,
+   Brighten shadows, Vignette, Keep only red) as a starting point. One **Undo** reverts a preset.
+2. Edit the **Red**, **Green** and **Blue** formulas. An empty field keeps that channel unchanged.
+3. **Amount** blends between the original (0) and the result (1).
+
+| | |
+|---|---|
+| Variables | `r`, `g`, `b` (the pixel's channels), `l` (luma), `x`, `y` (position, 0 at the top-left to 1), `w`, `h` (image size in pixels), `pi`, `e` |
+| Operators | `+ - * / % **`, comparisons `< <= > >= == !=` (1 when true, 0 when false), `and`, `or`, `not`, `a if condition else b` |
+| Functions | `abs sqrt exp log sin cos tan floor ceil round pow min max clamp(v, lo, hi) mix(a, b, t) step(edge, v) smoothstep(e0, e1, v) where(cond, a, b)` |
+
+Examples: `0.3*r + 0.59*g + 0.11*b` (grey), `1 - r` (invert), `r if r > 0.5 else 0` (keep bright
+reds), `g * smoothstep(0, 1, x)` (fade in from the left), `0.5 + 0.5*sin(x * pi * 10)` (stripes).
+Results outside 0–1 are clipped; division by zero gives 0. A mistake shows a message on the step,
+for example "red formula: unknown name 'q'". Formulas are at most 200 characters and only run on the
+server through a checker that allows the items above, nothing else.
 
 ### My filters (reusable filters)
 Save a pipeline as your own filter and use it as one step in other pipelines. You need to be signed in.

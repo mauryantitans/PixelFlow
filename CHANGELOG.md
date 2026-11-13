@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### ✨ Added
+- **Expression** (Custom → Formulas): write a formula for each colour channel, e.g.
+  `0.3*r + 0.59*g + 0.11*b`, with the pixel's position (`x`, `y`), luma (`l`), comparisons,
+  `a if c else b` and functions such as `clamp`, `mix`, `smoothstep` and `where`. Evaluated on the
+  server by a whitelist checker over NumPy (never `eval`); mistakes show as a message on the step.
+  Ten presets (Invert, Grayscale, Sepia, Vignette, Solarize, ...) and an Amount blend.
+- **Operation presets**: an operation can offer *Start from a preset*, which sets several
+  parameters at once as a single undo step (`presets` in the operations schema).
+
+### 🐛 Fixed
+- The accessibility audit restores the viewport after each Lighthouse snapshot, so CI on
+  Chrome 157 checks the page at the intended width.
+
+---
+
 ## [1.2.0] - 2026-11-12
 
 Everything since 1.1.0. It was built in three stages, listed newest first:

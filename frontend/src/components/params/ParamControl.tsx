@@ -185,7 +185,11 @@ const ParamControl: React.FC<ParamControlProps> = ({ spec, value, stepId, contro
           value={String(value ?? spec.default ?? '')}
           maxLength={spec.max_length ?? 80}
           onChange={(e) => onChange(e.target.value)}
-          className="input-field"
+          className={spec.code ? 'input-field font-mono text-sm' : 'input-field'}
+          {...(spec.code
+            ? { spellCheck: false, autoCapitalize: 'off', autoCorrect: 'off', autoComplete: 'off' }
+            : {})}
+          aria-describedby={spec.code && controlId ? `${stepId}-code-help` : undefined}
         />
       );
 

@@ -12,7 +12,7 @@ def test_slugify():
 def test_all_builtins_registered():
     ops = registry.all()
     # 53 built-ins + 2 interactive + 10 extras (batch 1) + 12 extras2 (batch 2)
-    assert len(ops) == 79  # 77 built-in + Custom Kernel + Custom Filter
+    assert len(ops) == 80  # 77 built-in + Custom Kernel + Expression + Custom Filter
 
 
 def test_resolve_by_id_label_and_alias():

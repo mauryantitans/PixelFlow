@@ -14,6 +14,8 @@ interface PipelineStepProps {
   onToggle?: () => void;
   onMove: (fromIndex: number, toIndex: number) => void;
   onParameterChange: (stepId: string, paramName: string, value: any) => void;
+  /** Apply one of the operation's presets (several params in one undo step). */
+  onApplyPreset?: (stepId: string, params: Record<string, any>) => void;
   onPreview: () => void;
   isViewing: boolean;
   stepTiming?: { duration: number; isAverage?: boolean };
@@ -29,6 +31,7 @@ const PipelineStepComponent: React.FC<PipelineStepProps> = ({
   onToggle,
   onMove,
   onParameterChange,
+  onApplyPreset,
   onPreview,
   isViewing,
   stepTiming,
@@ -152,6 +155,31 @@ const PipelineStepComponent: React.FC<PipelineStepProps> = ({
         {/* Parameters (rendered dynamically from the operation schema) */}
         {op && op.params.length > 0 && (
           <div className={`space-y-2 ${enabled ? '' : 'opacity-60'}`}>
+            {op.presets && op.presets.length > 0 && onApplyPreset && (
+              <div>
+                <label htmlFor={`${step.id}-preset`} className="text-xs text-gray-600 dark:text-gray-400 block mb-1">
+                  Start from a preset
+                </label>
+                <select
+                  id={`${step.id}-preset`}
+                  value=""
+                  onChange={(e) => {
+                    const preset = op.presets?.[Number(e.target.value)];
+                    if (preset) onApplyPreset(step.id, preset.params);
+                  }}
+                  className="input-field"
+                >
+                  <option value="" disabled>
+                    Choose a preset…
+                  </option>
+                  {op.presets.map((p, i) => (
+                    <option key={p.label} value={i}>
+                      {p.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
             {op.params.map((param) => {
               const controlId = `${step.id}-${param.name}`;
               // bool controls carry their own <label>; coordinate pickers have no
@@ -179,6 +207,16 @@ const PipelineStepComponent: React.FC<PipelineStepProps> = ({
                 </div>
               );
             })}
+            {(() => {
+              // Formula fields share one reference, shown once per step.
+              const help = op.params.find((p) => p.code && p.help)?.help;
+              return help ? (
+                <details className="text-xs text-gray-700 dark:text-gray-300">
+                  <summary className="cursor-pointer text-gray-600 dark:text-gray-400">Formula reference</summary>
+                  <p id={`${step.id}-code-help`} className="mt-1 leading-relaxed">{help}</p>
+                </details>
+              ) : null;
+            })()}
           </div>
         )}
 

@@ -37,6 +37,9 @@ class OperationSpec:
     #: Resolvable and executable, but not listed in the palette (e.g. the
     #: "Custom Filter" step, which is added from a saved filter, not clicked).
     hidden: bool = False
+    #: Starting points the UI offers for the whole step:
+    #: ``[{"label": str, "params": {name: value, ...}}]``. Choosing one sets those params.
+    presets: list[dict] = field(default_factory=list)
 
     @property
     def interactive(self) -> bool:
@@ -52,6 +55,7 @@ class OperationSpec:
             "description": self.description,
             "interactive": self.interactive,
             "hidden": self.hidden,
+            "presets": self.presets,
             "params": [p.schema() for p in self.params],
         }
 
